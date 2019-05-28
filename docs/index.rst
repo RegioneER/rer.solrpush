@@ -1,0 +1,5 @@
+============
+rer.solrpush
+============
+
+User documentation
