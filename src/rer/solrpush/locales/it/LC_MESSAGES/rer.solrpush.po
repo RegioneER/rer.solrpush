@@ -1,6 +1,3 @@
-# --- PLEASE EDIT THE LINES BELOW CORRECTLY ---
-# SOME DESCRIPTIVE TITLE.
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
@@ -15,41 +12,41 @@ msgstr ""
 "Language-Code: en\n"
 "Language-Name: English\n"
 "Preferred-Encodings: utf-8 latin1\n"
-"Domain: rer.solrpush\n"
+"Domain: DOMAIN\n"
 
 #: ../browser/controlpanel.py:16
 msgid "Connection"
-msgstr ""
+msgstr "Connessione"
 
 #: ../configure.zcml:29
 msgid "Installs the rer.solrpush add-on."
-msgstr ""
+msgstr "Installa l'add-on rer.solrpush."
 
 #: ../browser/controlpanel.py:24
 msgid "Solr Push Configuration"
-msgstr ""
+msgstr "Configurazione Solr Push"
 
 #: ../interfaces.py:20
 msgid "The SOLR URL to connect to"
-msgstr ""
+msgstr "L'URL di SOLR a cui connettersi"
 
 #: ../interfaces.py:19
 msgid "URL SOLR"
-msgstr ""
+msgstr "SOLR URL"
 
 #: ../configure.zcml:38
 msgid "Uninstalls the rer.solrpush add-on."
-msgstr ""
+msgstr "Disinstalla l'add-on rer.solrpush."
 
 #. Default: "Select a list of portal types to index in solr."
 #: ../interfaces.py:26
 msgid "enabled_types_help"
-msgstr ""
+msgstr "Scegli i tipi di contenuto da indicizzare su SOLR"
 
 #. Default: "Enabled portal types"
 #: ../interfaces.py:24
 msgid "enabled_types_label"
-msgstr ""
+msgstr "Tipo di contenuto"
 
 #: ../configure.zcml:29
 msgid "rer.solrpush"

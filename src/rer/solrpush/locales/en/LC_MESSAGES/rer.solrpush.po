@@ -1,0 +1,57 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"POT-Creation-Date: 2019-06-06 14:26+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI +ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0\n"
+"Language-Code: en\n"
+"Language-Name: English\n"
+"Preferred-Encodings: utf-8 latin1\n"
+"Domain: DOMAIN\n"
+
+#: ../browser/controlpanel.py:16
+msgid "Connection"
+msgstr ""
+
+#: ../configure.zcml:29
+msgid "Installs the rer.solrpush add-on."
+msgstr ""
+
+#: ../browser/controlpanel.py:24
+msgid "Solr Push Configuration"
+msgstr ""
+
+#: ../interfaces.py:20
+msgid "The SOLR URL to connect to"
+msgstr ""
+
+#: ../interfaces.py:19
+msgid "URL SOLR"
+msgstr ""
+
+#: ../configure.zcml:38
+msgid "Uninstalls the rer.solrpush add-on."
+msgstr ""
+
+#. Default: "Select a list of portal types to index in solr."
+#: ../interfaces.py:26
+msgid "enabled_types_help"
+msgstr ""
+
+#. Default: "Enabled portal types"
+#: ../interfaces.py:24
+msgid "enabled_types_label"
+msgstr ""
+
+#: ../configure.zcml:29
+msgid "rer.solrpush"
+msgstr ""
+
+#: ../configure.zcml:38
+msgid "rer.solrpush (uninstall)"
+msgstr ""
