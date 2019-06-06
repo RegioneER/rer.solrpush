@@ -8,10 +8,12 @@ rer.solrpush
 
 Tell me what your product does
 
-Features
---------
+Control Panel
+-------------
 
-- Can be bullet points
+- Solr URL
+- Site ID
+- Portal types da indicizzare
 
 
 Examples
