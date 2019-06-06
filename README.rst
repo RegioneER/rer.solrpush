@@ -6,7 +6,9 @@
 rer.solrpush
 ============
 
-Tell me what your product does
+Prodotto per il push delle modifiche di un sito regionale su SOLR per
+ottimizzare l'indicizzazione.
+
 
 Control Panel
 -------------
