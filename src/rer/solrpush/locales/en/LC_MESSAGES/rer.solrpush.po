@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2019-06-06 14:26+0000\n"
+"POT-Creation-Date: 2019-06-06 15:21+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI +ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -22,8 +22,16 @@ msgstr ""
 msgid "Installs the rer.solrpush add-on."
 msgstr ""
 
+#: ../interfaces.py:24
+msgid "Site ID"
+msgstr ""
+
 #: ../browser/controlpanel.py:24
 msgid "Solr Push Configuration"
+msgstr ""
+
+#: ../interfaces.py:25
+msgid "The ID for the website"
 msgstr ""
 
 #: ../interfaces.py:20
@@ -39,12 +47,12 @@ msgid "Uninstalls the rer.solrpush add-on."
 msgstr ""
 
 #. Default: "Select a list of portal types to index in solr."
-#: ../interfaces.py:26
+#: ../interfaces.py:31
 msgid "enabled_types_help"
 msgstr ""
 
 #. Default: "Enabled portal types"
-#: ../interfaces.py:24
+#: ../interfaces.py:29
 msgid "enabled_types_label"
 msgstr ""
 

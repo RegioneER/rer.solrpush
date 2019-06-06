@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2019-06-06 14:26+0000\n"
+"POT-Creation-Date: 2019-06-06 15:21+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI +ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -22,9 +22,17 @@ msgstr "Connessione"
 msgid "Installs the rer.solrpush add-on."
 msgstr "Installa l'add-on rer.solrpush."
 
+#: ../interfaces.py:24
+msgid "Site ID"
+msgstr "Site ID"
+
 #: ../browser/controlpanel.py:24
 msgid "Solr Push Configuration"
 msgstr "Configurazione Solr Push"
+
+#: ../interfaces.py:25
+msgid "The ID for the website"
+msgstr "L'id del sito"
 
 #: ../interfaces.py:20
 msgid "The SOLR URL to connect to"
@@ -39,12 +47,12 @@ msgid "Uninstalls the rer.solrpush add-on."
 msgstr "Disinstalla l'add-on rer.solrpush."
 
 #. Default: "Select a list of portal types to index in solr."
-#: ../interfaces.py:26
+#: ../interfaces.py:31
 msgid "enabled_types_help"
 msgstr "Scegli i tipi di contenuto da indicizzare su SOLR"
 
 #. Default: "Enabled portal types"
-#: ../interfaces.py:24
+#: ../interfaces.py:29
 msgid "enabled_types_label"
 msgstr "Tipo di contenuto"
 

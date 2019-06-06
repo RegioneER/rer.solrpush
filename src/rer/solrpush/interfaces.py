@@ -18,7 +18,12 @@ class IRerSolrpushConf(Interface):
     solr_url = schema.TextLine(
         title=_(u"URL SOLR"),
         description=_(u"The SOLR URL to connect to"),
-        required=False)
+        required=True)
+
+    site_id = schema.TextLine(
+        title=_(u"Site ID"),
+        description=_(u"The ID for the website"),
+        required=True)
 
     enabled_types = schema.List(
         title=_(u'enabled_types_label',
