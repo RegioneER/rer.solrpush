@@ -12,4 +12,5 @@ def push_to_solr(item):
     Perform push to solr
     """
     serializer = getMultiAdapter((item, item.REQUEST), ISerializeToJson)
+    # TODO - push dei dati su SOLR (POST)
     logger.info(serializer())

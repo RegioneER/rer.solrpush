@@ -10,6 +10,7 @@ logger = logging.getLogger(__name__)
 
 def pushToSolr(item):
     manager = SolrPushDataManager(item=item)
+    # TODO - controllo del content type
     transaction.get().join(manager)
 
 
