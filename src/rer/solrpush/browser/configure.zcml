@@ -22,7 +22,7 @@
   <browser:page
       name="solrpush-conf"
       for="Products.CMFPlone.interfaces.IPloneSiteRoot"
-      class=".solr_conf.IRerSolrpushView"
+      class=".controlpanel.RerSolrpushView"
       permission="cmf.ManagePortal"
       />
 

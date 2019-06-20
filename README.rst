@@ -6,12 +6,16 @@
 rer.solrpush
 ============
 
-Tell me what your product does
+Prodotto per il push delle modifiche di un sito regionale su SOLR per
+ottimizzare l'indicizzazione.
 
-Features
---------
 
-- Can be bullet points
+Control Panel
+-------------
+
+- Solr URL
+- Site ID
+- Portal types da indicizzare
 
 
 Examples
