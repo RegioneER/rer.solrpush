@@ -66,7 +66,12 @@ class SolrPushDataManager(object):
     #         return self.vote(*self.args)
 
     def tpc_finish(self, txn):
-        push_to_solr(self.item)
+        try:
+            push_to_solr(self.item)
+            logger.info('TRANSAZIONE FINITA')
+        except Exception as e:
+            logger.exception(e)
+            logger.info('TRANSAZIONE FALLITA')
 
     tpc_abort = abort
 
