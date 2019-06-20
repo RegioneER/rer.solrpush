@@ -14,14 +14,14 @@
   <!--<includeDependencies package="." />-->
 
   <include package=".browser" />
-
+  <include package=".events" />
   <include file="permissions.zcml" />
 
   <include file="upgrades.zcml" />
 
   <genericsetup:registerProfile
       name="default"
-      title="rer.solrpush"
+      title="RER: Solr push"
       directory="profiles/default"
       description="Installs the rer.solrpush add-on."
       provides="Products.GenericSetup.interfaces.EXTENSION"
@@ -30,7 +30,7 @@
 
   <genericsetup:registerProfile
       name="uninstall"
-      title="rer.solrpush (uninstall)"
+      title="RER: Solr push (uninstall)"
       directory="profiles/uninstall"
       description="Uninstalls the rer.solrpush add-on."
       provides="Products.GenericSetup.interfaces.EXTENSION"
@@ -42,6 +42,7 @@
       name="rer.solrpush-hiddenprofiles"
       />
 
-  <!-- -*- extra stuff goes here -*- -->
+  <!-- <adapter
+        factory=".push.SolrPushDataManager" /> -->
 
 </configure>

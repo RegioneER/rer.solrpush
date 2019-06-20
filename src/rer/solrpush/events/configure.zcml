@@ -1,0 +1,50 @@
+<configure
+    xmlns="http://namespaces.zope.org/zope"
+    xmlns:five="http://namespaces.zope.org/five"
+    xmlns:zcml="http://namespaces.zope.org/zcml"
+    i18n_domain="rer.solrpush">
+
+    <subscriber
+        handler=".subscribers.objectAdded"
+        for="plone.dexterity.interfaces.IDexterityItem
+             zope.lifecycleevent.interfaces.IObjectAddedEvent"
+        trusted="y" />
+
+    <subscriber
+        handler=".subscribers.objectModified"
+        for="plone.dexterity.interfaces.IDexterityItem
+             zope.lifecycleevent.interfaces.IObjectModifiedEvent"
+        trusted="y" />
+
+    <subscriber
+        handler=".subscribers.objectCopied"
+        for="plone.dexterity.interfaces.IDexterityItem
+             zope.lifecycleevent.interfaces.IObjectCopiedEvent"
+        trusted="y" />
+
+    <subscriber
+        handler=".subscribers.objectRemoved"
+        for="plone.dexterity.interfaces.IDexterityItem
+             zope.lifecycleevent.interfaces.IObjectRemovedEvent"
+        trusted="y" />
+
+    <subscriber
+        handler=".subscribers.objectMoved"
+        for="plone.dexterity.interfaces.IDexterityItem
+             zope.lifecycleevent.interfaces.IObjectMovedEvent"
+        trusted="y" />
+
+    <subscriber
+        handler=".subscribers.dispatchObjectMovedEvent"
+        for="plone.dexterity.interfaces.IDexterityItem
+             OFS.interfaces.IItem
+             zope.lifecycleevent.interfaces.IObjectMovedEvent"
+        trusted="y" />
+
+    <subscriber
+        handler=".subscribers.objectTransitioned"
+        for="plone.dexterity.interfaces.IDexterityItem
+             Products.DCWorkflow.interfaces.IAfterTransitionEvent"
+        trusted="y" />
+  
+</configure>
