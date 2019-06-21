@@ -24,6 +24,8 @@ def push_to_solr(item):
     ) or api.portal.get().id
 
     serializer = getMultiAdapter((item, item.REQUEST), ISerializeToJson)
+
     # TODO - push dei dati su SOLR (POST)
+    import pdb; pdb.set_trace()
     logger.info("***ESEGUITO IL PUSH!***")  # TODO rimuovere riga
     logger.info(serializer())

@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from plone import api
+from rer.solrpush.solr_schema import schema_conf
 from rer.solrpush.data_manager import SolrPushDataManager
 
 import logging
@@ -19,10 +20,11 @@ def pushToSolr(item):
         'rer.solrpush.interfaces.IRerSolrpushSettings.enabled_types'
     )
 
+    # No need to add the manager if we don't have to index this type of item
     if item.portal_type in enabled_types:
-        # No need to add the manager to the transaction if we don't have to
-        # index this type of item
-        transaction.get().join(manager)
+        logger.info(schema_conf.is_ready())
+        if schema_conf.is_ready():
+            transaction.get().join(manager)
 
 
 def objectAdded(item, ev):
