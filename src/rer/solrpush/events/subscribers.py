@@ -20,6 +20,8 @@ def pushToSolr(item):
     )
 
     if item.portal_type in enabled_types:
+        # No need to add the manager to the transaction if we don't have to
+        # index this type of item
         transaction.get().join(manager)
 
 
