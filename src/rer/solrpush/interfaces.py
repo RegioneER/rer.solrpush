@@ -1,13 +1,10 @@
 # -*- coding: utf-8 -*-
 """Module where all interfaces, events and exceptions live."""
 
-from plone.autoform import directives
 from rer.solrpush import _
 from zope import schema
 from plone.supermodel import model
-from zope.interface import Interface
 from zope.publisher.interfaces.browser import IDefaultBrowserLayer
-from plone.app.registry.browser import controlpanel
 
 
 class IRerSolrpushLayer(IDefaultBrowserLayer):
