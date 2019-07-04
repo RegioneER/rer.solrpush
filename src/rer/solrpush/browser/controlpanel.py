@@ -23,6 +23,14 @@ class RerSolrpushEditForm(RegistryEditForm):
     groups = (FormConfConnessione, )
     label = _(u"Solr Push Configuration")
 
+    def updateFields(self):
+        super(RerSolrpushEditForm, self).updateFields()
+        self.groups[0].fields = self.groups[0].fields.select(
+            'solr_url',
+            'site_id',
+            'enabled_types'
+        )
+
 
 class RerSolrpushView(ControlPanelFormWrapper):
     form = RerSolrpushEditForm
