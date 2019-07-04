@@ -26,6 +26,7 @@ class RerSolrpushEditForm(RegistryEditForm):
     def updateFields(self):
         super(RerSolrpushEditForm, self).updateFields()
         self.groups[0].fields = self.groups[0].fields.select(
+            'active',
             'solr_url',
             'site_id',
             'enabled_types'

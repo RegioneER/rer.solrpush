@@ -18,6 +18,13 @@ class IRerSolrpushConf(model.Schema):
     """
     """
 
+    active = schema.Bool(
+        title=_(u"Active"),
+        description=_(u"SOLR push indexing activation"),
+        required=False,
+        default=False,
+    )
+
     solr_url = schema.TextLine(
         title=_(u"URL SOLR"),
         description=_(u"The SOLR URL to connect to"),
