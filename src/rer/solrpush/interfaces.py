@@ -1,17 +1,20 @@
 # -*- coding: utf-8 -*-
 """Module where all interfaces, events and exceptions live."""
 
+from plone.autoform import directives
 from rer.solrpush import _
 from zope import schema
+from plone.supermodel import model
 from zope.interface import Interface
 from zope.publisher.interfaces.browser import IDefaultBrowserLayer
+from plone.app.registry.browser import controlpanel
 
 
 class IRerSolrpushLayer(IDefaultBrowserLayer):
     """Marker interface that defines a browser layer."""
 
 
-class IRerSolrpushConf(Interface):
+class IRerSolrpushConf(model.Schema):
     """
     """
 
@@ -36,6 +39,15 @@ class IRerSolrpushConf(Interface):
         value_type=schema.Choice(
             vocabulary='plone.app.vocabularies.PortalTypes',
         ),
+    )
+
+    index_fields = schema.List(
+        title=_(u'index_fields_label',
+                default=u'Fields list read from SOLR xml schema.'),
+        description=_(u'index_fields_help',
+                      default=u"DON'T CHANGE THIS MANUALLY"),
+        required=False,
+        value_type=schema.TextLine(),
     )
 
 
