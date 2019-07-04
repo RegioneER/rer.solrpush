@@ -20,7 +20,8 @@ class RerSolrpushSchemaConf(object):
 
     def init(self):
         self.solr_url = api.portal.get_registry_record(
-            'rer.solrpush.interfaces.IRerSolrpushSettings.solr_url'
+            'rer.solrpush.interfaces.IRerSolrpushSettings.solr_url',
+            default=False,
         )
         self.fields = None
 
