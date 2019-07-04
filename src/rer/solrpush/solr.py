@@ -14,7 +14,8 @@ def push_to_solr(item):
     """
 
     solr_url = api.portal.get_registry_record(
-        'rer.solrpush.interfaces.IRerSolrpushSettings.solr_url'
+        'rer.solrpush.interfaces.IRerSolrpushSettings.solr_url',
+        default=False,
     )
 
     # CHECK: Se il site_id resta obbligatorio nella configurazione del prodotto
