@@ -46,7 +46,7 @@ class IRerSolrpushConf(model.Schema):
     )
 
     # questo campo è la lista dei field letti direttamente dall'xml di solr
-    # NASCOSTO DAL PANNELLO DI CONTROLLO
+    # NASCOSTO DAL PANNELLO DI CONTROLLO (vedi: browser/controlpanel.py)
     index_fields = schema.List(
         title=_(u'index_fields_label',
                 default=u'Fields list read from SOLR xml schema.'),
@@ -54,6 +54,14 @@ class IRerSolrpushConf(model.Schema):
                       default=u"DON'T CHANGE THIS MANUALLY"),
         required=False,
         value_type=schema.TextLine(),
+    )
+
+    # NASCOSTO DAL PANNELLO DI CONTROLLO (vedi: browser/controlpanel.py)
+    ready = schema.Bool(
+        title=_(u"Ready"),
+        description=_(u"SOLR push is ready to be used"),
+        required=False,
+        default=False,
     )
 
 
