@@ -23,12 +23,16 @@ def init_solr_push(solr_url):
     :rtype: String
     """
 
-    print solr_url
-
     if solr_url:
         if not solr_url.endswith("/"):
             solr_url = solr_url + "/"
-        respo = requests.get(solr_url + 'admin/file?file=schema.xml')
+        try:
+            respo = requests.get(solr_url + 'admin/file?file=schema.xml')
+        except requests.exceptions.RequestException as err:
+            ErrorMessage = "Connection problem:\n{0}".format(
+                err,
+            )
+            return ErrorMessage
         if respo.status_code != 200:
             ErrorMessage = "Problems fetching schema:\n{0}\n{1}".format(
                 respo.status_code,

@@ -39,6 +39,9 @@ Caricamento schema.xml
 I campi da indicizzare su SOLR li leggiamo direttamente dal file `schema.xml`
 che SOLR stesso espone (ed è proprio il suo file di configurazione).
 
+Dopo aver inserito l'url di SOLR (e aver salvato il form), cliccare sul
+bottone "Load schema.xml".
+
 Le logiche di questo caricamento e parsing dell'xml sono all'interno del form
 del pannello di controllo del prodotto (`RerSolrpushEditForm`).
 Non le abbiamo messe in altri punti del transaction manager che andiamo ad
