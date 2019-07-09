@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+# from DateTime import DateTime
+from datetime import datetime
 from lxml import etree
 from plone import api
 from plone.restapi.interfaces import ISerializeToJson
@@ -6,10 +8,42 @@ from rer.solrpush import _
 from zope.component import getMultiAdapter
 
 import logging
+import pysolr
 import requests
 
-
 logger = logging.getLogger(__name__)
+
+
+# def parseDate(value):
+#     """ Presa da collective.solr :)
+#
+#     Use `DateTime` to parse a date, but take care of solr 1.4
+#         stripping away leading zeros for the year representation
+#     """
+#     if value.find('-') < 4:
+#         year, rest = value.split('-', 1)
+#         value = '%04d-%s' % (int(year), rest)
+#     return DateTime(value)
+
+
+def parse_date_as_datetime(value):
+    """ Sistemiamo le date
+    """
+    if value:
+        if value.find('-') < 4:
+            year, rest = value.split('-', 1)
+            value = '%04d-%s' % (int(year), rest)
+        if value.endswith('00:00'):
+            value = value[:-6]
+            value += "Z"
+        format = '%Y-%m-%dT%H:%M:%S'
+        if '.' in value:
+            format += '.%fZ'
+        else:
+            format += 'Z'
+
+        return datetime.strptime(value, format)
+    return value
 
 
 def init_solr_push(solr_url):
@@ -61,6 +95,26 @@ def init_solr_push(solr_url):
     return _("No SOLR url provided")
 
 
+def create_index_dict(serialized, index_fields):
+    """ Restituisce un dizionario pronto per essere 'mandato' a SOLR per
+    l'indicizzazione.
+    """
+
+    ascii_fields = [field.encode('ascii') for field in index_fields]
+    date_fields = ['created', 'modified', 'effective']
+
+    index_me = {}
+
+    for field in ascii_fields:
+        if field in date_fields:
+            index_me[field] = parse_date_as_datetime(serialized.get(field))
+            print("\n\n{}\n\n".format(parse_date_as_datetime(serialized.get(field))))  # noqa TODO togliere
+        else:
+            index_me[field] = serialized.get(field) or serialized.get(field.lower())  # noqa
+
+    return index_me
+
+
 def push_to_solr(item):
     """
     Perform push to solr
@@ -82,7 +136,24 @@ def push_to_solr(item):
 
     serializer = getMultiAdapter((item, item.REQUEST), ISerializeToJson)
 
+    solr_url = api.portal.get_registry_record(
+        'rer.solrpush.interfaces.IRerSolrpushSettings.solr_url',
+        default=False,
+    )
+
+    index_fields = api.portal.get_registry_record(
+        'rer.solrpush.interfaces.IRerSolrpushSettings.index_fields',
+        default=False,
+    )
+
     # TODO - push dei dati su SOLR (POST)
-    import pdb; pdb.set_trace()
-    logger.info("***ESEGUITO IL PUSH!***")  # TODO rimuovere riga
-    logger.info(serializer())
+    index_me = create_index_dict(serializer(), index_fields)
+
+    solr = pysolr.Solr(solr_url, always_commit=True)
+    try:
+        solr.add([index_me])
+        logger.info("***ESEGUITO IL PUSH!***")  # TODO rimuovere riga
+    except pysolr.SolrError as err:
+        logger.error(err)
+
+    logger.info(serializer())  # TODO rimuovere riga
