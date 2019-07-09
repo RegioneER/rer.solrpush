@@ -33,6 +33,19 @@ di controllo in modo che non vengano modificati per sbaglio.
   regionale
 
 
+Caricamento schema.xml
+''''''''''''''''''''''
+
+I campi da indicizzare su SOLR li leggiamo direttamente dal file `schema.xml`
+che SOLR stesso espone (ed è proprio il suo file di configurazione).
+
+Le logiche di questo caricamento e parsing dell'xml sono all'interno del form
+del pannello di controllo del prodotto (`RerSolrpushEditForm`).
+Non le abbiamo messe in altri punti del transaction manager che andiamo ad
+aggiungere perchè altrimenti ci saremmo ritrovati *nel mezzo* di una transazione
+e non avremmo potuto apportare modifiche al registry.
+
+
 Examples
 --------
 
