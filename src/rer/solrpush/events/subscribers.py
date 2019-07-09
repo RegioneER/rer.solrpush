@@ -26,12 +26,18 @@ def pushToSolr(item):
             default=False,
         )
 
-        # Don't add the manager if we don't have to index this type of item
-        if enabled_types:
+        active = api.portal.get_registry_record(
+            'rer.solrpush.interfaces.IRerSolrpushSettings.active',
+            default=False,
+        )
+
+        print enabled_types  # TODO eliminare
+        print active  # TODO eliminare
+
+        # Don't add the manager if we don't have to index this type of item.
+        if enabled_types and active:
             if item.portal_type in enabled_types:
-                logger.info(schema_conf.is_ready())
-                if schema_conf.is_ready():
-                    transaction.get().join(manager)
+                transaction.get().join(manager)
 
 
 def objectAdded(item, ev):
