@@ -13,9 +13,37 @@ ottimizzare l'indicizzazione.
 Control Panel
 -------------
 
-- Solr URL
+- Active: specifica se il push deve essere effettuato
+- Solr URL: l'indirizzo a cui connettersi a SOLR
 - Site ID
 - Portal types da indicizzare
+
+
+Campi del registro nascosti
+'''''''''''''''''''''''''''
+
+Ci sono degli altri campi del registro che però non sono visibili dal pannello
+di controllo in modo che non vengano modificati per sbaglio.
+
+- ready: un flag che specifica se il prodotto è pronto/inizializzato ed è
+  usabile. Principalmente segnala se lo schema.xml è stato caricato da SOLR ed
+  è stato parsato
+- index_fields: è una lista di stringhe dei vari field/attributi da indicizzare.
+  Questa lista viene popolata leggendo direttamente il file schema.xml del solr
+  regionale
+
+
+Caricamento schema.xml
+''''''''''''''''''''''
+
+I campi da indicizzare su SOLR li leggiamo direttamente dal file `schema.xml`
+che SOLR stesso espone (ed è proprio il suo file di configurazione).
+
+Le logiche di questo caricamento e parsing dell'xml sono all'interno del form
+del pannello di controllo del prodotto (`RerSolrpushEditForm`).
+Non le abbiamo messe in altri punti del transaction manager che andiamo ad
+aggiungere perchè altrimenti ci saremmo ritrovati *nel mezzo* di una transazione
+e non avremmo potuto apportare modifiche al registry.
 
 
 Examples

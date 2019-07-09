@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 from plone import api
+from Products.CMFPlone.utils import get_installer
 from rer.solrpush.data_manager import SolrPushDataManager
+from rer.solrpush.solr_schema import schema_conf
+
 
 import logging
 import transaction
@@ -13,16 +16,28 @@ def pushToSolr(item):
     """
     Checks before the real push
     """
-    manager = SolrPushDataManager(item=item)
+    qi = get_installer(api.portal.get())
 
-    enabled_types = api.portal.get_registry_record(
-        'rer.solrpush.interfaces.IRerSolrpushSettings.enabled_types'
-    )
+    if qi.is_product_installed('rer.solrpush'):
+        manager = SolrPushDataManager(item=item)
 
-    if item.portal_type in enabled_types:
-        # No need to add the manager to the transaction if we don't have to
-        # index this type of item
-        transaction.get().join(manager)
+        enabled_types = api.portal.get_registry_record(
+            'rer.solrpush.interfaces.IRerSolrpushSettings.enabled_types',
+            default=False,
+        )
+
+        active = api.portal.get_registry_record(
+            'rer.solrpush.interfaces.IRerSolrpushSettings.active',
+            default=False,
+        )
+
+        print enabled_types  # TODO eliminare
+        print active  # TODO eliminare
+
+        # Don't add the manager if we don't have to index this type of item.
+        if enabled_types and active:
+            if item.portal_type in enabled_types:
+                transaction.get().join(manager)
 
 
 def objectAdded(item, ev):
