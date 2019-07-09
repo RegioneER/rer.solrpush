@@ -74,7 +74,7 @@ class RerSolrpushEditForm(RegistryEditForm):
 
         if errors:
             api.portal.show_message(
-                message= ErrorMessage,
+                message=ErrorMessage,
                 request=self.request,
                 type='error',
             )
