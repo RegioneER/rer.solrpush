@@ -12,71 +12,65 @@ import transaction
 logger = logging.getLogger(__name__)
 
 
-def pushToSolr(item):
+def pushToSolr(item, ev):
     """
     Checks before the real push
+
+    Se non sono specificati gli enabled_types, allora mettiamo il manager
+    a tutti.
     """
-    qi = get_installer(api.portal.get())
 
-    if qi.is_product_installed('rer.solrpush'):
-        manager = SolrPushDataManager(item=item)
+    enabled_types = api.portal.get_registry_record(
+        'rer.solrpush.interfaces.IRerSolrpushSettings.enabled_types',
+        default=False,
+    )
 
-        enabled_types = api.portal.get_registry_record(
-            'rer.solrpush.interfaces.IRerSolrpushSettings.enabled_types',
-            default=False,
-        )
+    active = api.portal.get_registry_record(
+        'rer.solrpush.interfaces.IRerSolrpushSettings.active',
+        default=False,
+    )
 
-        active = api.portal.get_registry_record(
-            'rer.solrpush.interfaces.IRerSolrpushSettings.active',
-            default=False,
-        )
+    # Don't add the manager if we don't have to index this type of item.
+    if not active:
+        return
 
-        print enabled_types  # TODO eliminare
-        print active  # TODO eliminare
+    if enabled_types and item.portal_type not in enabled_types:
+        return
 
-        # Don't add the manager if we don't have to index this type of item.
-        if enabled_types and active:
-            if item.portal_type in enabled_types:
-                transaction.get().join(manager)
+    manager = SolrPushDataManager(item=item)
+    transaction.get().join(manager)
 
 
 def objectAdded(item, ev):
     logger.info("objectAdded")
-    logger.info(ev)
     pushToSolr(item)
 
 
 def objectModified(item, ev):
     logger.info("objectModified")
-    logger.info(ev)
     pushToSolr(item)
 
 
 def objectCopied(item, ev):
     logger.info("objectCopied")
-    logger.info(ev)
     pushToSolr(item)
 
 
 def objectRemoved(item, ev):
     logger.info("objectRemoved")
-    logger.info(ev)
     pushToSolr(item)
 
 
 def objectMoved(item, ev):
     logger.info("objectMoved")
-    logger.info(ev)
     pushToSolr(item)
 
 
 def dispatchObjectMovedEvent(item, ev):
     logger.info("dispatchObjectMovedEvent")
-    logger.info(ev)
     pushToSolr(item)
 
 
 def objectTransitioned(item, ev):
     logger.info("objectTransitioned")
-    logger.info(ev)
     pushToSolr(item)
