@@ -27,9 +27,9 @@ class IRerSolrpushConf(model.Schema):
         description=_(u"The SOLR URL to connect to"),
         required=True)
 
-    site_id = schema.TextLine(
-        title=_(u"Site ID"),
-        description=_(u"The ID for the website"),
+    frontend_url = schema.TextLine(
+        title=_(u"Frontend url"),
+        description=_(u"If the website has different URL for frontend users"),
         required=True)
 
     enabled_types = schema.List(
@@ -46,7 +46,7 @@ class IRerSolrpushConf(model.Schema):
     )
 
     # questo campo è la lista dei field letti direttamente dall'xml di solr
-    # NASCOSTO DAL PANNELLO DI CONTROLLO (vedi: browser/controlpanel.py)
+    # TODO - rendere questo campo "read only" nel pannello
     index_fields = schema.List(
         title=_(u'index_fields_label',
                 default=u'Fields list read from SOLR xml schema.'),
