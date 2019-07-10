@@ -5,46 +5,46 @@
     i18n_domain="rer.solrpush">
 
     <subscriber
-        handler=".subscribers.objectAdded"
+        handler=".subscribers.pushToSolr"
         for="plone.dexterity.interfaces.IDexterityItem
              zope.lifecycleevent.interfaces.IObjectAddedEvent"
         trusted="y" />
 
     <subscriber
-        handler=".subscribers.objectModified"
+        handler=".subscribers.pushToSolr"
         for="plone.dexterity.interfaces.IDexterityItem
              zope.lifecycleevent.interfaces.IObjectModifiedEvent"
         trusted="y" />
 
     <subscriber
-        handler=".subscribers.objectCopied"
+        handler=".subscribers.pushToSolr"
         for="plone.dexterity.interfaces.IDexterityItem
              zope.lifecycleevent.interfaces.IObjectCopiedEvent"
         trusted="y" />
 
     <subscriber
-        handler=".subscribers.objectRemoved"
+        handler=".subscribers.pushToSolr"
         for="plone.dexterity.interfaces.IDexterityItem
              zope.lifecycleevent.interfaces.IObjectRemovedEvent"
         trusted="y" />
 
     <subscriber
-        handler=".subscribers.objectMoved"
+        handler=".subscribers.pushToSolr"
         for="plone.dexterity.interfaces.IDexterityItem
              zope.lifecycleevent.interfaces.IObjectMovedEvent"
         trusted="y" />
 
     <subscriber
-        handler=".subscribers.dispatchObjectMovedEvent"
+        handler=".subscribers.pushToSolr"
         for="plone.dexterity.interfaces.IDexterityItem
              OFS.interfaces.IItem
              zope.lifecycleevent.interfaces.IObjectMovedEvent"
         trusted="y" />
 
     <subscriber
-        handler=".subscribers.objectTransitioned"
+        handler=".subscribers.pushToSolr"
         for="plone.dexterity.interfaces.IDexterityItem
              Products.DCWorkflow.interfaces.IAfterTransitionEvent"
         trusted="y" />
-  
+
 </configure>
