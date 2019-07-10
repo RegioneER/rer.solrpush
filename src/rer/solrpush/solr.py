@@ -119,11 +119,7 @@ def push_to_solr(item):
         init_solr_push()  # TODO - no, sono dentro alla transazione
 
     # TODO - cambiare questo pezzo vecchio. Non si usa più il site id così.
-    # CHECK: Se il site_id resta obbligatorio nella configurazione del prodotto
-    # allora non c'è bisogno di fare questo 'or'
-    site_id = api.portal.get_registry_record(
-        'rer.solrpush.interfaces.IRerSolrpushSettings.site_id'
-    ) or api.portal.get().id
+    site_id = api.portal.get().id
 
     serializer = getMultiAdapter((item, item.REQUEST), ISerializeToJson)
 
