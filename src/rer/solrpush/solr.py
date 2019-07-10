@@ -17,12 +17,14 @@ logger = logging.getLogger(__name__)
 def parse_date_as_datetime(value):
     """ Sistemiamo le date
     """
+
     if value:
         if value.find('-') < 4:
             year, rest = value.split('-', 1)
             value = '%04d-%s' % (int(year), rest)
         if value.endswith('00:00'):
             value = value[:-6]
+        if not value.endswith('Z'):
             value += "Z"
         format = '%Y-%m-%dT%H:%M:%S'
         if '.' in value:
