@@ -1,11 +1,10 @@
 # -*- coding: utf-8 -*-
-# from DateTime import DateTime
-from datetime import datetime
+from DateTime import DateTime
 from lxml import etree
 from plone import api
-from plone.restapi.interfaces import ISerializeToJson
+from plone.indexer.interfaces import IIndexableObject
 from rer.solrpush import _
-from zope.component import getMultiAdapter
+from zope.component import queryMultiAdapter
 
 import logging
 import pysolr
@@ -13,27 +12,26 @@ import requests
 
 logger = logging.getLogger(__name__)
 
+DATE_FIELDS = [
+    'created',
+    'modified',
+    'effective',
+    'ModificationDate',
+    'CreationDate',
+]
+
 
 def parse_date_as_datetime(value):
     """ Sistemiamo le date
     """
-
     if value:
-        if value.find('-') < 4:
-            year, rest = value.split('-', 1)
-            value = '%04d-%s' % (int(year), rest)
-        if value.endswith('00:00'):
-            value = value[:-6]
-        if not value.endswith('Z'):
-            value += "Z"
         format = '%Y-%m-%dT%H:%M:%S'
-        if '.' in value:
-            format += '.%fZ'
-        else:
-            format += 'Z'
-
-        return datetime.strptime(value, format)
+        return value.asdatetime().strftime(format) + 'Z'
     return value
+
+
+def parse_date_str(value):
+    return parse_date_as_datetime(DateTime(value))
 
 
 def init_solr_push(solr_url):
@@ -53,21 +51,17 @@ def init_solr_push(solr_url):
         try:
             respo = requests.get(solr_url + 'admin/file?file=schema.xml')
         except requests.exceptions.RequestException as err:
-            ErrorMessage = "Connection problem:\n{0}".format(
-                err,
-            )
+            ErrorMessage = "Connection problem:\n{0}".format(err)
             return ErrorMessage
         if respo.status_code != 200:
             ErrorMessage = "Problems fetching schema:\n{0}\n{1}".format(
-                respo.status_code,
-                respo.reason,
+                respo.status_code, respo.reason
             )
             return ErrorMessage
 
         root = etree.fromstring(respo.content)
         chosen_fields = [
-            unicode(x.get("name"))
-            for x in root.findall(".//field")
+            unicode(x.get("name")) for x in root.findall(".//field")
         ]
 
         api.portal.set_registry_record(
@@ -76,8 +70,7 @@ def init_solr_push(solr_url):
         )
 
         api.portal.set_registry_record(
-            'rer.solrpush.interfaces.IRerSolrpushSettings.ready',
-            True,
+            'rer.solrpush.interfaces.IRerSolrpushSettings.ready', True
         )
 
         return ""
@@ -85,22 +78,37 @@ def init_solr_push(solr_url):
     return _("No SOLR url provided")
 
 
-def create_index_dict(serialized, index_fields):
+def create_index_dict(item):
     """ Restituisce un dizionario pronto per essere 'mandato' a SOLR per
     l'indicizzazione.
     """
 
+    index_fields = api.portal.get_registry_record(
+        'rer.solrpush.interfaces.IRerSolrpushSettings.index_fields',
+        default=False,
+    )
+
     ascii_fields = [field.encode('ascii') for field in index_fields]
-    date_fields = ['created', 'modified', 'effective']
+
+    catalog = api.portal.get_tool(name="portal_catalog")
+    adapter = queryMultiAdapter((item, catalog), IIndexableObject)
 
     index_me = {}
 
     for field in ascii_fields:
-        if field in date_fields:
-            index_me[field] = parse_date_as_datetime(serialized.get(field))
-            print("\n\n{}\n\n".format(parse_date_as_datetime(serialized.get(field))))  # noqa TODO togliere
+
+        value = getattr(adapter, field, None)
+        if not value:
+            continue
+        if callable(value):
+            value = value()
+
+        if isinstance(value, DateTime):
+            value = parse_date_as_datetime(value)
         else:
-            index_me[field] = serialized.get(field) or serialized.get(field.lower())  # noqa
+            if field in DATE_FIELDS:
+                value = parse_date_str(value)
+        index_me[field] = value
 
     return index_me
 
@@ -111,35 +119,33 @@ def push_to_solr(item):
     """
 
     is_ready = api.portal.get_registry_record(
-        'rer.solrpush.interfaces.IRerSolrpushSettings.ready',
-        default=False,
+        'rer.solrpush.interfaces.IRerSolrpushSettings.ready', default=False
     )
 
     if not is_ready:
         init_solr_push()  # TODO - no, sono dentro alla transazione
 
-    # TODO - cambiare questo pezzo vecchio. Non si usa più il site id così.
-    site_id = api.portal.get().id
-
-    serializer = getMultiAdapter((item, item.REQUEST), ISerializeToJson)
-
     solr_url = api.portal.get_registry_record(
-        'rer.solrpush.interfaces.IRerSolrpushSettings.solr_url',
-        default=False,
+        'rer.solrpush.interfaces.IRerSolrpushSettings.solr_url', default=False
     )
 
-    index_fields = api.portal.get_registry_record(
-        'rer.solrpush.interfaces.IRerSolrpushSettings.index_fields',
-        default=False,
-    )
-
-    index_me = create_index_dict(serializer(), index_fields)
+    index_me = create_index_dict(item)
 
     solr = pysolr.Solr(solr_url, always_commit=True)
     try:
         solr.add([index_me])
-        logger.info("***ESEGUITO IL PUSH!***")  # TODO rimuovere riga
+        message = _(
+            'content_indexed_success',
+            default=u'Content correctly indexed on SOLR',
+        )
+        api.portal.show_message(message=message, request=item.REQUEST)
     except pysolr.SolrError as err:
         logger.error(err)
-
-    logger.info(serializer())  # TODO rimuovere riga
+        message = _(
+            'content_indexed_error',
+            default=u'There was a problem indexing this content. Please '
+            'contact site administrator.',
+        )
+        api.portal.show_message(
+            message=message, request=item.REQUEST, type='error'
+        )
