@@ -54,6 +54,7 @@ class IRerSolrpushConf(model.Schema):
                       default=u"DON'T CHANGE THIS MANUALLY"),
         required=False,
         value_type=schema.TextLine(),
+        readonly=True,
     )
 
     # NASCOSTO DAL PANNELLO DI CONTROLLO (vedi: browser/controlpanel.py)
