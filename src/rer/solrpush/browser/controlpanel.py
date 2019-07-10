@@ -40,8 +40,9 @@ class RerSolrpushEditForm(RegistryEditForm):
         self.groups[0].fields = self.groups[0].fields.select(
             'active',
             'solr_url',
-            'site_id',
-            'enabled_types'
+            'frontend_url',
+            'enabled_types',
+            'index_fields',
         )
 
     @button.buttonAndHandler(_("Save"), name=None)
