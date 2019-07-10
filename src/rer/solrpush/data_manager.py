@@ -77,9 +77,3 @@ class SolrPushDataManager(object):
 
     def savepoint(self):
         return DummySavepoint(self)
-
-
-# class SolrPushTransactionManager(object):
-#     def pushToSolr(self, item):
-#         datamanager = SolrPushDataManager(item=item)
-#         transaction.get().join(datamanager)
