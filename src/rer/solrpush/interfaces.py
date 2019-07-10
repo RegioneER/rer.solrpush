@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 """Module where all interfaces, events and exceptions live."""
 
+from plone.supermodel import model
 from rer.solrpush import _
 from zope import schema
-from plone.supermodel import model
 from zope.publisher.interfaces.browser import IDefaultBrowserLayer
 
 
@@ -30,7 +30,7 @@ class IRerSolrpushConf(model.Schema):
     frontend_url = schema.TextLine(
         title=_(u"Frontend url"),
         description=_(u"If the website has different URL for frontend users"),
-        required=True)
+        required=False)
 
     enabled_types = schema.List(
         title=_(u'enabled_types_label',
