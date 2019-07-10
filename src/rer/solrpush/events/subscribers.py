@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 from plone import api
-from Products.CMFPlone.utils import get_installer
 from rer.solrpush.data_manager import SolrPushDataManager
-from rer.solrpush.solr_schema import schema_conf
 
 
 import logging
