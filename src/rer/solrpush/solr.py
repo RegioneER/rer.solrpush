@@ -14,18 +14,6 @@ import requests
 logger = logging.getLogger(__name__)
 
 
-# def parseDate(value):
-#     """ Presa da collective.solr :)
-#
-#     Use `DateTime` to parse a date, but take care of solr 1.4
-#         stripping away leading zeros for the year representation
-#     """
-#     if value.find('-') < 4:
-#         year, rest = value.split('-', 1)
-#         value = '%04d-%s' % (int(year), rest)
-#     return DateTime(value)
-
-
 def parse_date_as_datetime(value):
     """ Sistemiamo le date
     """
@@ -126,8 +114,9 @@ def push_to_solr(item):
     )
 
     if not is_ready:
-        init_solr_push()
+        init_solr_push()  # TODO - no, sono dentro alla transazione
 
+    # TODO - cambiare questo pezzo vecchio. Non si usa più il site id così.
     # CHECK: Se il site_id resta obbligatorio nella configurazione del prodotto
     # allora non c'è bisogno di fare questo 'or'
     site_id = api.portal.get_registry_record(
@@ -146,7 +135,6 @@ def push_to_solr(item):
         default=False,
     )
 
-    # TODO - push dei dati su SOLR (POST)
     index_me = create_index_dict(serializer(), index_fields)
 
     solr = pysolr.Solr(solr_url, always_commit=True)
