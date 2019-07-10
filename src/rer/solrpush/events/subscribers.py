@@ -41,36 +41,36 @@ def pushToSolr(item, ev):
     transaction.get().join(manager)
 
 
-def objectAdded(item, ev):
-    logger.info("objectAdded")
-    pushToSolr(item)
-
-
-def objectModified(item, ev):
-    logger.info("objectModified")
-    pushToSolr(item)
-
-
-def objectCopied(item, ev):
-    logger.info("objectCopied")
-    pushToSolr(item)
-
-
-def objectRemoved(item, ev):
-    logger.info("objectRemoved")
-    pushToSolr(item)
-
-
-def objectMoved(item, ev):
-    logger.info("objectMoved")
-    pushToSolr(item)
-
-
-def dispatchObjectMovedEvent(item, ev):
-    logger.info("dispatchObjectMovedEvent")
-    pushToSolr(item)
-
-
-def objectTransitioned(item, ev):
-    logger.info("objectTransitioned")
-    pushToSolr(item)
+# def objectAdded(item, ev):
+#     logger.info("objectAdded")
+#     pushToSolr(item)
+#
+#
+# def objectModified(item, ev):
+#     logger.info("objectModified")
+#     pushToSolr(item)
+#
+#
+# def objectCopied(item, ev):
+#     logger.info("objectCopied")
+#     pushToSolr(item)
+#
+#
+# def objectRemoved(item, ev):
+#     logger.info("objectRemoved")
+#     pushToSolr(item)
+#
+#
+# def objectMoved(item, ev):
+#     logger.info("objectMoved")
+#     pushToSolr(item)
+#
+#
+# def dispatchObjectMovedEvent(item, ev):
+#     logger.info("dispatchObjectMovedEvent")
+#     pushToSolr(item)
+#
+#
+# def objectTransitioned(item, ev):
+#     logger.info("objectTransitioned")
+#     pushToSolr(item)
