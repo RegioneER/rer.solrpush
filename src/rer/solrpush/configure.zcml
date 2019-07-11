@@ -14,7 +14,7 @@
   <!--<includeDependencies package="." />-->
 
   <include package=".browser" />
-  <include package=".events" />
+  <!-- <include package=".events" /> -->
   <include file="permissions.zcml" />
 
   <include file="upgrades.zcml" />
@@ -42,7 +42,7 @@
       name="rer.solrpush-hiddenprofiles"
       />
 
-  <!-- <adapter
-        factory=".push.SolrPushDataManager" /> -->
+  <utility provides=".interfaces.ISolrIndexQueueProcessor"
+           factory=".indexer.SolrIndexProcessor" />
 
 </configure>

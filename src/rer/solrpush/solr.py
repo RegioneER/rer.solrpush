@@ -112,7 +112,9 @@ def create_index_dict(item):
 
     return index_me
 
-
+# TODO: implementare delete
+# TODO: è possibile con sol anche mandare un set di comandi (add+delete) in un unica volta, anzichè
+#       uno alla volta, valutare le due opzioni
 def push_to_solr(item):
     """
     Perform push to solr
@@ -146,6 +148,8 @@ def push_to_solr(item):
             default=u'There was a problem indexing this content. Please '
             'contact site administrator.',
         )
+        # TODO: il push su solr non è necessariamente sincrono, lo statusmessage può non essere
+        # la soluzione migliore per comunicare all'utente il problema di indicizzazione
         api.portal.show_message(
             message=message, request=item.REQUEST, type='error'
         )

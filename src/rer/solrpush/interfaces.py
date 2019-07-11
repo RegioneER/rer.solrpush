@@ -5,10 +5,20 @@ from plone.supermodel import model
 from rer.solrpush import _
 from zope import schema
 from zope.publisher.interfaces.browser import IDefaultBrowserLayer
+try:
+    # plone >= 5
+    from Products.CMFCore.interfaces import IIndexQueueProcessor
+except ImportError:
+    # plone < 5
+    from collective.indexing.interfaces import IIndexQueueProcessor
 
 
 class IRerSolrpushLayer(IDefaultBrowserLayer):
     """Marker interface that defines a browser layer."""
+
+
+class ISolrIndexQueueProcessor(IIndexQueueProcessor):
+    """ """
 
 
 class IRerSolrpushConf(model.Schema):
