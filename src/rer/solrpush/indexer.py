@@ -66,14 +66,14 @@ class SolrIndexProcessor(object):
         logger.debug('commit %s, %s, %s', wait, self.queue)
         # TODO: è possibile con sol anche mandare un set di comandi (add+delete) in un
         #  unica volta, anzichè uno alla volta, valutare le due opzioni
-        for action in self.queue:
-            if action[0] == INDEX:
-                logger.info('solr index %s %s', action[1:])
-                # TODO: valutare l'opzione di usare attributes (action[2]) per
+        for action, obj, *args in self.queue:
+            if action == INDEX:
+                logger.info('solr index %s %s', obj)
+                # TODO: valutare l'opzione di usare attributes (args[0]) per
                 # indicizzare solo alcuni campi solr update
-                push_to_solr(action[1])
-            elif action[0] == UNINDEX:
-                logger.warning('TODO solr unindex %s %s', action[1:])
+                push_to_solr(obj)
+            elif action == UNINDEX:
+                logger.warning('TODO solr unindex %s', obj)
         self.queue = []
 
     @checkbefore
