@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 from plone import api
-from zope.interface import implementer
-from rer.solrpush.interfaces import  ISolrIndexQueueProcessor
 from rer.solrpush import logger
+from rer.solrpush.interfaces import ISolrIndexQueueProcessor
 from rer.solrpush.solr import push_to_solr
-from time import time
+from zope.interface import implementer
+
 
 INDEX = 1
 UNINDEX = 2
@@ -16,7 +16,7 @@ UNINDEX = 2
 def checkbefore(f):
     def inner(self, *args, **kwargs):
         if self.active:
-            if (f.__name__ in ('begin', 'commit', 'abort') or \
+            if (f.__name__ in ('begin', 'commit', 'abort') or
                     args[0].portal_type in self.enabled_types):
                 return f(self, *args, **kwargs)
         logger.warning('skip solrpush for %s %s %s', f.__name__, args, kwargs)
@@ -37,9 +37,9 @@ class SolrIndexProcessor(object):
     @property
     def active(self):
         return api.portal.get_registry_record(
-                'rer.solrpush.interfaces.IRerSolrpushSettings.active',
-                default=False,
-            )
+            'rer.solrpush.interfaces.IRerSolrpushSettings.active',
+            default=False,
+        )
 
     @checkbefore
     def index(self, obj, attributes=None):
