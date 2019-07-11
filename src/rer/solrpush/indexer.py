@@ -58,17 +58,17 @@ class SolrIndexProcessor(object):
 
     @checkbefore
     def begin(self):
-        logger.debug('begin %s, %s', self.queue)
+        logger.debug('begin %s', self.queue)
         self.queue = []
 
     @checkbefore
     def commit(self, wait=None):
-        logger.debug('commit %s, %s, %s', wait, self.queue)
+        logger.debug('commit %s, %s', wait, self.queue)
         # TODO: è possibile con sol anche mandare un set di comandi (add+delete) in un
         #  unica volta, anzichè uno alla volta, valutare le due opzioni
         for action, obj, *args in self.queue:
             if action == INDEX:
-                logger.info('solr index %s %s', obj)
+                logger.info('solr index %s %s', obj, args)
                 # TODO: valutare l'opzione di usare attributes (args[0]) per
                 # indicizzare solo alcuni campi solr update
                 push_to_solr(obj)
