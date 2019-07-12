@@ -11,7 +11,11 @@ UNINDEX = 2
 
 
 # TODO: aggiungere un controllo sul browserlayer della request o togliere lo zcml
-# e scommentare l'xml della componentregistry nei profiles
+# e scommentare l'xml della componentregistry nei profiles (probabilmente la seconda
+# è più pulita, testare però anche l'uninstall)
+
+# TODO: il check su active e enabled_types in realtà potrebbe anche ssere fatto nei metodi
+# index (push_to_solr) e unindex solr e tolto il decoratore
 
 def checkbefore(f):
     def inner(self, *args, **kwargs):
