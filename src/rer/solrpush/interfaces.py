@@ -1,10 +1,26 @@
 # -*- coding: utf-8 -*-
 """Module where all interfaces, events and exceptions live."""
 
+from lxml.etree import fromstring
+from lxml.etree import XMLSyntaxError
+from plone.directives import form
 from plone.supermodel import model
 from rer.solrpush import _
 from zope import schema
+from zope.interface import Invalid
 from zope.publisher.interfaces.browser import IDefaultBrowserLayer
+
+from plone.app.z3cform.wysiwyg import WysiwygFieldWidget
+
+
+def elevateConstraint(value):
+    """Check if is a valid xml
+    """
+    try:
+        fromstring(value)
+        return True
+    except XMLSyntaxError as e:
+        raise Invalid(e.message)
 
 
 class IRerSolrpushLayer(IDefaultBrowserLayer):
@@ -45,8 +61,24 @@ class IRerSolrpushConf(model.Schema):
         ),
     )
 
+    elevate_xml = schema.Text(
+            title=u'Configurazione elevate',
+            description=u'Inserisci una configurazione per l\'elevate come '
+                        u'se fosse un file xml.',
+            required=False,
+            constraint=elevateConstraint
+    )
+
+    enable_query_debug = schema.Bool(
+            title=u'Abilita il debug delle query solr',
+            description=u'Se selezionato, mostra la query effettuata su solr, '
+                        u'per il debug. Solo per gli amministratori del sito.',
+            required=False,
+        )
+
     # questo campo è la lista dei field letti direttamente dall'xml di solr
-    # TODO - rendere questo campo "read only" nel pannello
+    # TODO - sistemare il suo widget perchè così fa schifo
+    form.widget('index_fields', WysiwygFieldWidget)
     index_fields = schema.List(
         title=_(u'index_fields_label',
                 default=u'Fields list read from SOLR xml schema.'),
