@@ -17,6 +17,8 @@ Control Panel
 - Solr URL: l'indirizzo a cui connettersi a SOLR
 - Site ID
 - Portal types da indicizzare
+- Configurazione elevate
+- Flag debug query solr
 
 
 Campi del registro nascosti

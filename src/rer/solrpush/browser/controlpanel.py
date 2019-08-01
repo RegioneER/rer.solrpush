@@ -42,6 +42,8 @@ class RerSolrpushEditForm(RegistryEditForm):
             'solr_url',
             'frontend_url',
             'enabled_types',
+            'elevate_xml',
+            'enable_query_debug',
             'index_fields',
         )
 
