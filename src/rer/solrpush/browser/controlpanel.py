@@ -72,7 +72,7 @@ class RerSolrpushEditForm(RegistryEditForm):
             default=False,
         )
         if solr_url:
-            outcome = init_solr_push(solr_url)
+            outcome = init_solr_push()
             if outcome:
                 errors = True
                 ErrorMessage = outcome

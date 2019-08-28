@@ -40,7 +40,7 @@ class TestEvents(unittest.TestCase):
         res = requests.get('{}/select?q=*%3A*&wt=json'.format(solr_url)).json()
         self.assertEquals(res['response']['numFound'], 0)
 
-        init_solr_push(solr_url)
+        init_solr_push()
 
         api.content.create(container=self.portal, type='Document', title='bar')
         commit()

@@ -35,7 +35,7 @@ def parse_date_str(value):
     return parse_date_as_datetime(DateTime(value))
 
 
-def init_solr_push(solr_url):
+def init_solr_push():
     """Inizializza la voce di registro 'index_fields'
 
     Lo fa leggendo il file xml di SOLR.
@@ -45,6 +45,9 @@ def init_solr_push(solr_url):
     :returns: Empty String if everything's good
     :rtype: String
     """
+    solr_url = api.portal.get_registry_record(
+        'rer.solrpush.interfaces.IRerSolrpushSettings.solr_url', default=False
+    )
 
     if solr_url:
         if not solr_url.endswith('/'):
@@ -61,8 +64,9 @@ def init_solr_push(solr_url):
             return ErrorMessage
 
         root = etree.fromstring(respo.content)
-        chosen_fields = map(extract_field_name, root.findall('.//field'))
-
+        chosen_fields = [
+            extract_field_name(x) for x in root.findall('.//field')
+        ]
         api.portal.set_registry_record(
             'rer.solrpush.interfaces.IRerSolrpushSettings.index_fields',
             chosen_fields,
@@ -80,7 +84,7 @@ def init_solr_push(solr_url):
 def extract_field_name(node):
     name = node.get('name')
     if six.PY2:
-        name = unicode(name)
+        name = unicode(name)  # noqa
     return name
 
 
@@ -94,15 +98,14 @@ def create_index_dict(item):
         default=False,
     )
 
-    ascii_fields = [field.encode('ascii') for field in index_fields]
-
     catalog = api.portal.get_tool(name='portal_catalog')
     adapter = queryMultiAdapter((item, catalog), IIndexableObject)
 
     index_me = {}
 
-    for field in ascii_fields:
-
+    for field in index_fields:
+        if six.PY2:
+            field = field.encode('ascii')
         value = getattr(adapter, field, None)
         if not value:
             continue
@@ -123,19 +126,17 @@ def push_to_solr(item):
     """
     Perform push to solr
     """
-
     is_ready = api.portal.get_registry_record(
         'rer.solrpush.interfaces.IRerSolrpushSettings.ready', default=False
     )
     if not is_ready:
-        init_solr_push()  # TODO - no, sono dentro alla transazione
-
+        logger.error('Unable to push to solr. Configuration is not ready.')
+        return
     solr_url = api.portal.get_registry_record(
         'rer.solrpush.interfaces.IRerSolrpushSettings.solr_url', default=False
     )
 
     index_me = create_index_dict(item)
-
     solr = pysolr.Solr(solr_url, always_commit=True)
     try:
         solr.add([index_me])
