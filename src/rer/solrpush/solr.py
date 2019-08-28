@@ -9,6 +9,7 @@ from zope.component import queryMultiAdapter
 import logging
 import pysolr
 import requests
+import six
 
 logger = logging.getLogger(__name__)
 
@@ -60,9 +61,7 @@ def init_solr_push(solr_url):
             return ErrorMessage
 
         root = etree.fromstring(respo.content)
-        chosen_fields = [
-            unicode(x.get("name")) for x in root.findall(".//field")
-        ]
+        chosen_fields = map(extract_field_name, root.findall(".//field"))
 
         api.portal.set_registry_record(
             'rer.solrpush.interfaces.IRerSolrpushSettings.index_fields',
@@ -76,6 +75,13 @@ def init_solr_push(solr_url):
         return ""
 
     return _("No SOLR url provided")
+
+
+def extract_field_name(node):
+    name = node.get('name')
+    if six.PY2:
+        name = unicode(name)
+    return name
 
 
 def create_index_dict(item):
