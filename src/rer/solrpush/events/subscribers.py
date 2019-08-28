@@ -37,7 +37,8 @@ def pushToSolr(item, ev):
     """
     if isinstance(ev, ObjectRemovedEvent):
         # ObjectRemovedEvent implements also ObjectModifiedEvent, so this means
-        # that ObjectModifiedEvent will be fired also when we are deleting an item.
+        # that ObjectModifiedEvent will be fired also when we are deletin
+        # an item.
         return
     # logger.info('EVENTO: {}'.format(ev))
     if can_index(item):

@@ -47,21 +47,21 @@ def init_solr_push(solr_url):
     """
 
     if solr_url:
-        if not solr_url.endswith("/"):
-            solr_url = solr_url + "/"
+        if not solr_url.endswith('/'):
+            solr_url = solr_url + '/'
         try:
             respo = requests.get(solr_url + 'admin/file?file=schema.xml')
         except requests.exceptions.RequestException as err:
-            ErrorMessage = "Connection problem:\n{0}".format(err)
+            ErrorMessage = 'Connection problem:\n{0}'.format(err)
             return ErrorMessage
         if respo.status_code != 200:
-            ErrorMessage = "Problems fetching schema:\n{0}\n{1}".format(
+            ErrorMessage = 'Problems fetching schema:\n{0}\n{1}'.format(
                 respo.status_code, respo.reason
             )
             return ErrorMessage
 
         root = etree.fromstring(respo.content)
-        chosen_fields = map(extract_field_name, root.findall(".//field"))
+        chosen_fields = map(extract_field_name, root.findall('.//field'))
 
         api.portal.set_registry_record(
             'rer.solrpush.interfaces.IRerSolrpushSettings.index_fields',
@@ -72,9 +72,9 @@ def init_solr_push(solr_url):
             'rer.solrpush.interfaces.IRerSolrpushSettings.ready', True
         )
 
-        return ""
+        return ''
 
-    return _("No SOLR url provided")
+    return _('No SOLR url provided')
 
 
 def extract_field_name(node):
@@ -96,7 +96,7 @@ def create_index_dict(item):
 
     ascii_fields = [field.encode('ascii') for field in index_fields]
 
-    catalog = api.portal.get_tool(name="portal_catalog")
+    catalog = api.portal.get_tool(name='portal_catalog')
     adapter = queryMultiAdapter((item, catalog), IIndexableObject)
 
     index_me = {}
@@ -172,7 +172,7 @@ def remove_from_solr(item):
         return
     solr = pysolr.Solr(solr_url, always_commit=True)
     try:
-        solr.delete(q="UID:{}".format(item.UID()), commit=True)
+        solr.delete(q='UID:{}'.format(item.UID()), commit=True)
         message = _(
             'content_unindexed_success',
             default=u'Content correctly removed from SOLR',
@@ -188,4 +188,3 @@ def remove_from_solr(item):
         api.portal.show_message(
             message=message, request=item.REQUEST, type='error'
         )
-
