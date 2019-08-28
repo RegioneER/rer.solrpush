@@ -6,44 +6,37 @@
 
     <subscriber
         handler=".subscribers.pushToSolr"
-        for="plone.dexterity.interfaces.IDexterityItem
+        for="Products.CMFCore.interfaces._content.ICatalogAware
              zope.lifecycleevent.interfaces.IObjectAddedEvent"
         trusted="y" />
 
     <subscriber
         handler=".subscribers.pushToSolr"
-        for="plone.dexterity.interfaces.IDexterityItem
+        for="Products.CMFCore.interfaces._content.ICatalogAware
              zope.lifecycleevent.interfaces.IObjectModifiedEvent"
         trusted="y" />
 
     <subscriber
         handler=".subscribers.pushToSolr"
-        for="plone.dexterity.interfaces.IDexterityItem
+        for="Products.CMFCore.interfaces._content.ICatalogAware
              zope.lifecycleevent.interfaces.IObjectCopiedEvent"
         trusted="y" />
 
     <subscriber
-        handler=".subscribers.pushToSolr"
-        for="plone.dexterity.interfaces.IDexterityItem
+        handler=".subscribers.objectRemoved"
+        for="Products.CMFCore.interfaces._content.ICatalogAware
              zope.lifecycleevent.interfaces.IObjectRemovedEvent"
         trusted="y" />
 
     <subscriber
         handler=".subscribers.pushToSolr"
-        for="plone.dexterity.interfaces.IDexterityItem
+        for="Products.CMFCore.interfaces._content.ICatalogAware
              zope.lifecycleevent.interfaces.IObjectMovedEvent"
         trusted="y" />
 
     <subscriber
         handler=".subscribers.pushToSolr"
-        for="plone.dexterity.interfaces.IDexterityItem
-             OFS.interfaces.IItem
-             zope.lifecycleevent.interfaces.IObjectMovedEvent"
-        trusted="y" />
-
-    <subscriber
-        handler=".subscribers.pushToSolr"
-        for="plone.dexterity.interfaces.IDexterityItem
+        for="Products.CMFCore.interfaces._content.ICatalogAware
              Products.DCWorkflow.interfaces.IAfterTransitionEvent"
         trusted="y" />
 

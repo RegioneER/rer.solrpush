@@ -13,6 +13,7 @@ from rer.solrpush.solr import init_solr_push
 from z3c.form import button
 from z3c.form import field
 from z3c.form import group
+from z3c.form.interfaces import DISPLAY_MODE
 
 import logging
 
@@ -30,22 +31,26 @@ class RerSolrpushEditForm(RegistryEditForm):
     """
 
     schema = IRerSolrpushSettings
-    groups = (FormConfConnessione, )
+    groups = (FormConfConnessione,)
     label = _(u"Solr Push Configuration")
 
-    formErrorsMessage = "Sono presenti degli errori, si prega di ricontrollare i dati inseriti"  # noqa
+    formErrorsMessage = (
+        "Sono presenti degli errori, si prega di ricontrollare i dati inseriti"
+    )  # noqa
 
     def updateFields(self):
         super(RerSolrpushEditForm, self).updateFields()
-        self.groups[0].fields = self.groups[0].fields.select(
-            'active',
-            'solr_url',
-            'frontend_url',
-            'enabled_types',
-            'elevate_xml',
-            'enable_query_debug',
-            'index_fields',
-        )
+        # self.groups[0].fields = self.groups[0].fields.select(
+        #     'active',
+        #     'solr_url',
+        #     'frontend_url',
+        #     'enabled_types',
+        #     'elevate_xml',
+        #     'enable_query_debug',
+        #     'index_fields',
+        # )
+        self.groups[0].fields['index_fields'].mode = DISPLAY_MODE
+        self.groups[0].fields['ready'].mode = DISPLAY_MODE
 
     @button.buttonAndHandler(_("Save"), name=None)
     def handleSave(self, action):
@@ -66,7 +71,6 @@ class RerSolrpushEditForm(RegistryEditForm):
             'rer.solrpush.interfaces.IRerSolrpushSettings.solr_url',
             default=False,
         )
-
         if solr_url:
             outcome = init_solr_push(solr_url)
             if outcome:
@@ -77,9 +81,7 @@ class RerSolrpushEditForm(RegistryEditForm):
 
         if errors:
             api.portal.show_message(
-                message=ErrorMessage,
-                request=self.request,
-                type='error',
+                message=ErrorMessage, request=self.request, type='error'
             )
             return False
 

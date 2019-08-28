@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from rer.solrpush.solr import push_to_solr
+from rer.solrpush.solr import remove_from_solr
 from transaction.interfaces import IDataManager
 from transaction.interfaces import ISavepoint
 from zope.interface import implementer
@@ -68,12 +69,18 @@ class SolrPushDataManager(object):
     def tpc_finish(self, txn):
         try:
             push_to_solr(self.item)
-            logger.info('TRANSAZIONE FINITA')
         except Exception as e:
             logger.exception(e)
-            logger.info('TRANSAZIONE FALLITA')
 
     tpc_abort = abort
 
     def savepoint(self):
         return DummySavepoint(self)
+
+
+class SolrRemoveDataManager(SolrPushDataManager):
+    def tpc_finish(self, txn):
+        try:
+            remove_from_solr(self.item)
+        except Exception as e:
+            logger.exception(e)

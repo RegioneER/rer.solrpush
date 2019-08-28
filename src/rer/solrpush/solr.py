@@ -121,7 +121,6 @@ def push_to_solr(item):
     is_ready = api.portal.get_registry_record(
         'rer.solrpush.interfaces.IRerSolrpushSettings.ready', default=False
     )
-
     if not is_ready:
         init_solr_push()  # TODO - no, sono dentro alla transazione
 
@@ -149,3 +148,38 @@ def push_to_solr(item):
         api.portal.show_message(
             message=message, request=item.REQUEST, type='error'
         )
+
+
+def remove_from_solr(item):
+    """
+    Perform remove item from solr
+    """
+
+    is_ready = api.portal.get_registry_record(
+        'rer.solrpush.interfaces.IRerSolrpushSettings.ready', default=False
+    )
+
+    solr_url = api.portal.get_registry_record(
+        'rer.solrpush.interfaces.IRerSolrpushSettings.solr_url', default=False
+    )
+    if not is_ready or not solr_url:
+        return
+    solr = pysolr.Solr(solr_url, always_commit=True)
+    try:
+        solr.delete(q="UID:{}".format(item.UID()), commit=True)
+        message = _(
+            'content_unindexed_success',
+            default=u'Content correctly removed from SOLR',
+        )
+        api.portal.show_message(message=message, request=item.REQUEST)
+    except (pysolr.SolrError, TypeError) as err:
+        logger.error(err)
+        message = _(
+            'content_indexed_error',
+            default=u'There was a problem removing this content from SOLR. '
+            ' Please contact site administrator.',
+        )
+        api.portal.show_message(
+            message=message, request=item.REQUEST, type='error'
+        )
+

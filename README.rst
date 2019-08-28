@@ -51,6 +51,16 @@ aggiungere perchè altrimenti ci saremmo ritrovati *nel mezzo* di una transazion
 e non avremmo potuto apportare modifiche al registry.
 
 
+Ricerca
+-------
+
+Campi data:
+
+from DateTime import DateTime
+timezone = DateTime().timezone()
+DateTime(value).toZone(timezone).ISO8601()
+
+
 Examples
 --------
 
