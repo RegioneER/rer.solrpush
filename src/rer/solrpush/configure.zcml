@@ -7,14 +7,7 @@
 
   <i18n:registerTranslations directory="locales" />
 
-  <!--
-    Be careful if you use general includeDependencies, it can have sideffects!
-    Better import explicite packages or configurations ;)
-  -->
-  <!--<includeDependencies package="." />-->
-
   <include package=".browser" />
-  <include package=".events" />
   <include file="permissions.zcml" />
 
   <include file="upgrades.zcml" />
@@ -42,7 +35,8 @@
       name="rer.solrpush-hiddenprofiles"
       />
 
-  <!-- <adapter
-        factory=".push.SolrPushDataManager" /> -->
+  <utility 
+        provides=".interfaces.ISolrIndexQueueProcessor"
+        factory=".indexer.SolrIndexProcessor" />
 
 </configure>

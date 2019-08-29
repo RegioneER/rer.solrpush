@@ -140,11 +140,11 @@ def push_to_solr(item):
     solr = pysolr.Solr(solr_url, always_commit=True)
     try:
         solr.add([index_me])
-        message = _(
-            'content_indexed_success',
-            default=u'Content correctly indexed on SOLR',
-        )
-        api.portal.show_message(message=message, request=item.REQUEST)
+        # message = _(
+        #     'content_indexed_success',
+        #     default=u'Content correctly indexed on SOLR',
+        # )
+        # api.portal.show_message(message=message, request=item.REQUEST)
     except pysolr.SolrError as err:
         logger.error(err)
         message = _(
@@ -174,11 +174,11 @@ def remove_from_solr(item):
     solr = pysolr.Solr(solr_url, always_commit=True)
     try:
         solr.delete(q='UID:{}'.format(item.UID()), commit=True)
-        message = _(
-            'content_unindexed_success',
-            default=u'Content correctly removed from SOLR',
-        )
-        api.portal.show_message(message=message, request=item.REQUEST)
+        # message = _(
+        #     'content_unindexed_success',
+        #     default=u'Content correctly removed from SOLR',
+        # )
+        # api.portal.show_message(message=message, request=item.REQUEST)
     except (pysolr.SolrError, TypeError) as err:
         logger.error(err)
         message = _(
