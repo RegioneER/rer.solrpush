@@ -36,9 +36,9 @@
       name="rer.solrpush-hiddenprofiles"
       />
 
-  <!-- <utility 
+  <utility 
         provides=".interfaces.ISolrIndexQueueProcessor"
         name="solrpush"
-        factory=".indexer.SolrIndexProcessor" /> -->
+        factory=".indexer.SolrIndexProcessor" />
   
 </configure>
