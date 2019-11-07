@@ -7,6 +7,7 @@
 
   <i18n:registerTranslations directory="locales" />
 
+  <include package=".behaviors" />
   <include package=".browser" />
   <include file="permissions.zcml" />
 
@@ -35,8 +36,9 @@
       name="rer.solrpush-hiddenprofiles"
       />
 
-  <utility 
+  <!-- <utility 
         provides=".interfaces.ISolrIndexQueueProcessor"
-        factory=".indexer.SolrIndexProcessor" />
-
+        name="solrpush"
+        factory=".indexer.SolrIndexProcessor" /> -->
+  
 </configure>

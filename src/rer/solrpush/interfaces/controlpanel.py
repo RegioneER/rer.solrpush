@@ -1,14 +1,10 @@
 # -*- coding: utf-8 -*-
-"""Module where all interfaces, events and exceptions live."""
-
 from lxml.etree import fromstring
 from lxml.etree import XMLSyntaxError
 from plone.supermodel import model
 from rer.solrpush import _
 from zope import schema
 from zope.interface import Invalid
-from zope.publisher.interfaces.browser import IDefaultBrowserLayer
-from Products.CMFCore.interfaces import IIndexQueueProcessor
 
 
 def elevateConstraint(value):
@@ -19,14 +15,6 @@ def elevateConstraint(value):
         return True
     except XMLSyntaxError as e:
         raise Invalid(e.message)
-
-
-class IRerSolrpushLayer(IDefaultBrowserLayer):
-    """Marker interface that defines a browser layer."""
-
-
-class ISolrIndexQueueProcessor(IIndexQueueProcessor):
-    """ """
 
 
 class IRerSolrpushConf(model.Schema):

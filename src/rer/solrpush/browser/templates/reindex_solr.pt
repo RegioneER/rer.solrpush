@@ -1,0 +1,30 @@
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en"
+      xmlns:tal="http://xml.zope.org/namespaces/tal"
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
+      xmlns:i18n="http://xml.zope.org/namespaces/i18n"
+      metal:use-macro="context/main_template/macros/master"
+      i18n:domain="rer.solrpush">
+<body>
+<metal:title fill-slot="content-title">
+    <a class="link-parent"
+      href="${context/portal_url}/solrpush-conf"
+      title="Go back"
+      i18n:translate="go_to_controlpanel"
+      i18n:attributes="title">Go to configuration</a>
+    <h1 i18n:translate="maintenance_reindex_label" class="documentFirstHeading">Reindex SOLR</h1> 
+</metal:title>
+<metal:description fill-slot="content-description">
+    <p class="discreet" i18n:translate="maintenance_reindex_description">
+      Get all Plone contents and reindex them on SOLR
+    </p> 
+</metal:description>
+<metal:core fill-slot="content-core">
+  <div class="portalMessage warning" role="status">
+      <strong>You might run into problems</strong>
+      Please check your settings, be sure what you're doing is right.
+  </div>
+  <div id="reindex-solr" data-authenticator="${view/token}" />
+  <script src="${context/portal_url}/++plone++rer.solrpush/dist/prod/main.js"></script>
+</metal:core>
+</body>
+</html>

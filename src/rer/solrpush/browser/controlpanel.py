@@ -6,6 +6,7 @@ Modulo per il pannello di configurazione di solr.
 from plone import api
 from plone.app.registry.browser.controlpanel import ControlPanelFormWrapper
 from plone.app.registry.browser.controlpanel import RegistryEditForm
+from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
 from rer.solrpush import _
 from rer.solrpush.interfaces import IRerSolrpushConf
 from rer.solrpush.interfaces import IRerSolrpushSettings
@@ -40,15 +41,6 @@ class RerSolrpushEditForm(RegistryEditForm):
 
     def updateFields(self):
         super(RerSolrpushEditForm, self).updateFields()
-        # self.groups[0].fields = self.groups[0].fields.select(
-        #     'active',
-        #     'solr_url',
-        #     'frontend_url',
-        #     'enabled_types',
-        #     'elevate_xml',
-        #     'enable_query_debug',
-        #     'index_fields',
-        # )
         self.groups[0].fields['index_fields'].mode = DISPLAY_MODE
         self.groups[0].fields['ready'].mode = DISPLAY_MODE
 
@@ -117,3 +109,4 @@ class RerSolrpushEditForm(RegistryEditForm):
 
 class RerSolrpushView(ControlPanelFormWrapper):
     form = RerSolrpushEditForm
+    index = ViewPageTemplateFile('templates/controlpanel_layout.pt')

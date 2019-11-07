@@ -58,18 +58,18 @@ class SolrIndexProcessor(object):
 
     @checkbefore
     def index(self, obj, attributes=None):
-        logger.info('index %s, %s, %s', obj, attributes, self.queue)
+        # logger.info('index %s, %s, %s', obj, attributes, self.queue)
         self.queue.append((INDEX, obj, attributes))
 
     @checkbefore
     def reindex(self, obj, attributes=None, update_metadata=None):
-        logger.info(
-            'reindex %s, %s, %s, %s',
-            obj,
-            attributes,
-            update_metadata,
-            self.queue,
-        )
+        # logger.info(
+        #     'reindex %s, %s, %s, %s',
+        #     obj,
+        #     attributes,
+        #     update_metadata,
+        #     self.queue,
+        # )
         if self.has_right_permission(obj):
             self.index(obj, attributes=attributes)
         else:
@@ -77,27 +77,27 @@ class SolrIndexProcessor(object):
 
     @checkbefore
     def unindex(self, obj):
-        logger.info('unindex %s, %s', obj, self.queue)
+        # logger.info('unindex %s, %s', obj, self.queue)
         self.queue.append((UNINDEX, obj, []))
 
     @checkbefore
     def begin(self):
-        logger.info('begin %s', self.queue)
+        # logger.info('begin %s', self.queue)
         self.queue = []
 
     @checkbefore
     def commit(self, wait=None):
-        logger.info('commit %s, %s', wait, self.queue)
+        # logger.info('commit %s, %s', wait, self.queue)
         # TODO: è possibile con sol anche mandare un set di comandi (add+delete) in un
         #  unica volta, anzichè uno alla volta, valutare le due opzioni
         for action, obj, args in self.queue:
             if action == INDEX:
-                logger.info('solr index %s %s', obj, args)
+                # logger.info('solr index %s %s', obj, args)
                 # TODO: valutare l'opzione di usare attributes (args[0]) per
                 # indicizzare solo alcuni campi solr update
                 push_to_solr(obj)
             elif action == UNINDEX:
-                remove_from_solr(obj)
+                remove_from_solr(obj.UID())
         self.queue = []
 
     @checkbefore

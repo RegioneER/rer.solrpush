@@ -21,6 +21,27 @@ DATE_FIELDS = [
     'CreationDate',
 ]
 
+ADDITIONAL_FIELDS = ['showinsearch', 'searchwords']
+
+PATTERN = '''
++(Title:({base_value})^5 OR Description:({base_value})^2 OR SearchableText:({base_value}) OR searchwords:({base_value})^1000)
++(portal_type:Document^10 OR portal_type:*) +((portal_type:* -portal_type:Folder)^1000 OR portal_type:Folder^0.01) +((portal_type:* -portal_type:Circolare)^1000 OR portal_type:Circolare^0.01) +(*:* OR  searchwords:redazione^100)
++showinsearch:True
+'''
+
+
+def get_solr_connection():
+    is_ready = api.portal.get_registry_record(
+        'rer.solrpush.interfaces.IRerSolrpushSettings.ready', default=False
+    )
+
+    solr_url = api.portal.get_registry_record(
+        'rer.solrpush.interfaces.IRerSolrpushSettings.solr_url', default=False
+    )
+    if not is_ready or not solr_url:
+        return
+    return pysolr.Solr(solr_url, always_commit=True)
+
 
 def parse_date_as_datetime(value):
     """ Sistemiamo le date
@@ -119,6 +140,11 @@ def create_index_dict(item):
                 value = parse_date_str(value)
         index_me[field] = value
 
+    for field in ADDITIONAL_FIELDS:
+        value = getattr(item, field, None)
+        if value is not None:
+            index_me[field] = value
+    index_me['site_name'] = api.portal.get().getId()
     return index_me
 
 
@@ -126,18 +152,12 @@ def push_to_solr(item):
     """
     Perform push to solr
     """
-    is_ready = api.portal.get_registry_record(
-        'rer.solrpush.interfaces.IRerSolrpushSettings.ready', default=False
-    )
-    if not is_ready:
-        logger.error('Unable to push to solr. Configuration is not ready.')
-        return
-    solr_url = api.portal.get_registry_record(
-        'rer.solrpush.interfaces.IRerSolrpushSettings.solr_url', default=False
-    )
+    solr = get_solr_connection()
 
+    if not solr:
+        logger.error('Unable to push to solr. Configuration is incomplete.')
+        return
     index_me = create_index_dict(item)
-    solr = pysolr.Solr(solr_url, always_commit=True)
     try:
         solr.add([index_me])
         # message = _(
@@ -157,28 +177,17 @@ def push_to_solr(item):
         )
 
 
-def remove_from_solr(item):
+def remove_from_solr(uid):
     """
     Perform remove item from solr
     """
-
-    is_ready = api.portal.get_registry_record(
-        'rer.solrpush.interfaces.IRerSolrpushSettings.ready', default=False
-    )
-
-    solr_url = api.portal.get_registry_record(
-        'rer.solrpush.interfaces.IRerSolrpushSettings.solr_url', default=False
-    )
-    if not is_ready or not solr_url:
+    solr = get_solr_connection()
+    portal = api.portal.get()
+    if not solr:
+        logger.error('Unable to push to solr. Configuration is incomplete.')
         return
-    solr = pysolr.Solr(solr_url, always_commit=True)
     try:
-        solr.delete(q='UID:{}'.format(item.UID()), commit=True)
-        # message = _(
-        #     'content_unindexed_success',
-        #     default=u'Content correctly removed from SOLR',
-        # )
-        # api.portal.show_message(message=message, request=item.REQUEST)
+        solr.delete(q='UID:{}'.format(uid), commit=True)
     except (pysolr.SolrError, TypeError) as err:
         logger.error(err)
         message = _(
@@ -187,5 +196,61 @@ def remove_from_solr(item):
             ' Please contact site administrator.',
         )
         api.portal.show_message(
-            message=message, request=item.REQUEST, type='error'
+            message=message, request=portal.REQUEST, type='error'
         )
+
+
+def reset_solr():
+    solr = get_solr_connection()
+    if not solr:
+        logger.error('Unable to push to solr. Configuration is incomplete.')
+        return
+    solr.delete(q='*:*')
+
+
+def search(query, fl=''):
+    solr = get_solr_connection()
+    q, fq = generate_query(query)
+    if not solr:
+        logger.error('Unable to push to solr. Configuration is incomplete.')
+        return
+    additional_parameters = {
+        'fq': fq,
+        'facet': 'true',
+        'facet.field': ['Subject', 'portal_type'],
+        'start': query.get('b_start', 0),
+        'rows': query.get('b_size', 20),
+    }
+    if fl:
+        additional_parameters['fl'] = fl
+    # import pdb
+
+    # pdb.set_trace()
+    return solr.search(q=q, **additional_parameters)
+
+
+def generate_query(query):
+    q = ''
+    fq = ['site_name:{}'.format(api.portal.get().getId())]
+    pattern = ''  # TODO
+    if not pattern:
+        for index, value in query.items():
+            if index == 'SearchableText':
+                q = 'SearchableText:{}'.format(value)
+            if index == '*':
+                q = '*:{}'.format(value)
+            else:
+                fq.append('{index}:{value}'.format(index=index, value=value))
+    return q, fq
+
+
+# fq=+portal_type:(BookCrossing+OR+AdsCategory+OR+WildcardVideo+OR+File+OR+Image+OR+Circolare+OR+LinkNormativa+OR+Collection+OR+Document+OR+WildcardAudio+OR+BulletinBoard+OR+Link+OR+Advertisement+OR+Folder+OR+"News+Item"+OR+Aforisma+OR+Event)
+# fq=+allowedRolesAndUsers:(user$Cecchi_A+OR+Member+OR+Manager+OR+Authenticated+OR+user$Administrators+OR+user$AuthenticatedUsers+OR+Anonymous)
+# rows=20
+# facet.field=Subjec
+# facet.field=portal_type
+# enableElevation=false
+# facet=true
+# start=0
+# q=+path_parents:"\/orma"++(Title:(regione)^5+OR+Description:(regione)^2+OR+SearchableText:(regione)+OR+searchwords:(regione)^1000)+%0D%0A+(portal_type:Document^10+OR+portal_type:*)++(portal_type:*+-portal_type:Folder)^1000+OR+portal_type:Folder^0.01)++(portal_type:*+-portal_type:Circolare)^1000+OR+portal_type:Circolare^0.01)++(*:*+OR++searchwords:redazione^100)%0D%0A+showinsearch:True
+# fl=*+score+[elevated]

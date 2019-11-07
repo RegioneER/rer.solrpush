@@ -26,4 +26,44 @@
       permission="cmf.ManagePortal"
       />
 
+  <browser:page
+    for="Products.CMFCore.interfaces.ISiteRoot"
+    name="reindex-solr"
+    permission="cmf.ManagePortal"
+    class=".maintenance.ReindexSolrView"
+    template="templates/reindex_solr.pt"
+    />
+    <browser:page
+    for="Products.CMFCore.interfaces.ISiteRoot"
+    name="sync-solr"
+    permission="cmf.ManagePortal"
+    class=".maintenance.DoSyncView"
+    template="templates/reindex_solr.pt"
+    />
+
+   <browser:page
+        for="Products.CMFCore.interfaces.ISiteRoot"
+        name="reindex-progress"
+        permission="cmf.ManagePortal"
+        class=".maintenance.ReindexProgressView"
+    />
+    <browser:page
+        for="Products.CMFCore.interfaces.ISiteRoot"
+        name="do-reindex"
+        permission="cmf.ManagePortal"
+        class=".maintenance.DoReindexView"
+    />
+
+  <browser:page
+          for="Products.CMFCore.interfaces.ISiteRoot"
+          name="reset-solr"
+          permission="cmf.ManagePortal"
+          class=".maintenance.ResetSolr"
+          />
+    <browser:page
+          for="Products.CMFCore.interfaces.ISiteRoot"
+          name="prova"
+          permission="cmf.ManagePortal"
+          class=".prova.View"
+          />
 </configure>
