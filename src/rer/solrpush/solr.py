@@ -32,11 +32,13 @@ PATTERN = '''
 
 def get_solr_connection():
     is_ready = api.portal.get_registry_record(
-        'rer.solrpush.interfaces.IRerSolrpushSettings.ready', default=False
+        'rer.solrpush.interfaces.settings.IRerSolrpushSettings.ready',
+        default=False,
     )
 
     solr_url = api.portal.get_registry_record(
-        'rer.solrpush.interfaces.IRerSolrpushSettings.solr_url', default=False
+        'rer.solrpush.interfaces.settings.IRerSolrpushSettings.solr_url',
+        default=False,
     )
     if not is_ready or not solr_url:
         return
@@ -67,7 +69,8 @@ def init_solr_push():
     :rtype: String
     """
     solr_url = api.portal.get_registry_record(
-        'rer.solrpush.interfaces.IRerSolrpushSettings.solr_url', default=False
+        'rer.solrpush.interfaces.settings.IRerSolrpushSettings.solr_url',
+        default=False,
     )
 
     if solr_url:
@@ -89,12 +92,12 @@ def init_solr_push():
             extract_field_name(x) for x in root.findall('.//field')
         ]
         api.portal.set_registry_record(
-            'rer.solrpush.interfaces.IRerSolrpushSettings.index_fields',
+            'rer.solrpush.interfaces.settings.IRerSolrpushSettings.index_fields',
             chosen_fields,
         )
 
         api.portal.set_registry_record(
-            'rer.solrpush.interfaces.IRerSolrpushSettings.ready', True
+            'rer.solrpush.interfaces.settings.IRerSolrpushSettings.ready', True
         )
 
         return ''
@@ -115,7 +118,7 @@ def create_index_dict(item):
     """
 
     index_fields = api.portal.get_registry_record(
-        'rer.solrpush.interfaces.IRerSolrpushSettings.index_fields',
+        'rer.solrpush.interfaces.settings.IRerSolrpushSettings.index_fields',
         default=False,
     )
 
@@ -223,9 +226,6 @@ def search(query, fl=''):
     }
     if fl:
         additional_parameters['fl'] = fl
-    # import pdb
-
-    # pdb.set_trace()
     return solr.search(q=q, **additional_parameters)
 
 
@@ -237,7 +237,7 @@ def generate_query(query):
         for index, value in query.items():
             if index == 'SearchableText':
                 q = 'SearchableText:{}'.format(value)
-            if index == '*':
+            elif index == '*':
                 q = '*:{}'.format(value)
             else:
                 fq.append('{index}:{value}'.format(index=index, value=value))

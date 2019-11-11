@@ -28,17 +28,14 @@ class TestSetup(unittest.TestCase):
 
     def test_product_installed(self):
         """Test if rer.solrpush is installed."""
-        self.assertTrue(self.installer.isProductInstalled(
-            'rer.solrpush'))
+        self.assertTrue(self.installer.isProductInstalled('rer.solrpush'))
 
     def test_browserlayer(self):
         """Test that IRerSolrpushLayer is registered."""
-        from rer.solrpush.interfaces import (
-            IRerSolrpushLayer)
+        from rer.solrpush.interfaces import IRerSolrpushLayer
         from plone.browserlayer import utils
-        self.assertIn(
-            IRerSolrpushLayer,
-            utils.registered_layers())
+
+        self.assertIn(IRerSolrpushLayer, utils.registered_layers())
 
 
 class TestUninstall(unittest.TestCase):
@@ -58,14 +55,11 @@ class TestUninstall(unittest.TestCase):
 
     def test_product_uninstalled(self):
         """Test if rer.solrpush is cleanly uninstalled."""
-        self.assertFalse(self.installer.isProductInstalled(
-            'rer.solrpush'))
+        self.assertFalse(self.installer.isProductInstalled('rer.solrpush'))
 
     def test_browserlayer_removed(self):
         """Test that IRerSolrpushLayer is removed."""
-        from rer.solrpush.interfaces import \
-            IRerSolrpushLayer
+        from rer.solrpush.interfaces import IRerSolrpushLayer
         from plone.browserlayer import utils
-        self.assertNotIn(
-            IRerSolrpushLayer,
-            utils.registered_layers())
+
+        self.assertNotIn(IRerSolrpushLayer, utils.registered_layers())

@@ -41,14 +41,14 @@ class SolrIndexProcessor(object):
     @property
     def enabled_types(self):
         return api.portal.get_registry_record(
-            'rer.solrpush.interfaces.IRerSolrpushSettings.enabled_types',
+            'rer.solrpush.interfaces.settings.IRerSolrpushSettings.enabled_types',
             default=False,
         )
 
     @property
     def active(self):
         return api.portal.get_registry_record(
-            'rer.solrpush.interfaces.IRerSolrpushSettings.active',
+            'rer.solrpush.interfaces.settings.IRerSolrpushSettings.active',
             default=False,
         )
 

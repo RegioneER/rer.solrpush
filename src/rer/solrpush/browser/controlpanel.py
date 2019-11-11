@@ -8,12 +8,14 @@ from plone.app.registry.browser.controlpanel import ControlPanelFormWrapper
 from plone.app.registry.browser.controlpanel import RegistryEditForm
 from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
 from rer.solrpush import _
-from rer.solrpush.interfaces import IRerSolrpushConf
-from rer.solrpush.interfaces import IRerSolrpushSettings
+
+# from rer.solrpush.interfaces.settings import IRerSolrpushConf
+from rer.solrpush.interfaces.settings import IRerSolrpushSettings
 from rer.solrpush.solr import init_solr_push
 from z3c.form import button
-from z3c.form import field
-from z3c.form import group
+
+# from z3c.form import field
+# from z3c.form import group
 from z3c.form.interfaces import DISPLAY_MODE
 
 import logging
@@ -21,9 +23,9 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-class FormConfConnessione(group.Group):
-    label = _(u"Connection")
-    fields = field.Fields(IRerSolrpushConf)
+# class FormConfConnessione(group.Group):
+#     label = _(u"Connection")
+#     fields = field.Fields(IRerSolrpushConf)
 
 
 class RerSolrpushEditForm(RegistryEditForm):
@@ -32,7 +34,7 @@ class RerSolrpushEditForm(RegistryEditForm):
     """
 
     schema = IRerSolrpushSettings
-    groups = (FormConfConnessione,)
+    # groups = (FormConfConnessione,)
     label = _(u"Solr Push Configuration")
 
     formErrorsMessage = (
@@ -41,8 +43,10 @@ class RerSolrpushEditForm(RegistryEditForm):
 
     def updateFields(self):
         super(RerSolrpushEditForm, self).updateFields()
-        self.groups[0].fields['index_fields'].mode = DISPLAY_MODE
-        self.groups[0].fields['ready'].mode = DISPLAY_MODE
+        # self.groups[0].fields['index_fields'].mode = DISPLAY_MODE
+        # self.groups[0].fields['ready'].mode = DISPLAY_MODE
+        self.fields['index_fields'].mode = DISPLAY_MODE
+        self.fields['ready'].mode = DISPLAY_MODE
 
     @button.buttonAndHandler(_("Save"), name=None)
     def handleSave(self, action):
@@ -60,7 +64,7 @@ class RerSolrpushEditForm(RegistryEditForm):
         ErrorMessage = _('There were problems when updating the schema.')
 
         solr_url = api.portal.get_registry_record(
-            'rer.solrpush.interfaces.IRerSolrpushSettings.solr_url',
+            'rer.solrpush.interfaces.settings.IRerSolrpushSettings.solr_url',
             default=False,
         )
         if solr_url:
@@ -94,7 +98,7 @@ class RerSolrpushEditForm(RegistryEditForm):
             return False
 
         solr_url_reg = api.portal.get_registry_record(
-            'rer.solrpush.interfaces.IRerSolrpushSettings.solr_url',
+            'rer.solrpush.interfaces.settings.IRerSolrpushSettings.solr_url',
             default=False,
         )
 
