@@ -51,6 +51,14 @@ aggiungere perchè altrimenti ci saremmo ritrovati *nel mezzo* di una transazion
 e non avremmo potuto apportare modifiche al registry.
 
 
+Buildout di sviluppo
+--------------------
+
+Il buildout del pacchetto contiene già una recipe di `solr` che permette di
+avere in locale un server `solr` funzionante da poter provare e da usare
+per i test.
+
+
 Ricerca
 -------
 
