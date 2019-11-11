@@ -4,11 +4,12 @@ import { Line } from 'rc-progress';
 import { string } from 'prop-types';
 import Spinner from 'react-svg-spinner';
 
-const ProgressBarContainer = ({ authenticator }) => {
+const ProgressBarContainer = ({ authenticator, action }) => {
   const defaultData = {
     in_progress: true,
     tot: 0,
     counter: 0,
+    message: '',
   };
   const [intervalId, setIntervalId] = useState();
   const [reindexStart, setReindexStart] = useState(false);
@@ -18,10 +19,14 @@ const ProgressBarContainer = ({ authenticator }) => {
     ? document.body.getAttribute('data-portal-url') || ''
     : '';
 
+  const doCancel = () => {
+    window.location.href = `${portalUrl}/@@solrpush-conf`;
+  };
+
   const doReindex = () => {
     setData(defaultData);
     setReindexStart(true);
-    axios(`${portalUrl}/do-reindex`, {
+    axios(`${portalUrl}/${action}`, {
       params: { _authenticator: authenticator },
     });
     const intervalId = setInterval(function() {
@@ -32,27 +37,34 @@ const ProgressBarContainer = ({ authenticator }) => {
     setIntervalId(intervalId);
   };
 
-  if (reindexStart && !data.in_progress) {
+  const { tot, counter, in_progress, message } = data;
+  if (reindexStart && !in_progress) {
     setReindexStart(false);
     clearInterval(intervalId);
   }
-  const progress =
-    data.tot === 0 ? 0 : Math.floor((data.counter * 100) / data.tot);
+  const progress = tot === 0 ? 0 : Math.floor((counter * 100) / tot);
+  console.log(data);
   return (
-    <div className="progress-wrapper">
-      <button onClick={doReindex} disabled={reindexStart}>
-        START {reindexStart ? <Spinner /> : ''}
-      </button>
-      <div>
+    <div className="maintenance-wrapper">
+      <div className="formControls">
+        <button onClick={doReindex} disabled={reindexStart}>
+          Start {reindexStart ? <Spinner /> : ''}
+        </button>{' '}
+        <button onClick={doCancel} disabled={reindexStart}>
+          Cancel
+        </button>
+      </div>
+      <div className="status-bar">
         <Line
           percent={progress}
           strokeWidth="2"
           strokeLinecap="butt"
           strokeColor={progress === 100 ? '#008000' : '#007bb1'}
         />
-        {data.tot > 0 ? (
+        {message && <div className="status-message">{message}</div>}
+        {tot > 0 ? (
           <div>
-            {data.counter}/{data.tot} ({progress}%)
+            {counter}/{tot} ({progress}%)
           </div>
         ) : (
           ''
@@ -64,6 +76,7 @@ const ProgressBarContainer = ({ authenticator }) => {
 
 ProgressBarContainer.propTypes = {
   authenticator: string,
+  action: string,
 };
 
 export default ProgressBarContainer;

@@ -156,7 +156,6 @@ def push_to_solr(item):
     Perform push to solr
     """
     solr = get_solr_connection()
-
     if not solr:
         logger.error('Unable to push to solr. Configuration is incomplete.')
         return
@@ -230,6 +229,9 @@ def search(query, fl=''):
 
 
 def generate_query(query):
+    """
+    by default makes queries only on current site
+    """
     q = ''
     fq = ['site_name:{}'.format(api.portal.get().getId())]
     pattern = ''  # TODO
@@ -239,6 +241,8 @@ def generate_query(query):
                 q = 'SearchableText:{}'.format(value)
             elif index == '*':
                 q = '*:{}'.format(value)
+            elif index in ['b_start', 'b_size']:
+                continue
             else:
                 fq.append('{index}:{value}'.format(index=index, value=value))
     return q, fq

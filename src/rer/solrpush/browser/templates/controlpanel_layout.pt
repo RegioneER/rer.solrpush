@@ -5,11 +5,6 @@
       lang="en"
       metal:use-macro="here/prefs_main_template/macros/master"
       i18n:domain="plone">
-<head>
-    <metal:styleslot fill-slot="style_slot">
-      <link rel="stylesheet" type="text/css" href="${context/portal_url}/++plone++rer.solrpush/progressbar.css">
-    </metal:styleslot>
-</head>
 <body>
 <div metal:fill-slot="prefs_configlet_main">
 

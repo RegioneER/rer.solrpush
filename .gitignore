@@ -30,6 +30,7 @@ report.html
 .vscode/
 .tox/
 reports/
+*.hot-update.*
 # excludes
 !.coveragerc
 !.editorconfig

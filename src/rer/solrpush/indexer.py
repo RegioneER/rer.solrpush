@@ -23,13 +23,12 @@ UNINDEX = 2
 
 def checkbefore(f):
     def inner(self, *args, **kwargs):
+        return f(self, *args, **kwargs)
         if self.active:
-            if (
-                f.__name__ in ('begin', 'commit', 'abort')
-                or args[0].portal_type in self.enabled_types  # noqa
-            ):
+            has_right_name = f.__name__ not in ('begin', 'commit', 'abort')
+            if has_right_name:
                 return f(self, *args, **kwargs)
-        logger.warning('skip solrpush for %s %s %s', f.__name__, args, kwargs)
+        # logger.warning('skip solrpush for %s %s %s', f.__name__, args, kwargs)
 
     return inner
 
@@ -42,14 +41,14 @@ class SolrIndexProcessor(object):
     def enabled_types(self):
         return api.portal.get_registry_record(
             'rer.solrpush.interfaces.settings.IRerSolrpushSettings.enabled_types',
-            default=False,
+            default=[],
         )
 
     @property
     def active(self):
         return api.portal.get_registry_record(
             'rer.solrpush.interfaces.settings.IRerSolrpushSettings.active',
-            default=False,
+            default='',
         )
 
     def has_right_permission(self, obj):
@@ -95,7 +94,15 @@ class SolrIndexProcessor(object):
                 # logger.info('solr index %s %s', obj, args)
                 # TODO: valutare l'opzione di usare attributes (args[0]) per
                 # indicizzare solo alcuni campi solr update
-                push_to_solr(obj)
+                portal_type = obj and obj.portal_type or None
+                if not self.enabled_types:
+                    has_right_type = True
+                else:
+                    has_right_type = portal_type in self.enabled_types
+                if has_right_type:
+                    push_to_solr(obj)
+                else:
+                    remove_from_solr(obj.UID())
             elif action == UNINDEX:
                 remove_from_solr(obj.UID())
         self.queue = []
