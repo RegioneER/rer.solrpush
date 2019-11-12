@@ -85,6 +85,10 @@ class ResetSolr(SolrMaintenanceBaseForm):
 
 
 class ReindexBaseView(BrowserView):
+    formErrorsMessage = (
+        "Sono presenti degli errori, si prega di ricontrollare i dati inseriti"
+    )
+
     def setupAnnotations(self, items_len, message):
         annotations = IAnnotations(api.portal.get())
         annotations['solr_reindex'] = PersistentDict(
@@ -103,10 +107,9 @@ class ReindexBaseView(BrowserView):
     @memoize
     def solr_utility(self):
         sm = getSiteManager()
-        return sm.queryUtility(IIndexQueueProcessor, name="solrpush")
+        return sm.queryUtility(IIndexQueueProcessor, name="solrpush.utility")
 
     def reindexPloneToSolr(self):
-
         if not self.solr_utility:
             self.status = self.formErrorsMessage
             return
@@ -142,7 +145,6 @@ class ReindexBaseView(BrowserView):
                     type=brain.portal_type,
                 )
             )
-
             self.solr_utility.commit()
         status['in_progress'] = False
         elapsed_time = next(elapsed)
@@ -150,7 +152,6 @@ class ReindexBaseView(BrowserView):
 
     def cleanupSolrIndex(self):
         if not self.solr_utility:
-            self.status = self.formErrorsMessage
             return
         elapsed = timer()
         pc = api.portal.get_tool(name='portal_catalog')
@@ -176,7 +177,6 @@ class ReindexBaseView(BrowserView):
             status['counter'] = status['counter'] + 1
             commit()
 
-        # TODO
         status['in_progress'] = False
         elapsed_time = next(elapsed)
         logger.info(

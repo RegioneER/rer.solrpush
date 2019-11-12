@@ -4,6 +4,7 @@ from lxml import etree
 from plone import api
 from plone.indexer.interfaces import IIndexableObject
 from rer.solrpush import _
+from rer.solrpush.interfaces.settings import IRerSolrpushSettings
 from zope.component import queryMultiAdapter
 
 import logging
@@ -30,16 +31,22 @@ PATTERN = '''
 '''
 
 
-def get_solr_connection():
-    is_ready = api.portal.get_registry_record(
-        'rer.solrpush.interfaces.settings.IRerSolrpushSettings.ready',
-        default=False,
+def get_setting(field):
+    return api.portal.get_registry_record(
+        field, interface=IRerSolrpushSettings, default=False
     )
 
-    solr_url = api.portal.get_registry_record(
-        'rer.solrpush.interfaces.settings.IRerSolrpushSettings.solr_url',
-        default=False,
+
+def set_setting(field, value):
+    return api.portal.set_registry_record(
+        field, interface=IRerSolrpushSettings, value=value
     )
+
+
+def get_solr_connection():
+    is_ready = get_setting(field='ready')
+    solr_url = get_setting(field='solr_url')
+
     if not is_ready or not solr_url:
         return
     return pysolr.Solr(solr_url, always_commit=True)
@@ -68,10 +75,7 @@ def init_solr_push():
     :returns: Empty String if everything's good
     :rtype: String
     """
-    solr_url = api.portal.get_registry_record(
-        'rer.solrpush.interfaces.settings.IRerSolrpushSettings.solr_url',
-        default=False,
-    )
+    solr_url = get_setting(field='solr_url')
 
     if solr_url:
         if not solr_url.endswith('/'):
@@ -91,16 +95,9 @@ def init_solr_push():
         chosen_fields = [
             extract_field_name(x) for x in root.findall('.//field')
         ]
-        api.portal.set_registry_record(
-            'rer.solrpush.interfaces.settings.IRerSolrpushSettings.index_fields',
-            chosen_fields,
-        )
-
-        api.portal.set_registry_record(
-            'rer.solrpush.interfaces.settings.IRerSolrpushSettings.ready', True
-        )
-
-        return ''
+        set_setting(field='index_fields', value=chosen_fields)
+        set_setting(field='ready', value=True)
+        return
 
     return _('No SOLR url provided')
 
@@ -112,15 +109,22 @@ def extract_field_name(node):
     return name
 
 
+def can_index(item):
+    enabled_types = get_setting(field='enabled_types')
+    active = get_setting(field='active')
+    if not active:
+        return False
+    if not enabled_types:
+        return True
+    return item.portal_type in enabled_types
+
+
 def create_index_dict(item):
     """ Restituisce un dizionario pronto per essere 'mandato' a SOLR per
     l'indicizzazione.
     """
 
-    index_fields = api.portal.get_registry_record(
-        'rer.solrpush.interfaces.settings.IRerSolrpushSettings.index_fields',
-        default=False,
-    )
+    index_fields = get_setting(field='index_fields')
 
     catalog = api.portal.get_tool(name='portal_catalog')
     adapter = queryMultiAdapter((item, catalog), IIndexableObject)
@@ -155,6 +159,8 @@ def push_to_solr(item):
     """
     Perform push to solr
     """
+    if not can_index(item):
+        return
     solr = get_solr_connection()
     if not solr:
         logger.error('Unable to push to solr. Configuration is incomplete.')
