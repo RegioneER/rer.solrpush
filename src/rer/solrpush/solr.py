@@ -30,6 +30,30 @@ PATTERN = '''
 +showinsearch:True
 '''
 
+LUCENE_SPECIAL_CHARACTERS = '+-&|!(){}[]^"~*?: \t\v\\/'
+
+
+def fix_value(value):
+    if isinstance(value, basestring):
+        return escape_special_characters(value)
+    elif isinstance(value, list):
+        return map(escape_special_characters, value)
+    logger.warning(
+        '[fix_value]: unable to escape value: {}. skipping'.format(value)
+    )
+    return
+
+
+def escape_special_characters(value):
+    chars = []
+    value = value.decode('utf-8')
+    for c in value:
+        if c in LUCENE_SPECIAL_CHARACTERS:
+            chars.append(u'\{}'.format(c))
+        else:
+            chars.append(c)
+    return u''.join(chars)
+
 
 def get_setting(field):
     return api.portal.get_registry_record(
@@ -238,19 +262,20 @@ def generate_query(query):
     """
     by default makes queries only on current site
     """
+    index_fields = get_setting(field='index_fields')
     q = ''
     fq = ['site_name:{}'.format(api.portal.get().getId())]
-    pattern = ''  # TODO
-    if not pattern:
-        for index, value in query.items():
-            if index == 'SearchableText':
-                q = 'SearchableText:{}'.format(value)
-            elif index == '*':
-                q = '*:{}'.format(value)
-            elif index in ['b_start', 'b_size']:
-                continue
-            else:
-                fq.append('{index}:{value}'.format(index=index, value=value))
+    for index, value in query.items():
+        if index == '*':
+            q = '*:*'.format(value)
+            continue
+        if index not in index_fields:
+            continue
+        value = fix_value(value)
+        if index == 'SearchableText':
+            q = u'SearchableText:{}'.format(value)
+        else:
+            fq.append('{index}:{value}'.format(index=index, value=value))
     return q, fq
 
 
