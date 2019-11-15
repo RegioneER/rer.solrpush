@@ -8,7 +8,7 @@ from plone.app.testing import IntegrationTesting
 from plone.app.testing import PloneSandboxLayer
 from plone.testing import Layer
 from plone.testing import z2
-from rer.solrpush.interfaces import IRerSolrpushSettings
+from rer.solrpush.interfaces.settings import IRerSolrpushSettings
 from time import sleep
 from ZPublisher.HTTPRequest import HTTPRequest
 

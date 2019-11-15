@@ -10,12 +10,12 @@
       href="${context/portal_url}/solrpush-conf"
       title="Go back"
       i18n:translate="go_to_controlpanel"
-      i18n:attributes="title">Go to configuration</a>
-    <h1 i18n:translate="maintenance_reindex_label" class="documentFirstHeading">Reindex SOLR</h1> 
+      i18n:attributes="title">Return to configuration</a>
+    <h1 class="documentFirstHeading" tal:content="view/label">View Title</h1>
 </metal:title>
 <metal:description fill-slot="content-description">
-    <p class="discreet" i18n:translate="maintenance_reindex_description">
-      Get all Plone contents and reindex them on SOLR
+    <p class="discreet" tal:content="view/description">
+      description
     </p> 
 </metal:description>
 <metal:core fill-slot="content-core">
@@ -23,8 +23,8 @@
       <strong>You might run into problems</strong>
       Please check your settings, be sure what you're doing is right.
   </div>
-  <div id="reindex-solr" data-authenticator="${view/token}" />
-  <script src="${context/portal_url}/++plone++rer.solrpush/dist/prod/main.js"></script>
+  <div id="solr-maintenance" data-authenticator="${view/token}" data-action="${view/action}" />
+  <script src="${context/portal_url}/++plone++rer.solrpush/dist/dev/main.js"></script>
 </metal:core>
 </body>
 </html>

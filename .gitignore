@@ -31,6 +31,7 @@ report.html
 .tox/
 .Python
 reports/
+*.hot-update.*
 # excludes
 !.coveragerc
 !.editorconfig

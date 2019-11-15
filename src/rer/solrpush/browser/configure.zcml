@@ -37,7 +37,7 @@
     for="Products.CMFCore.interfaces.ISiteRoot"
     name="sync-solr"
     permission="cmf.ManagePortal"
-    class=".maintenance.DoSyncView"
+    class=".maintenance.SyncSolrView"
     template="templates/reindex_solr.pt"
     />
 
@@ -53,7 +53,12 @@
         permission="cmf.ManagePortal"
         class=".maintenance.DoReindexView"
     />
-
+    <browser:page
+        for="Products.CMFCore.interfaces.ISiteRoot"
+        name="do-sync"
+        permission="cmf.ManagePortal"
+        class=".maintenance.DoSyncView"
+    />
   <browser:page
           for="Products.CMFCore.interfaces.ISiteRoot"
           name="reset-solr"

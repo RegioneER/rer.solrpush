@@ -6,7 +6,9 @@ from plone.protect.authenticator import createToken
 from Products.CMFCore.interfaces import IIndexQueueProcessor
 from Products.Five import BrowserView
 from rer.solrpush import _
+from rer.solrpush.solr import remove_from_solr
 from rer.solrpush.solr import reset_solr
+from rer.solrpush.solr import search
 from time import strftime
 from time import time
 from transaction import commit
@@ -15,9 +17,11 @@ from z3c.form import form
 from zope.annotation.interfaces import IAnnotations
 from zope.component import getMultiAdapter
 from zope.component import getSiteManager
+from plone.memoize.view import memoize
 
 import logging
 import json
+
 
 logger = logging.getLogger(__name__)
 
@@ -48,6 +52,14 @@ class SolrMaintenanceBaseForm(form.Form):
             return
         self.do_action()
 
+    @button.buttonAndHandler(_('cancel_label', default=u'Cancel'))
+    def handleCancel(self, action):
+        msg_label = _('maintenance_cancel_action', default='Action cancelled')
+        api.portal.show_message(message=msg_label, request=self.request)
+        return self.request.response.redirect(
+            '{}/@@solrpush-conf'.format(api.portal.get().absolute_url())
+        )
+
 
 class ResetSolr(SolrMaintenanceBaseForm):
     """
@@ -67,96 +79,109 @@ class ResetSolr(SolrMaintenanceBaseForm):
         )
         logger.info('##### SOLR Index dropped #####')
         api.portal.show_message(message=msg_label, request=self.request)
-
-
-class SyncSolr(SolrMaintenanceBaseForm):
-
-    label = _('maintenance_sync_solr_label', default="Sync SOLR index")
-    description = _(
-        'maintenance_sync_solr_description',
-        default='Remove no longer existing contents from SOLR and index'
-        ' missing objects.',
-    )
-
-    def do_action(self):
-
-        msg_label = _(
-            'maintenance_reset_success', default='SOLR index dropped'
+        return self.request.response.redirect(
+            '{}/@@solrpush-conf'.format(api.portal.get().absolute_url())
         )
-        logger.info('##### SOLR Index dropped')
-        self.status = msg_label
 
 
 class ReindexBaseView(BrowserView):
-    def reindexPloneToSolr(self):
+    formErrorsMessage = (
+        "Sono presenti degli errori, si prega di ricontrollare i dati inseriti"
+    )
+
+    def setupAnnotations(self, items_len, message):
         annotations = IAnnotations(api.portal.get())
-        sm = getSiteManager()
-        utility = sm.queryUtility(IIndexQueueProcessor, name="solrpush")
-        if not utility:
-            self.status = self.formErrorsMessage
-            return
-        elapsed = timer()
-        utility.begin()
-        brains = api.content.find(portal_type=utility.enabled_types)
         annotations['solr_reindex'] = PersistentDict(
             {
                 'in_progress': True,
-                'tot': brains.actual_result_count,
+                'tot': items_len,
                 'counter': 0,
                 'timestamp': strftime("%Y/%m/%d-%H:%M:%S "),
-                'message': 'Reindex items on SOLR',
+                'message': message,
             }
         )
         commit()
-        status = annotations['solr_reindex']
+        return annotations['solr_reindex']
+
+    @property
+    @memoize
+    def solr_utility(self):
+        sm = getSiteManager()
+        return sm.queryUtility(IIndexQueueProcessor, name="solrpush.utility")
+
+    def reindexPloneToSolr(self):
+        if not self.solr_utility:
+            self.status = self.formErrorsMessage
+            return
+        elapsed = timer()
+        self.solr_utility.begin()
+        if self.solr_utility.enabled_types:
+            brains_to_reindex = api.content.find(
+                portal_type=self.solr_utility.enabled_types
+            )
+        else:
+            pc = api.portal.get_tool(name='portal_catalog')
+            brains_to_reindex = pc()
+        status = self.setupAnnotations(
+            items_len=brains_to_reindex.actual_result_count,
+            message='Sync items to SOLR',
+        )
         logger.info('##### SOLR REINDEX START #####')
-        logger.info('Reindexing {} items.'.format(brains.actual_result_count))
-        for i, brain in enumerate(brains):
+        logger.info(
+            'Reindexing {} items.'.format(
+                brains_to_reindex.actual_result_count
+            )
+        )
+        for i, brain in enumerate(brains_to_reindex):
             status['counter'] = status['counter'] + 1
             commit()
             obj = brain.getObject()
-            utility.reindex(obj, [])
+            self.solr_utility.reindex(obj, [])
             logger.info(
                 '[{index}/{total}] {path} ({type})'.format(
                     index=i + 1,
-                    total=brains.actual_result_count,
+                    total=brains_to_reindex.actual_result_count,
                     path=brain.getPath(),
                     type=brain.portal_type,
                 )
             )
-
-            utility.commit()
+            self.solr_utility.commit()
         status['in_progress'] = False
         elapsed_time = next(elapsed)
         logger.info('SOLR Reindex completed in {}'.format(elapsed_time))
 
     def cleanupSolrIndex(self):
-        pass
-        # annotations = IAnnotations(api.portal.get())
-        # sm = getSiteManager()
-        # elapsed = timer()
-        # pc = api.portal.get_tool(name='portal_catalog')
-        # uids = pc.uniqueValuesFor('UID')
-        # solr_result = search({'*': '*'})
-        # import pdb
+        if not self.solr_utility:
+            return
+        elapsed = timer()
+        pc = api.portal.get_tool(name='portal_catalog')
+        if self.solr_utility.enabled_types:
+            brains_to_sync = api.content.find(
+                portal_type=self.solr_utility.enabled_types
+            )
+        else:
+            pc = api.portal.get_tool(name='portal_catalog')
+            brains_to_sync = pc()
+        good_uids = [x.UID for x in brains_to_sync]
+        solr_results = search(query={'*': '*', 'b_size': 100000}, fl='UID')
+        uids_to_cleanup = [
+            x['UID'] for x in solr_results.docs if x['UID'] not in good_uids
+        ]
+        status = self.setupAnnotations(
+            items_len=len(uids_to_cleanup), message='Cleanup items on SOLR'
+        )
+        logger.info('##### SOLR CLEANUP STARTED #####')
+        logger.info(' - First of all, cleanup items on SOLR')
+        for uid in uids_to_cleanup:
+            remove_from_solr(uid)
+            status['counter'] = status['counter'] + 1
+            commit()
 
-        # pdb.set_trace()
-        # annotations['solr_reindex'] = PersistentDict(
-        #     {
-        #         'in_progress': True,
-        #         'tot': brains.actual_result_count,
-        #         'counter': 0,
-        #         'timestamp': strftime("%Y/%m/%d-%H:%M:%S "),
-        #         'message': 'Reindex items on SOLR',
-        #     }
-        # )
-        # status = annotations['solr_reindex']
-        # logger.info('##### SOLR REINDEX START #####')
-        # logger.info('Reindexing {} items.'.format(brains.actual_result_count))
-        # # TODO
-        # status['in_progress'] = False
-        # elapsed_time = next(elapsed)
-        # logger.info('SOLR Reindex completed in {}'.format(elapsed_time))
+        status['in_progress'] = False
+        elapsed_time = next(elapsed)
+        logger.info(
+            'SOLR indexes cleanup completed in {}'.format(elapsed_time)
+        )
 
 
 class DoReindexView(ReindexBaseView):
@@ -176,11 +201,8 @@ class DoSyncView(ReindexBaseView):
         )
         if not authenticator.verify():
             raise Unauthorized
-        # first of all reindex objects to solr
-        # self.reindexPloneToSolr()
-
-        # then remove no more present items on SOLR
         self.cleanupSolrIndex()
+        self.reindexPloneToSolr()
 
 
 class ReindexProgressView(BrowserView):
@@ -198,3 +220,23 @@ class ReindexSolrView(BrowserView):
     @property
     def token(self):
         return createToken()
+
+    label = _('maintenance_reindex_label', default='Reindex SOLR')
+    description = _(
+        'maintenance_reindex_help',
+        default='Get all Plone contents and reindex them on SOLR.',
+    )
+    action = 'do-reindex'
+
+
+class SyncSolrView(BrowserView):
+    @property
+    def token(self):
+        return createToken()
+
+    label = _('maintenance_sync_label', default='Sync SOLR')
+    description = _(
+        'maintenance_sync_help',
+        default='Remove no more existing contents from SOLR and sync with Plone.',  # noqa
+    )
+    action = 'do-sync'

@@ -5,12 +5,13 @@ from plone.api.portal import get_registry_record
 from plone.api.portal import set_registry_record
 from plone.app.testing import setRoles
 from plone.app.testing import TEST_USER_ID
-from rer.solrpush.interfaces import IRerSolrpushSettings
+from rer.solrpush.interfaces.settings import IRerSolrpushSettings
 from rer.solrpush.solr import init_solr_push
 from rer.solrpush.testing import RER_SOLRPUSH_FUNCTIONAL_TESTING  # noqa: E501
 from transaction import commit
 from zope.event import notify
 from zope.lifecycleevent import ObjectModifiedEvent
+from rer.solrpush.solr import reset_solr
 
 import requests
 import unittest
@@ -38,11 +39,8 @@ class TestSOLRPush(unittest.TestCase):
         )
 
     def tearDown(self):
-        solr_url = get_registry_record('solr_url', IRerSolrpushSettings)
-        solr_clean_url = "{0}/update?stream.body=<delete><query>*:*</query></delete>&commit=true".format(  # noqa
-            solr_url
-        )
-        requests.get(solr_clean_url)
+        set_registry_record('active', True, interface=IRerSolrpushSettings)
+        reset_solr()
 
     def test_item_not_indexed_if_solrpush_is_not_ready(self):
         solr_url = get_registry_record('solr_url', IRerSolrpushSettings)
@@ -87,7 +85,8 @@ class TestEvents(unittest.TestCase):
         init_solr_push()
 
     def tearDown(self):
-        self.clean_solr()
+        set_registry_record('active', True, interface=IRerSolrpushSettings)
+        reset_solr()
 
     def clean_solr(self):
         solr_url = get_registry_record('solr_url', IRerSolrpushSettings)
@@ -123,7 +122,7 @@ class TestEvents(unittest.TestCase):
 
     def test_create_non_indexeable_content(self):
         # we use images because hte don't have a workflow, like Files.
-        api.content.create(container=self.portal, type='Image', title='bar')
+        api.content.create(container=self.portal, type='Image', title='bara')
         commit()
         res = self.get_solr_results()
         self.assertEquals(res['response']['numFound'], 0)

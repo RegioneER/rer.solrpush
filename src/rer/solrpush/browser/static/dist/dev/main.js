@@ -63,7 +63,7 @@
 /******/
 /******/ 	var hotApplyOnUpdate = true;
 /******/ 	// eslint-disable-next-line no-unused-vars
-/******/ 	var hotCurrentHash = "3547d196e7def809f9f6";
+/******/ 	var hotCurrentHash = "314e69e24605c5a83626";
 /******/ 	var hotRequestTimeout = 10000;
 /******/ 	var hotCurrentModuleData = {};
 /******/ 	var hotCurrentChildModule;
@@ -43356,11 +43356,13 @@ function _arrayWithHoles(arr) {
 
 
 var ProgressBarContainer = function ProgressBarContainer(_ref) {
-  var authenticator = _ref.authenticator;
+  var authenticator = _ref.authenticator,
+      action = _ref.action;
   var defaultData = {
     in_progress: true,
     tot: 0,
-    counter: 0
+    counter: 0,
+    message: ''
   };
 
   var _useState = Object(react__WEBPACK_IMPORTED_MODULE_0__["useState"])(),
@@ -43380,10 +43382,14 @@ var ProgressBarContainer = function ProgressBarContainer(_ref) {
 
   var portalUrl = document.body ? document.body.getAttribute('data-portal-url') || '' : '';
 
+  var doCancel = function doCancel() {
+    window.location.href = "".concat(portalUrl, "/@@solrpush-conf");
+  };
+
   var doReindex = function doReindex() {
     setData(defaultData);
     setReindexStart(true);
-    axios__WEBPACK_IMPORTED_MODULE_1___default()("".concat(portalUrl, "/do-reindex"), {
+    axios__WEBPACK_IMPORTED_MODULE_1___default()("".concat(portalUrl, "/").concat(action), {
       params: {
         _authenticator: authenticator
       }
@@ -43396,27 +43402,43 @@ var ProgressBarContainer = function ProgressBarContainer(_ref) {
     setIntervalId(intervalId);
   };
 
-  if (reindexStart && !data.in_progress) {
+  var tot = data.tot,
+      counter = data.counter,
+      in_progress = data.in_progress,
+      message = data.message;
+
+  if (reindexStart && !in_progress) {
     setReindexStart(false);
     clearInterval(intervalId);
   }
 
-  var progress = data.tot === 0 ? 0 : Math.floor(data.counter * 100 / data.tot);
+  var progress = tot === 0 ? 0 : Math.floor(counter * 100 / tot);
+  console.log(data);
   return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
-    className: "progress-wrapper"
+    className: "maintenance-wrapper"
+  }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+    className: "formControls"
   }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
     onClick: doReindex,
     disabled: reindexStart
-  }, "START ", reindexStart ? react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_svg_spinner__WEBPACK_IMPORTED_MODULE_4___default.a, null) : ''), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(rc_progress__WEBPACK_IMPORTED_MODULE_2__["Line"], {
+  }, "Start ", reindexStart ? react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_svg_spinner__WEBPACK_IMPORTED_MODULE_4___default.a, null) : ''), ' ', react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
+    onClick: doCancel,
+    disabled: reindexStart
+  }, "Cancel")), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+    className: "status-bar"
+  }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(rc_progress__WEBPACK_IMPORTED_MODULE_2__["Line"], {
     percent: progress,
     strokeWidth: "2",
     strokeLinecap: "butt",
     strokeColor: progress === 100 ? '#008000' : '#007bb1'
-  }), data.tot > 0 ? react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", null, data.counter, "/", data.tot, " (", progress, "%)") : ''));
+  }), message && react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+    className: "status-message"
+  }, message), tot > 0 ? react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", null, counter, "/", tot, " (", progress, "%)") : ''));
 };
 
 ProgressBarContainer.propTypes = {
-  authenticator: prop_types__WEBPACK_IMPORTED_MODULE_3__["string"]
+  authenticator: prop_types__WEBPACK_IMPORTED_MODULE_3__["string"],
+  action: prop_types__WEBPACK_IMPORTED_MODULE_3__["string"]
 };
 /* harmony default export */ __webpack_exports__["default"] = (ProgressBarContainer);
 
@@ -43439,10 +43461,12 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-var rootElement = document.getElementById('reindex-solr');
+var rootElement = document.getElementById('solr-maintenance');
 var authenticator = rootElement.getAttribute('data-authenticator');
+var action = rootElement.getAttribute('data-action');
 react_dom__WEBPACK_IMPORTED_MODULE_1___default.a.render(react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_ProgressBarContainer__WEBPACK_IMPORTED_MODULE_2__["default"], {
-  authenticator: authenticator
+  authenticator: authenticator,
+  action: action
 }), rootElement);
 
 /***/ }),

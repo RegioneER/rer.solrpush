@@ -4,6 +4,7 @@ from lxml import etree
 from plone import api
 from plone.indexer.interfaces import IIndexableObject
 from rer.solrpush import _
+from rer.solrpush.interfaces.settings import IRerSolrpushSettings
 from zope.component import queryMultiAdapter
 
 import logging
@@ -29,15 +30,47 @@ PATTERN = '''
 +showinsearch:True
 '''
 
+LUCENE_SPECIAL_CHARACTERS = '+-&|!(){}[]^"~*?: \t\v\\/'
+
+
+def fix_value(value):
+    if isinstance(value, basestring):
+        return escape_special_characters(value)
+    elif isinstance(value, list):
+        return map(escape_special_characters, value)
+    logger.warning(
+        '[fix_value]: unable to escape value: {}. skipping'.format(value)
+    )
+    return
+
+
+def escape_special_characters(value):
+    chars = []
+    value = value.decode('utf-8')
+    for c in value:
+        if c in LUCENE_SPECIAL_CHARACTERS:
+            chars.append(u'\{}'.format(c))
+        else:
+            chars.append(c)
+    return u''.join(chars)
+
+
+def get_setting(field):
+    return api.portal.get_registry_record(
+        field, interface=IRerSolrpushSettings, default=False
+    )
+
+
+def set_setting(field, value):
+    return api.portal.set_registry_record(
+        field, interface=IRerSolrpushSettings, value=value
+    )
+
 
 def get_solr_connection():
-    is_ready = api.portal.get_registry_record(
-        'rer.solrpush.interfaces.IRerSolrpushSettings.ready', default=False
-    )
+    is_ready = get_setting(field='ready')
+    solr_url = get_setting(field='solr_url')
 
-    solr_url = api.portal.get_registry_record(
-        'rer.solrpush.interfaces.IRerSolrpushSettings.solr_url', default=False
-    )
     if not is_ready or not solr_url:
         return
     return pysolr.Solr(solr_url, always_commit=True)
@@ -66,9 +99,7 @@ def init_solr_push():
     :returns: Empty String if everything's good
     :rtype: String
     """
-    solr_url = api.portal.get_registry_record(
-        'rer.solrpush.interfaces.IRerSolrpushSettings.solr_url', default=False
-    )
+    solr_url = get_setting(field='solr_url')
 
     if solr_url:
         if not solr_url.endswith('/'):
@@ -88,16 +119,9 @@ def init_solr_push():
         chosen_fields = [
             extract_field_name(x) for x in root.findall('.//field')
         ]
-        api.portal.set_registry_record(
-            'rer.solrpush.interfaces.IRerSolrpushSettings.index_fields',
-            chosen_fields,
-        )
-
-        api.portal.set_registry_record(
-            'rer.solrpush.interfaces.IRerSolrpushSettings.ready', True
-        )
-
-        return ''
+        set_setting(field='index_fields', value=chosen_fields)
+        set_setting(field='ready', value=True)
+        return
 
     return _('No SOLR url provided')
 
@@ -109,15 +133,22 @@ def extract_field_name(node):
     return name
 
 
+def can_index(item):
+    enabled_types = get_setting(field='enabled_types')
+    active = get_setting(field='active')
+    if not active:
+        return False
+    if not enabled_types:
+        return True
+    return item.portal_type in enabled_types
+
+
 def create_index_dict(item):
     """ Restituisce un dizionario pronto per essere 'mandato' a SOLR per
     l'indicizzazione.
     """
 
-    index_fields = api.portal.get_registry_record(
-        'rer.solrpush.interfaces.IRerSolrpushSettings.index_fields',
-        default=False,
-    )
+    index_fields = get_setting(field='index_fields')
 
     catalog = api.portal.get_tool(name='portal_catalog')
     adapter = queryMultiAdapter((item, catalog), IIndexableObject)
@@ -152,8 +183,9 @@ def push_to_solr(item):
     """
     Perform push to solr
     """
+    if not can_index(item):
+        return
     solr = get_solr_connection()
-
     if not solr:
         logger.error('Unable to push to solr. Configuration is incomplete.')
         return
@@ -223,24 +255,27 @@ def search(query, fl=''):
     }
     if fl:
         additional_parameters['fl'] = fl
-    # import pdb
-
-    # pdb.set_trace()
     return solr.search(q=q, **additional_parameters)
 
 
 def generate_query(query):
+    """
+    by default makes queries only on current site
+    """
+    index_fields = get_setting(field='index_fields')
     q = ''
     fq = ['site_name:{}'.format(api.portal.get().getId())]
-    pattern = ''  # TODO
-    if not pattern:
-        for index, value in query.items():
-            if index == 'SearchableText':
-                q = 'SearchableText:{}'.format(value)
-            if index == '*':
-                q = '*:{}'.format(value)
-            else:
-                fq.append('{index}:{value}'.format(index=index, value=value))
+    for index, value in query.items():
+        if index == '*':
+            q = '*:*'.format(value)
+            continue
+        if index not in index_fields:
+            continue
+        value = fix_value(value)
+        if index == 'SearchableText':
+            q = u'SearchableText:{}'.format(value)
+        else:
+            fq.append('{index}:{value}'.format(index=index, value=value))
     return q, fq
 
 
