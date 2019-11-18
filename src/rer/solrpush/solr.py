@@ -22,13 +22,7 @@ DATE_FIELDS = [
     'CreationDate',
 ]
 
-ADDITIONAL_FIELDS = ['showinsearch', 'searchwords']
-
-PATTERN = '''
-+(Title:({base_value})^5 OR Description:({base_value})^2 OR SearchableText:({base_value}) OR searchwords:({base_value})^1000)
-+(portal_type:Document^10 OR portal_type:*) +((portal_type:* -portal_type:Folder)^1000 OR portal_type:Folder^0.01) +((portal_type:* -portal_type:Circolare)^1000 OR portal_type:Circolare^0.01) +(*:* OR  searchwords:redazione^100)
-+showinsearch:True
-'''
+ADDITIONAL_FIELDS = ['searchwords']
 
 LUCENE_SPECIAL_CHARACTERS = '+-&|!(){}[]^"~*?: \t\v\\/'
 
@@ -149,6 +143,7 @@ def create_index_dict(item):
     """
 
     index_fields = get_setting(field='index_fields')
+    frontend_url = get_setting(field='frontend_url')
 
     catalog = api.portal.get_tool(name='portal_catalog')
     adapter = queryMultiAdapter((item, catalog), IIndexableObject)
@@ -175,7 +170,12 @@ def create_index_dict(item):
         value = getattr(item, field, None)
         if value is not None:
             index_me[field] = value
-    index_me['site_name'] = api.portal.get().getId()
+    portal = api.portal.get()
+    index_me['site_name'] = portal.getId()
+    if frontend_url:
+        index_me['url'] = item.absolute_url().replace(
+            portal.portal_url(), frontend_url
+        )
     return index_me
 
 

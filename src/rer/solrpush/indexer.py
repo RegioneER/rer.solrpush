@@ -41,13 +41,16 @@ class SolrIndexProcessor(object):
             return api.user.has_permission('View', obj=obj)
 
     def index(self, obj, attributes=None):
-        self.queue.append((INDEX, obj, attributes))
+        if getattr(obj, 'showinsearch', True):
+            self.queue.append((INDEX, obj, attributes))
 
     def reindex(self, obj, attributes=None, update_metadata=None):
         """
         Here we check only if the object has the right state
         """
-        if self.has_right_permission(obj):
+        if self.has_right_permission(obj) and getattr(
+            obj, 'showinsearch', True
+        ):
             self.index(obj, attributes=attributes)
         else:
             self.unindex(obj)

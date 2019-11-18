@@ -1,8 +1,4 @@
 # -*- coding: utf-8 -*-
-"""
-Modulo per il pannello di configurazione di solr.
-"""
-
 from plone import api
 from plone.app.registry.browser.controlpanel import ControlPanelFormWrapper
 from plone.app.registry.browser.controlpanel import RegistryEditForm
@@ -11,12 +7,18 @@ from rer.solrpush import _
 
 # from rer.solrpush.interfaces.settings import IRerSolrpushConf
 from rer.solrpush.interfaces.settings import IRerSolrpushSettings
+
+# from rer.solrpush.browser.solr_fields import (
+#     SolrFieldsWidget,
+#     SolrFieldsFieldWidget,
+# )
 from rer.solrpush.solr import init_solr_push
 from z3c.form import button
 
 # from z3c.form import field
 # from z3c.form import group
-from z3c.form.interfaces import DISPLAY_MODE
+# from z3c.form.interfaces import DISPLAY_MODE
+from z3c.form.interfaces import HIDDEN_MODE
 
 import logging
 
@@ -45,70 +47,46 @@ class RerSolrpushEditForm(RegistryEditForm):
         super(RerSolrpushEditForm, self).updateFields()
         # self.groups[0].fields['index_fields'].mode = DISPLAY_MODE
         # self.groups[0].fields['ready'].mode = DISPLAY_MODE
-        self.fields['index_fields'].mode = DISPLAY_MODE
-        self.fields['ready'].mode = DISPLAY_MODE
+        self.fields['index_fields'].mode = HIDDEN_MODE
+        self.fields['ready'].mode = HIDDEN_MODE
 
     @button.buttonAndHandler(_("Save"), name=None)
     def handleSave(self, action):
-        super(RerSolrpushEditForm, self).handleSave(self, action)
-        # self.save()
+        data, errors = self.extractData()
+        if errors:
+            self.status = self.formErrorsMessage
+            return
+        self.applyChanges(data)
+        api.portal.show_message(_(u"Changes saved."), request=self.request)
+        init_error = init_solr_push()
+        if init_error:
+            api.portal.show_message(
+                init_error, type="error", request=self.request
+            )
+        else:
+            api.portal.show_message(
+                _(u"Loaded schema.xml from SOLR"), request=self.request
+            )
+        self.request.response.redirect(self.request.getURL())
 
     @button.buttonAndHandler(_("Cancel"), name="cancel")
     def handleCancel(self, action):
         super(RerSolrpushEditForm, self).handleCancel(self, action)
 
-    @button.buttonAndHandler(_("Load schema.xml"), name="reload")
+    @button.buttonAndHandler(_("Reload schema.xml"), name="reload")
     def handleReload(self, action):
         data, errors = self.extractData()
 
-        ErrorMessage = _('There were problems when updating the schema.')
-
-        solr_url = api.portal.get_registry_record(
-            'rer.solrpush.interfaces.settings.IRerSolrpushSettings.solr_url',
-            default=False,
-        )
-        if solr_url:
-            outcome = init_solr_push()
-            if outcome:
-                errors = True
-                ErrorMessage = outcome
-        else:
-            errors = True
-
-        if errors:
+        init_error = init_solr_push()
+        if init_error:
             api.portal.show_message(
-                message=ErrorMessage, request=self.request, type='error'
+                init_error, type="error", request=self.request
             )
-            return False
-
-        api.portal.show_message(
-            message=_('Schema ricaricatone!'),
-            request=self.request,
-            type='info',
-        )
-
-        return True
-
-    def save(self):
-        # TODO - Eliminare questo metodo se non viene più usato alla fine
-        # perchè logiche spostate nell'altro bottone
-        data, errors = self.extractData()
-        if errors:
-            self.status = self.formErrorsMessage
-            return False
-
-        solr_url_reg = api.portal.get_registry_record(
-            'rer.solrpush.interfaces.settings.IRerSolrpushSettings.solr_url',
-            default=False,
-        )
-
-        if data.get('solr_url', '') != solr_url_reg:
-            # TODO - QUI lanciamo l'inizializzazione del prodotto
-            pass
-
-        self.applyChanges(data)
-
-        return True
+        else:
+            api.portal.show_message(
+                _(u"Reloaded schema.xml from SOLR"), request=self.request
+            )
+        self.request.response.redirect(self.request.getURL())
 
 
 class RerSolrpushView(ControlPanelFormWrapper):
