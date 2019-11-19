@@ -240,19 +240,29 @@ def reset_solr():
     solr.delete(q='*:*')
 
 
-def search(query, fl=''):
+def search(
+    query,
+    fl='',
+    facets=False,
+    facet_fields=['Subject', 'portal_type'],
+    filtered_sites=[],
+):
     solr = get_solr_connection()
     q, fq = generate_query(query)
+    if filtered_sites:
+        fq.append('site_name:{}'.format(' OR '.join(filtered_sites)))
     if not solr:
         logger.error('Unable to push to solr. Configuration is incomplete.')
         return
     additional_parameters = {
         'fq': fq,
-        'facet': 'true',
-        'facet.field': ['Subject', 'portal_type'],
+        'facet': facets and 'true' or 'false',
         'start': query.get('b_start', 0),
         'rows': query.get('b_size', 20),
+        'json.nl': 'arrmap',
     }
+    if facets:
+        additional_parameters['facet.field'] = facet_fields
     if fl:
         additional_parameters['fl'] = fl
     return solr.search(q=q, **additional_parameters)
@@ -264,7 +274,7 @@ def generate_query(query):
     """
     index_fields = get_setting(field='index_fields')
     q = ''
-    fq = ['site_name:{}'.format(api.portal.get().getId())]
+    fq = []
     for index, value in query.items():
         if index == '*':
             q = '*:*'.format(value)

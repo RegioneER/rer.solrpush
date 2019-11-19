@@ -35,4 +35,10 @@
       factory=".setuphandlers.HiddenProfiles"
       name="rer.solrpush-hiddenprofiles"
       />
+    
+  <utility
+    name="rer.solrpush.vocabularies.AvailableSites"
+    component=".vocabularies.AvailableSitesVocabulary"
+    />
+    
 </configure>
