@@ -3,6 +3,7 @@ from DateTime import DateTime
 from lxml import etree
 from plone import api
 from plone.indexer.interfaces import IIndexableObject
+from pysolr import SolrError
 from rer.solrpush import _
 from rer.solrpush.interfaces.settings import IRerSolrpushSettings
 from zope.component import queryMultiAdapter
@@ -198,7 +199,7 @@ def push_to_solr(item):
         # )
         # api.portal.show_message(message=message, request=item.REQUEST)
     except pysolr.SolrError as err:
-        logger.error(err)
+        logger.exception(err)
         message = _(
             'content_indexed_error',
             default=u'There was a problem indexing this content. Please '
@@ -265,7 +266,11 @@ def search(
         additional_parameters['facet.field'] = facet_fields
     if fl:
         additional_parameters['fl'] = fl
-    return solr.search(q=q, **additional_parameters)
+    try:
+        return solr.search(q=q, **additional_parameters)
+    except SolrError as e:
+        logger.exception(e)
+        return {'error': True}
 
 
 def generate_query(query):
@@ -286,6 +291,8 @@ def generate_query(query):
             q = u'SearchableText:{}'.format(value)
         else:
             fq.append('{index}:{value}'.format(index=index, value=value))
+    if not q:
+        q = '*:*'
     return q, fq
 
 
