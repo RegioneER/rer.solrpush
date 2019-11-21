@@ -2,10 +2,12 @@
 from AccessControl import Unauthorized
 from persistent.dict import PersistentDict
 from plone import api
+from plone.memoize.view import memoize
 from plone.protect.authenticator import createToken
 from Products.CMFCore.interfaces import IIndexQueueProcessor
 from Products.Five import BrowserView
 from rer.solrpush import _
+from rer.solrpush.solr import is_solr_active
 from rer.solrpush.solr import remove_from_solr
 from rer.solrpush.solr import reset_solr
 from rer.solrpush.solr import search
@@ -17,7 +19,6 @@ from z3c.form import form
 from zope.annotation.interfaces import IAnnotations
 from zope.component import getMultiAdapter
 from zope.component import getSiteManager
-from plone.memoize.view import memoize
 
 import logging
 import json
@@ -113,6 +114,9 @@ class ReindexBaseView(BrowserView):
         if not self.solr_utility:
             self.status = self.formErrorsMessage
             return
+        if not is_solr_active():
+            logger.warning('Trying to reindexing but solr is not set as active')
+            return
         elapsed = timer()
         self.solr_utility.begin()
         if self.solr_utility.enabled_types:
@@ -152,6 +156,9 @@ class ReindexBaseView(BrowserView):
 
     def cleanupSolrIndex(self):
         if not self.solr_utility:
+            return
+        if not is_solr_active():
+            logger.warning('Trying to cleanup but solr is not set as active')
             return
         elapsed = timer()
         pc = api.portal.get_tool(name='portal_catalog')
