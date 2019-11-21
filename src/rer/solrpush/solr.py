@@ -128,7 +128,15 @@ def extract_field_name(node):
     return name
 
 
+def is_solr_active():
+    """ Just checking if solr indexing is set to active in control panel
+    """
+    return get_setting(field='active')
+
+
 def can_index(item):
+    """ Check if the item passed as argument can and has to be indexed
+    """
     enabled_types = get_setting(field='enabled_types')
     active = get_setting(field='active')
     if not active:
