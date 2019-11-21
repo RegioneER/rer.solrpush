@@ -261,7 +261,7 @@ def search(
     if filtered_sites:
         fq.append('site_name:{}'.format(' OR '.join(filtered_sites)))
     if not solr:
-        logger.error('Unable to push to solr. Configuration is incomplete.')
+        logger.error('Unable to search using solr. Configuration is incomplete.')
         return
     additional_parameters = {
         'fq': fq,
