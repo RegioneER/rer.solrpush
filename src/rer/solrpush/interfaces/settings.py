@@ -1,8 +1,12 @@
 # -*- coding: utf-8 -*-
 from lxml.etree import fromstring
 from lxml.etree import XMLSyntaxError
+
+# from plone.autoform import directives
 from plone.supermodel import model
 from rer.solrpush import _
+
+# from rer.solrpush.browser.solr_fields import SolrFieldsFieldWidget
 from zope import schema
 from zope.interface import Invalid
 
@@ -23,20 +27,20 @@ class IRerSolrpushConf(model.Schema):
 
     active = schema.Bool(
         title=_(u"Active"),
-        description=_(u"SOLR push indexing activation"),
+        description=_(u"Enable SOLR indexing on this site."),
         required=False,
         default=False,
     )
 
     solr_url = schema.TextLine(
-        title=_(u"URL SOLR"),
-        description=_(u"The SOLR URL to connect to"),
+        title=_(u"SOLR url"),
+        description=_(u"The SOLR core to connect to."),
         required=True,
     )
 
     frontend_url = schema.TextLine(
         title=_(u"Frontend url"),
-        description=_(u"If the website has different URL for frontend users"),
+        description=_(u"If the website has different URL for frontend users."),
         required=False,
     )
 
@@ -44,8 +48,9 @@ class IRerSolrpushConf(model.Schema):
         title=_(u'enabled_types_label', default=u'Enabled portal types'),
         description=_(
             u'enabled_types_help',
-            default=u'Select a list of portal types to index in solr.',
-        ),  # noqa
+            default=u'Select a list of portal types to index in solr. '
+            u'Empty list means that all portal types will be indexed.',
+        ),
         required=False,
         default=[],
         missing_value=[],
@@ -54,31 +59,32 @@ class IRerSolrpushConf(model.Schema):
         ),
     )
 
-    elevate_xml = schema.Text(
-        title=u'Configurazione elevate',
-        description=u'Inserisci una configurazione per l\'elevate come '
-        u'se fosse un file xml.',
-        required=False,
-        constraint=elevateConstraint,
-    )
+    # elevate_xml = schema.Text(
+    #     title=u'Configurazione elevate',
+    #     description=u'Inserisci una configurazione per l\'elevate come '
+    #     u'se fosse un file xml.',
+    #     required=False,
+    #     constraint=elevateConstraint,
+    # )
 
-    enable_query_debug = schema.Bool(
-        title=u'Abilita il debug delle query solr',
-        description=u'Se selezionato, mostra la query effettuata su solr, '
-        u'per il debug. Solo per gli amministratori del sito.',
-        required=False,
-    )
+    # enable_query_debug = schema.Bool(
+    #     title=u'Abilita il debug delle query solr',
+    #     description=u'Se selezionato, mostra la query effettuata su solr, '
+    #     u'per il debug. Solo per gli amministratori del sito.',
+    #     required=False,
+    # )
 
-    # questo campo è la lista dei field letti direttamente dall'xml di solr
-    # TODO - sistemare il suo widget perchè così fa schifo
-    # form.widget('index_fields', WysiwygFieldWidget)
+    # directives.widget(index_fields=SolrFieldsFieldWidget)
     index_fields = schema.List(
         title=_(
-            u'index_fields_label',
-            default=u'Fields list read from SOLR xml schema.',
+            'index_fields_label',
+            default=u'List of fields loaded from SOLR that we use for indexing.',
         ),
         description=_(
-            u'index_fields_help', default=u"DON'T CHANGE THIS MANUALLY"
+            u'index_fields_help',
+            default=u'We store this list for performance'
+            u' reasons. If the configuration changes, you need to click on'
+            u' Reload button',
         ),
         required=False,
         value_type=schema.TextLine(),
@@ -87,7 +93,7 @@ class IRerSolrpushConf(model.Schema):
     # NASCOSTO DAL PANNELLO DI CONTROLLO (vedi: browser/controlpanel.py)
     ready = schema.Bool(
         title=_(u"Ready"),
-        description=_(u"SOLR push is ready to be used"),
+        description=_(u"SOLR push is ready to be used."),
         required=False,
         default=False,
     )

@@ -3,6 +3,7 @@ from DateTime import DateTime
 from lxml import etree
 from plone import api
 from plone.indexer.interfaces import IIndexableObject
+from pysolr import SolrError
 from rer.solrpush import _
 from rer.solrpush.interfaces.settings import IRerSolrpushSettings
 from zope.component import queryMultiAdapter
@@ -22,13 +23,7 @@ DATE_FIELDS = [
     'CreationDate',
 ]
 
-ADDITIONAL_FIELDS = ['showinsearch', 'searchwords']
-
-PATTERN = '''
-+(Title:({base_value})^5 OR Description:({base_value})^2 OR SearchableText:({base_value}) OR searchwords:({base_value})^1000)
-+(portal_type:Document^10 OR portal_type:*) +((portal_type:* -portal_type:Folder)^1000 OR portal_type:Folder^0.01) +((portal_type:* -portal_type:Circolare)^1000 OR portal_type:Circolare^0.01) +(*:* OR  searchwords:redazione^100)
-+showinsearch:True
-'''
+ADDITIONAL_FIELDS = ['searchwords']
 
 LUCENE_SPECIAL_CHARACTERS = '+-&|!(){}[]^"~*?: \t\v\\/'
 
@@ -149,6 +144,7 @@ def create_index_dict(item):
     """
 
     index_fields = get_setting(field='index_fields')
+    frontend_url = get_setting(field='frontend_url')
 
     catalog = api.portal.get_tool(name='portal_catalog')
     adapter = queryMultiAdapter((item, catalog), IIndexableObject)
@@ -175,7 +171,12 @@ def create_index_dict(item):
         value = getattr(item, field, None)
         if value is not None:
             index_me[field] = value
-    index_me['site_name'] = api.portal.get().getId()
+    portal = api.portal.get()
+    index_me['site_name'] = portal.getId()
+    if frontend_url:
+        index_me['url'] = item.absolute_url().replace(
+            portal.portal_url(), frontend_url
+        )
     return index_me
 
 
@@ -198,7 +199,7 @@ def push_to_solr(item):
         # )
         # api.portal.show_message(message=message, request=item.REQUEST)
     except pysolr.SolrError as err:
-        logger.error(err)
+        logger.exception(err)
         message = _(
             'content_indexed_error',
             default=u'There was a problem indexing this content. Please '
@@ -240,22 +241,36 @@ def reset_solr():
     solr.delete(q='*:*')
 
 
-def search(query, fl=''):
+def search(
+    query,
+    fl='',
+    facets=False,
+    facet_fields=['Subject', 'portal_type'],
+    filtered_sites=[],
+):
     solr = get_solr_connection()
     q, fq = generate_query(query)
+    if filtered_sites:
+        fq.append('site_name:{}'.format(' OR '.join(filtered_sites)))
     if not solr:
         logger.error('Unable to push to solr. Configuration is incomplete.')
         return
     additional_parameters = {
         'fq': fq,
-        'facet': 'true',
-        'facet.field': ['Subject', 'portal_type'],
+        'facet': facets and 'true' or 'false',
         'start': query.get('b_start', 0),
         'rows': query.get('b_size', 20),
+        'json.nl': 'arrmap',
     }
+    if facets:
+        additional_parameters['facet.field'] = facet_fields
     if fl:
         additional_parameters['fl'] = fl
-    return solr.search(q=q, **additional_parameters)
+    try:
+        return solr.search(q=q, **additional_parameters)
+    except SolrError as e:
+        logger.exception(e)
+        return {'error': True}
 
 
 def generate_query(query):
@@ -264,7 +279,7 @@ def generate_query(query):
     """
     index_fields = get_setting(field='index_fields')
     q = ''
-    fq = ['site_name:{}'.format(api.portal.get().getId())]
+    fq = []
     for index, value in query.items():
         if index == '*':
             q = '*:*'.format(value)
@@ -276,6 +291,8 @@ def generate_query(query):
             q = u'SearchableText:{}'.format(value)
         else:
             fq.append('{index}:{value}'.format(index=index, value=value))
+    if not q:
+        q = '*:*'
     return q, fq
 
 
