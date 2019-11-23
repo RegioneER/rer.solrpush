@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 from plone import api
+from pysolr import SolrError
+from rer.solrpush import _
 from rer.solrpush.interfaces import ISolrIndexQueueProcessor
 from rer.solrpush.interfaces.settings import IRerSolrpushSettings
 from rer.solrpush.solr import push_to_solr
@@ -66,10 +68,21 @@ class SolrIndexProcessor(object):
         # TODO: è possibile con sol anche mandare un set di comandi (add+delete) in un
         #  unica volta, anzichè uno alla volta, valutare le due opzioni
         for action, obj, args in self.queue:
-            if action == INDEX:
-                push_to_solr(obj)
-            elif action == UNINDEX:
-                remove_from_solr(obj.UID())
+            try:
+                if action == INDEX:
+                    push_to_solr(obj)
+                elif action == UNINDEX:
+                    remove_from_solr(obj.UID())
+            except SolrError as err:
+                logger.exception(err)
+                message = _(
+                    'content_indexed_error',
+                    default=u'There was a problem indexing this content. Please '
+                    'contact site administrator.',
+                )
+                api.portal.show_message(
+                    message=message, request=obj.REQUEST, type='error'
+                )
         self.queue = []
 
     def abort(self):

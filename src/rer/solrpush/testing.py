@@ -17,6 +17,7 @@ import rer.solrpush
 import six
 import subprocess
 import sys
+from six.moves import range
 
 BIN_DIR = os.path.dirname(os.path.realpath(sys.argv[0]))
 

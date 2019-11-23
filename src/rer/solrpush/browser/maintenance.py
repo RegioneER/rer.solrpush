@@ -2,12 +2,15 @@
 from AccessControl import Unauthorized
 from persistent.dict import PersistentDict
 from plone import api
+from plone.memoize import ram
 from plone.memoize.view import memoize
 from plone.protect.authenticator import createToken
 from Products.CMFCore.interfaces import IIndexQueueProcessor
 from Products.Five import BrowserView
+from pysolr import SolrError
 from rer.solrpush import _
 from rer.solrpush.solr import is_solr_active
+from rer.solrpush.solr import push_to_solr
 from rer.solrpush.solr import remove_from_solr
 from rer.solrpush.solr import reset_solr
 from rer.solrpush.solr import search
@@ -19,9 +22,19 @@ from z3c.form import form
 from zope.annotation.interfaces import IAnnotations
 from zope.component import getMultiAdapter
 from zope.component import getSiteManager
+from zope.i18n import translate
 
 import logging
 import json
+import pkg_resources
+
+
+JS_TEMPLATE = (
+    '{portal_url}/++plone++rer.solrpush/dist/{env_mode}/{name}.js?v={version}'
+)
+CSS_TEMPLATE = (
+    '{portal_url}/++plone++rer.solrpush/dist/{env_mode}/{name}.css?v={version}'
+)
 
 
 logger = logging.getLogger(__name__)
@@ -69,12 +82,15 @@ class ResetSolr(SolrMaintenanceBaseForm):
 
     label = _("maintenance_reset_solr_label", default="Reset SOLR index")
     description = _(
-        "maintenance_reset_solr_description", default="Drop all items in SOLR index.",
+        "maintenance_reset_solr_description",
+        default="Drop all items in SOLR index.",
     )
 
     def do_action(self):
         reset_solr()
-        msg_label = _("maintenance_reset_success", default="SOLR index dropped")
+        msg_label = _(
+            "maintenance_reset_success", default="SOLR index dropped"
+        )
         logger.info("##### SOLR Index dropped #####")
         api.portal.show_message(message=msg_label, request=self.request)
         return self.request.response.redirect(
@@ -83,9 +99,16 @@ class ResetSolr(SolrMaintenanceBaseForm):
 
 
 class ReindexBaseView(BrowserView):
-    formErrorsMessage = (
-        "Sono presenti degli errori, si prega di ricontrollare i dati inseriti"
-    )
+    @property
+    def solr_error_message(self):
+        return translate(
+            _(
+                'solr_error_connection',
+                default=u'There have been problems connecting to SOLR. '
+                u'Contact site administrator.',
+            ),
+            context=self.request,
+        )
 
     def setupAnnotations(self, items_len, message):
         annotations = IAnnotations(api.portal.get())
@@ -109,13 +132,13 @@ class ReindexBaseView(BrowserView):
 
     def reindexPloneToSolr(self):
         if not self.solr_utility:
-            self.status = self.formErrorsMessage
             return
         if not is_solr_active():
-            logger.warning("Trying to reindexing but solr is not set as active")
+            logger.warning(
+                "Trying to reindexing but solr is not set as active"
+            )
             return
         elapsed = timer()
-        self.solr_utility.begin()
         if self.solr_utility.enabled_types:
             brains_to_reindex = api.content.find(
                 portal_type=self.solr_utility.enabled_types
@@ -129,22 +152,29 @@ class ReindexBaseView(BrowserView):
         )
         logger.info("##### SOLR REINDEX START #####")
         logger.info(
-            "Reindexing {} items.".format(brains_to_reindex.actual_result_count)
+            "Reindexing {} items.".format(
+                brains_to_reindex.actual_result_count
+            )
         )
         for i, brain in enumerate(brains_to_reindex):
             status["counter"] = status["counter"] + 1
             commit()
             obj = brain.getObject()
-            self.solr_utility.reindex(obj, [])
-            logger.info(
-                "[{index}/{total}] {path} ({type})".format(
-                    index=i + 1,
-                    total=brains_to_reindex.actual_result_count,
-                    path=brain.getPath(),
-                    type=brain.portal_type,
+            try:
+                push_to_solr(obj)
+                logger.info(
+                    "[{index}/{total}] {path} ({type})".format(
+                        index=i + 1,
+                        total=brains_to_reindex.actual_result_count,
+                        path=brain.getPath(),
+                        type=brain.portal_type,
+                    )
                 )
-            )
-            self.solr_utility.commit()
+            except SolrError:
+                status["in_progress"] = False
+                status["error"] = True
+                status["message"] = self.solr_error_message
+                return
         status["in_progress"] = False
         elapsed_time = next(elapsed)
         logger.info("SOLR Reindex completed in {}".format(elapsed_time))
@@ -181,7 +211,9 @@ class ReindexBaseView(BrowserView):
 
         status["in_progress"] = False
         elapsed_time = next(elapsed)
-        logger.info("SOLR indexes cleanup completed in {}".format(elapsed_time))
+        logger.info(
+            "SOLR indexes cleanup completed in {}".format(elapsed_time)
+        )
 
 
 class DoReindexView(ReindexBaseView):
@@ -216,10 +248,47 @@ class ReindexProgressView(BrowserView):
         return dict(annotations.get("solr_reindex", {}))
 
 
-class ReindexSolrView(BrowserView):
+# REACT VIEWS
+class ReactView(BrowserView):
+    """ """
+
+    @ram.cache(lambda *args: time() // (60 * 60))
+    def get_version(self):
+        return pkg_resources.get_distribution('rer.solrpush').version
+
+    def get_env_mode(self):
+        return (
+            api.portal.get_registry_record('plone.resources.development')
+            and 'dev'  # noqa
+            or 'prod'  # noqa
+        )
+
+    def get_resource_js(self, name='main'):
+        return JS_TEMPLATE.format(
+            portal_url=api.portal.get().absolute_url(),
+            env_mode=self.get_env_mode(),
+            name=name,
+            version=self.get_version(),
+        )
+
+    def get_resource_css(self, name='main'):
+        return CSS_TEMPLATE.format(
+            portal_url=api.portal.get().absolute_url(),
+            env_mode=self.get_env_mode(),
+            name=name,
+            version=self.get_version(),
+        )
+
     @property
     def token(self):
         return createToken()
+
+    @property
+    def is_active(self):
+        return is_solr_active()
+
+
+class ReindexSolrView(ReactView):
 
     label = _("maintenance_reindex_label", default="Reindex SOLR")
     description = _(
@@ -229,10 +298,7 @@ class ReindexSolrView(BrowserView):
     action = "do-reindex"
 
 
-class SyncSolrView(BrowserView):
-    @property
-    def token(self):
-        return createToken()
+class SyncSolrView(ReactView):
 
     label = _("maintenance_sync_label", default="Sync SOLR")
     description = _(

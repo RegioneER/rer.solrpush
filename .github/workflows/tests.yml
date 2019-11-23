@@ -37,5 +37,5 @@ jobs:
           firefox -v
       - name: Run tests
         run: |
-          python --version 2> /dev/stdout | grep 3.6 || bin/code-analysis
+          bin/code-analysis
           bin/test --all

@@ -7,11 +7,14 @@ from pysolr import SolrError
 from rer.solrpush import _
 from rer.solrpush.interfaces.settings import IRerSolrpushSettings
 from zope.component import queryMultiAdapter
+from zope.i18n import translate
 
 import logging
 import pysolr
 import requests
 import six
+import json
+from six.moves import map
 
 logger = logging.getLogger(__name__)
 
@@ -20,19 +23,20 @@ DATE_FIELDS = [
     'modified',
     'effective',
     'ModificationDate',
+    'EffectiveDate',
     'CreationDate',
 ]
 
 ADDITIONAL_FIELDS = ['searchwords']
 
-LUCENE_SPECIAL_CHARACTERS = '+-&|!(){}[]^"~*?: \t\v\\/'
+LUCENE_SPECIAL_CHARACTERS = '+-&|!(){}^"~?:\t\v\\/'
 
 
 def fix_value(value):
-    if isinstance(value, basestring):
+    if isinstance(value, six.string_types):
         return escape_special_characters(value)
     elif isinstance(value, list):
-        return map(escape_special_characters, value)
+        return list(map(escape_special_characters, value))
     logger.warning(
         '[fix_value]: unable to escape value: {}. skipping'.format(value)
     )
@@ -62,6 +66,13 @@ def set_setting(field, value):
     )
 
 
+def get_index_fields(field):
+    json_str = api.portal.get_registry_record(
+        field, interface=IRerSolrpushSettings, default=''
+    )
+    return json.loads(json_str)
+
+
 def get_solr_connection():
     is_ready = get_setting(field='ready')
     solr_url = get_setting(field='solr_url')
@@ -76,7 +87,7 @@ def parse_date_as_datetime(value):
     """
     if value:
         format = '%Y-%m-%dT%H:%M:%S'
-        return value.asdatetime().strftime(format) + 'Z'
+        return value.utcdatetime().strftime(format) + 'Z'
     return value
 
 
@@ -111,9 +122,11 @@ def init_solr_push():
             return ErrorMessage
 
         root = etree.fromstring(respo.content)
-        chosen_fields = [
-            extract_field_name(x) for x in root.findall('.//field')
-        ]
+        chosen_fields = json.dumps(
+            list(map(extract_field, root.findall('.//field')))
+        )
+        if six.PY2:
+            chosen_fields = chosen_fields.decode('utf-8')
         set_setting(field='index_fields', value=chosen_fields)
         set_setting(field='ready', value=True)
         return
@@ -121,11 +134,13 @@ def init_solr_push():
     return _('No SOLR url provided')
 
 
-def extract_field_name(node):
-    name = node.get('name')
+def extract_field(node):
+    field_name = node.get('name')
+    field_type = node.get('type')
     if six.PY2:
-        name = unicode(name)  # noqa
-    return name
+        field_name = six.text_type(field_name)
+        field_type = six.text_type(field_type)
+    return {'id': field_name, 'type': field_type}
 
 
 def is_solr_active():
@@ -137,6 +152,9 @@ def is_solr_active():
 def can_index(item):
     """ Check if the item passed as argument can and has to be indexed
     """
+    with api.env.adopt_roles(['Anonymous']):
+        if not api.user.has_permission('View', obj=item):
+            return False
     enabled_types = get_setting(field='enabled_types')
     active = get_setting(field='active')
     if not active:
@@ -151,7 +169,7 @@ def create_index_dict(item):
     l'indicizzazione.
     """
 
-    index_fields = get_setting(field='index_fields')
+    index_fields = get_index_fields(field='index_fields')
     frontend_url = get_setting(field='frontend_url')
 
     catalog = api.portal.get_tool(name='portal_catalog')
@@ -159,7 +177,9 @@ def create_index_dict(item):
 
     index_me = {}
 
-    for field in index_fields:
+    for field_infos in index_fields:
+        field = field_infos.get('id')
+        field_type = field_infos.get('type')
         if six.PY2:
             field = field.encode('ascii')
         value = getattr(adapter, field, None)
@@ -167,11 +187,10 @@ def create_index_dict(item):
             continue
         if callable(value):
             value = value()
-
         if isinstance(value, DateTime):
             value = parse_date_as_datetime(value)
         else:
-            if field in DATE_FIELDS:
+            if field_type == 'date':
                 value = parse_date_str(value)
         index_me[field] = value
 
@@ -199,23 +218,7 @@ def push_to_solr(item):
         logger.error('Unable to push to solr. Configuration is incomplete.')
         return
     index_me = create_index_dict(item)
-    try:
-        solr.add([index_me])
-        # message = _(
-        #     'content_indexed_success',
-        #     default=u'Content correctly indexed on SOLR',
-        # )
-        # api.portal.show_message(message=message, request=item.REQUEST)
-    except pysolr.SolrError as err:
-        logger.exception(err)
-        message = _(
-            'content_indexed_error',
-            default=u'There was a problem indexing this content. Please '
-            'contact site administrator.',
-        )
-        api.portal.show_message(
-            message=message, request=item.REQUEST, type='error'
-        )
+    solr.add([index_me])
 
 
 def remove_from_solr(uid):
@@ -232,7 +235,7 @@ def remove_from_solr(uid):
     except (pysolr.SolrError, TypeError) as err:
         logger.error(err)
         message = _(
-            'content_indexed_error',
+            'content_remove_error',
             default=u'There was a problem removing this content from SOLR. '
             ' Please contact site administrator.',
         )
@@ -261,7 +264,9 @@ def search(
     if filtered_sites:
         fq.append('site_name:{}'.format(' OR '.join(filtered_sites)))
     if not solr:
-        logger.error('Unable to search using solr. Configuration is incomplete.')
+        logger.error(
+            'Unable to search using solr. Configuration is incomplete.'
+        )
         return
     additional_parameters = {
         'fq': fq,
@@ -270,6 +275,8 @@ def search(
         'rows': query.get('b_size', 20),
         'json.nl': 'arrmap',
     }
+    if 'sort_on' in query:
+        additional_parameters['sort'] = set_sort_parameter(query)
     if facets:
         additional_parameters['facet.field'] = facet_fields
     if fl:
@@ -278,23 +285,47 @@ def search(
         return solr.search(q=q, **additional_parameters)
     except SolrError as e:
         logger.exception(e)
-        return {'error': True}
+        return {
+            'error': True,
+            'message': translate(
+                _(
+                    'search_error_label',
+                    default=u'Unable to perform a search with SOLR.'
+                    u' Please contact the site administrator or wait some'
+                    u' minutes.',
+                ),
+                context=api.portal.get().REQUEST,
+            ),
+        }
+
+
+def set_sort_parameter(query):
+    sort_on = query.get('sort_on')
+    sort_order = query.get('sort_order', '')
+    if not sort_order:
+        return sort_on
+    if sort_order in ['reverse']:
+        return '{sort_on} desc'.format(sort_on=sort_on)
+    return '{sort_on} {sort_order}'.format(
+        sort_on=sort_on, sort_order=sort_order
+    )
 
 
 def generate_query(query):
     """
     by default makes queries only on current site
     """
-    index_fields = get_setting(field='index_fields')
+    index_fields = get_index_fields(field='index_fields')
+    index_ids = [x['id'] for x in index_fields]
     q = ''
     fq = []
     for index, value in query.items():
         if index == '*':
             q = '*:*'.format(value)
             continue
-        if index not in index_fields:
+        if index not in index_ids:
             continue
-        value = fix_value(value)
+        value = fix_value(value=value)
         if index == 'SearchableText':
             q = u'SearchableText:{}'.format(value)
         else:

@@ -12,8 +12,8 @@ class AvailableSitesVocabularyFactory(object):
         solr_results = search(
             query={'*': '*'}, fl='UID', facets=True, facet_fields='site_name'
         )
-        # if solr_results.get('error', False):
-        #     return []
+        if isinstance(solr_results, dict) and solr_results.get('error', False):
+            return []
         facets = solr_results.facets['facet_fields'].get('site_name', [])
         if not facets:
             return []

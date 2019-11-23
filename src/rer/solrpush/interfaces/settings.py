@@ -75,7 +75,7 @@ class IRerSolrpushConf(model.Schema):
     # )
 
     # directives.widget(index_fields=SolrFieldsFieldWidget)
-    index_fields = schema.List(
+    index_fields = schema.SourceText(
         title=_(
             'index_fields_label',
             default=u'List of fields loaded from SOLR that we use for indexing.',
@@ -87,7 +87,6 @@ class IRerSolrpushConf(model.Schema):
             u' Reload button',
         ),
         required=False,
-        value_type=schema.TextLine(),
     )
 
     # NASCOSTO DAL PANNELLO DI CONTROLLO (vedi: browser/controlpanel.py)

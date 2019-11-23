@@ -31,7 +31,7 @@
                 <a class="link-parent"
                    href="${context/portal_url}/reset-solr"
                    title="Drop all items in SOLR index."
-                   i18n:translate="solr_reindex_label"
+                   i18n:translate="solr_reset_label"
                    i18n:attributes="title">Reset</a>
                 <a class="link-parent"
                    href="${context/portal_url}/sync-solr"

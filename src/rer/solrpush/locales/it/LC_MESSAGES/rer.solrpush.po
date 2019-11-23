@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2019-06-06 15:21+0000\n"
+"POT-Creation-Date: 2019-11-23 06:17+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI +ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -14,52 +14,213 @@ msgstr ""
 "Preferred-Encodings: utf-8 latin1\n"
 "Domain: DOMAIN\n"
 
-#: ../browser/controlpanel.py:16
-msgid "Connection"
-msgstr "Connessione"
+#: ../interfaces/settings.py:29
+msgid "Active"
+msgstr "Attivo"
 
-#: ../configure.zcml:29
+#: ../browser/controlpanel.py:53
+msgid "Cancel"
+msgstr "Annull  "
+
+#: ../browser/controlpanel.py:41
+msgid "Changes saved."
+msgstr "Modifiche salvate."
+
+#: ../interfaces/settings.py:30
+msgid "Enable SOLR indexing on this site."
+msgstr "Abilita l'indicizzazione con SOLR su questo sito."
+
+#: ../behaviors/configure.zcml:14
+msgid "Extra fields for Solr indexing"
+msgstr "Campi extra per SOLR"
+
+#: ../interfaces/settings.py:42
+msgid "Frontend url"
+msgstr "Url di frontend"
+
+#: ../browser/templates/reindex_solr.pt:9
+msgid "Go back"
+msgstr "Torna indietro"
+
+#: ../interfaces/settings.py:43
+msgid "If the website has different URL for frontend users."
+msgstr "Se il sito ha un url differente per il frontend."
+
+#: ../configure.zcml:23
 msgid "Installs the rer.solrpush add-on."
 msgstr "Installa l'add-on rer.solrpush."
 
-#: ../interfaces.py:24
-msgid "Site ID"
-msgstr "Site ID"
+#: ../browser/controlpanel.py:49
+msgid "Loaded schema.xml from SOLR"
+msgstr "schema.xml caricato correttamente da SOLR"
 
-#: ../browser/controlpanel.py:24
+#: ../solr.py:133
+msgid "No SOLR url provided"
+msgstr "Nessun url di connessione a SOLR fornito"
+
+#: ../configure.zcml:23
+msgid "RER: Solr push"
+msgstr ""
+
+#: ../configure.zcml:32
+msgid "RER: Solr push (uninstall)"
+msgstr ""
+
+#: ../interfaces/settings.py:94
+msgid "Ready"
+msgstr "Pronto"
+
+#: ../browser/controlpanel.py:57
+msgid "Reload schema.xml"
+msgstr "Ricarica schema.xml"
+
+#: ../browser/controlpanel.py:68
+msgid "Reloaded schema.xml from SOLR"
+msgstr "Ricarica le informazioni di schema.xml da SOLR"
+
+#: ../interfaces/settings.py:95
+msgid "SOLR push is ready to be used."
+msgstr "SOLR push è pronto per essere utilizzato."
+
+#: ../interfaces/settings.py:36
+msgid "SOLR url"
+msgstr "Url di SOLR"
+
+#: ../browser/controlpanel.py:34
+msgid "Save"
+msgstr "Salva"
+
+#: ../browser/controlpanel.py:23
 msgid "Solr Push Configuration"
 msgstr "Configurazione Solr Push"
 
-#: ../interfaces.py:25
-msgid "The ID for the website"
-msgstr "L'id del sito"
+#: ../behaviors/configure.zcml:14
+msgid "Solr additional fields"
+msgstr "Campi aggiuntivi di SOLR"
 
-#: ../interfaces.py:20
-msgid "The SOLR URL to connect to"
-msgstr "L'URL di SOLR a cui connettersi"
+#: ../interfaces/settings.py:37
+msgid "The SOLR core to connect to."
+msgstr "Il core di SOLR a cui connettersi."
 
-#: ../interfaces.py:19
-msgid "URL SOLR"
-msgstr "SOLR URL"
-
-#: ../configure.zcml:38
+#: ../configure.zcml:32
 msgid "Uninstalls the rer.solrpush add-on."
 msgstr "Disinstalla l'add-on rer.solrpush."
 
-#. Default: "Select a list of portal types to index in solr."
-#: ../interfaces.py:31
+#. Default: "Cancel"
+#: ../browser/maintenance.py:69
+msgid "cancel_label"
+msgstr "Annulla"
+
+#. Default: "There was a problem indexing this content. Please contact site administrator."
+#: ../indexer.py:78
+msgid "content_indexed_error"
+msgstr "Si è verificato un problema indicizzando questo contenuto su SOLR. Contatta l'amministratore per maggiori informazioni."
+
+#. Default: "There was a problem removing this content from SOLR.  Please contact site administrator."
+#: ../solr.py:233
+msgid "content_remove_error"
+msgstr "Si è verificato un problema rimuovendo questo contenuto da SOLR. Contatta l'amministratore per maggiori informazioni."
+
+#. Default: "Select a list of portal types to index in solr. Empty list means that all portal types will be indexed."
+#: ../interfaces/settings.py:49
 msgid "enabled_types_help"
-msgstr "Scegli i tipi di contenuto da indicizzare su SOLR"
+msgstr "Scegli i tipi di contenuto da indicizzare su SOLR. Una lista vuota significa che tutti i tipi di contenuto verranno indicizzati."
 
 #. Default: "Enabled portal types"
-#: ../interfaces.py:29
+#: ../interfaces/settings.py:48
 msgid "enabled_types_label"
-msgstr "Tipo di contenuto"
+msgstr "Tipi di contenuto"
 
-#: ../configure.zcml:29
-msgid "rer.solrpush"
+#. Default: "Return to configuration"
+#: ../browser/templates/reindex_solr.pt:9
+msgid "go_to_controlpanel"
+msgstr "Ritorna alla configurazione"
+
+#. Default: "Specify words for which this item will show up as the first search result. Multiple words can be specified on new lines."
+#: ../behaviors/solr_fields.py:33
+msgid "help_searchwords"
+msgstr "Specifica le parole per cui questo elemento verrà mostrato tra i primi risultati della ricerca. Inserisci una parola per riga."
+
+#: ../behaviors/solr_fields.py:24
+msgid "help_showinsearch"
 msgstr ""
 
-#: ../configure.zcml:38
-msgid "rer.solrpush (uninstall)"
-msgstr ""
+#. Default: "We store this list for performance reasons. If the configuration changes, you need to click on Reload button"
+#: ../interfaces/settings.py:83
+msgid "index_fields_help"
+msgstr "Ci salviamo questa lista per motivi di performance. Se la configurazione cambia, bisogna cliccare sul bottone di Aggiornamento."
+
+#. Default: "List of fields loaded from SOLR that we use for indexing."
+#: ../interfaces/settings.py:79
+msgid "index_fields_label"
+msgstr "Elenco di campi utilizzati per indicizzare su SOLR."
+
+#. Default: "Search words"
+#: ../behaviors/solr_fields.py:31
+msgid "label_searchwords"
+msgstr "Search words"
+
+#. Default: "Show in search"
+#: ../behaviors/solr_fields.py:23
+msgid "label_showinsearch"
+msgstr "Mostra nella ricerca"
+
+#. Default: "Action cancelled"
+#: ../browser/maintenance.py:71
+msgid "maintenance_cancel_action"
+msgstr "Azione annullata"
+
+#. Default: "Get all Plone contents and reindex them on SOLR."
+#: ../browser/maintenance.py:295
+msgid "maintenance_reindex_help"
+msgstr "Recupera tutti i contenuti da Plone e reindicizzali su SOLR."
+
+#. Default: "Reindex SOLR"
+#: ../browser/maintenance.py:294
+msgid "maintenance_reindex_label"
+msgstr "Reindicizza SOLR"
+
+#. Default: "Drop all items in SOLR index."
+#: ../browser/maintenance.py:84
+msgid "maintenance_reset_solr_description"
+msgstr "Rmuovi tutti gli elementi dall'indice SOLR."
+
+#. Default: "Reset SOLR index"
+#: ../browser/maintenance.py:83
+msgid "maintenance_reset_solr_label"
+msgstr "Azzera l'indice SOLR"
+
+#. Default: "SOLR index dropped"
+#: ../browser/maintenance.py:91
+msgid "maintenance_reset_success"
+msgstr "Indice SOLR azzerato"
+
+#. Default: "Remove no more existing contents from SOLR and sync with Plone."
+#: ../browser/maintenance.py:305
+msgid "maintenance_sync_help"
+msgstr "Rimuove da SOLR gli elementi non più presenti su Plone, e fa il sync con Plone"
+
+#. Default: "Sync SOLR"
+#: ../browser/maintenance.py:304
+msgid "maintenance_sync_label"
+msgstr "Sincronizza SOLR"
+
+#. Default: "SOLR push is not active. Unable to sync with solr."
+#: ../browser/templates/reindex_solr.pt:26
+msgid "reindex_solr_not_active"
+msgstr "SOLR push non è attivo. Impossibile sincronizzarsi."
+
+#. Default: "Unable to perform a search with SOLR. Please contact the site administrator or wait some minutes."
+#: ../solr.py:285
+msgid "search_error_label"
+msgstr "Impossibile eseguire la ricerca su SOLR. Contatta l'amministratore del sito o riprova tra qualche minuto."
+
+#. Default: "There have been problems connecting to SOLR. Contact site administrator."
+#: ../browser/maintenance.py:105
+msgid "solr_error_connection"
+msgstr "Si è verificato un problema di connessione verso SOLR. Contatta l'amministratore per maggiori informazioni."
+
+#. Default: "Start"
+#: ../browser/maintenance.py:61
+msgid "start_label"
+msgstr "Avvia"

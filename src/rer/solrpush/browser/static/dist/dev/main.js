@@ -63,7 +63,7 @@
 /******/
 /******/ 	var hotApplyOnUpdate = true;
 /******/ 	// eslint-disable-next-line no-unused-vars
-/******/ 	var hotCurrentHash = "314e69e24605c5a83626";
+/******/ 	var hotCurrentHash = "d5128f02152487fde112";
 /******/ 	var hotRequestTimeout = 10000;
 /******/ 	var hotCurrentModuleData = {};
 /******/ 	var hotCurrentChildModule;
@@ -43293,6 +43293,57 @@ module.exports.formatError = function(err) {
 
 /***/ }),
 
+/***/ "./src/rer/solrpush/browser/static/javascripts/ProgressBar/index.js":
+/*!**************************************************************************!*\
+  !*** ./src/rer/solrpush/browser/static/javascripts/ProgressBar/index.js ***!
+  \**************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var rc_progress__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! rc-progress */ "./node_modules/rc-progress/es/index.js");
+/* harmony import */ var prop_types__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! prop-types */ "./node_modules/prop-types/index.js");
+/* harmony import */ var prop_types__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(prop_types__WEBPACK_IMPORTED_MODULE_2__);
+
+
+
+
+var ProgressBar = function ProgressBar(_ref) {
+  var tot = _ref.tot,
+      counter = _ref.counter,
+      message = _ref.message,
+      error = _ref.error;
+
+  if (error) {
+    return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+      className: "status-message"
+    }, message || 'Generic Error.');
+  }
+
+  var progress = tot === 0 ? 0 : Math.floor(counter * 100 / tot);
+  return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+    className: "status-bar"
+  }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(rc_progress__WEBPACK_IMPORTED_MODULE_1__["Line"], {
+    percent: progress,
+    strokeWidth: "2",
+    strokeLinecap: "butt",
+    strokeColor: progress === 100 ? '#008000' : '#007bb1'
+  }), tot > 0 ? react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", null, counter, "/", tot, " (", progress, "%)") : '');
+};
+
+ProgressBar.propTypes = {
+  tot: prop_types__WEBPACK_IMPORTED_MODULE_2__["number"],
+  counter: prop_types__WEBPACK_IMPORTED_MODULE_2__["number"],
+  message: prop_types__WEBPACK_IMPORTED_MODULE_2__["string"],
+  error: prop_types__WEBPACK_IMPORTED_MODULE_2__["bool"]
+};
+/* harmony default export */ __webpack_exports__["default"] = (ProgressBar);
+
+/***/ }),
+
 /***/ "./src/rer/solrpush/browser/static/javascripts/ProgressBarContainer/index.js":
 /*!***********************************************************************************!*\
   !*** ./src/rer/solrpush/browser/static/javascripts/ProgressBarContainer/index.js ***!
@@ -43306,11 +43357,11 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! axios */ "./node_modules/axios/index.js");
 /* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(axios__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var rc_progress__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! rc-progress */ "./node_modules/rc-progress/es/index.js");
-/* harmony import */ var prop_types__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! prop-types */ "./node_modules/prop-types/index.js");
-/* harmony import */ var prop_types__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(prop_types__WEBPACK_IMPORTED_MODULE_3__);
-/* harmony import */ var react_svg_spinner__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! react-svg-spinner */ "./node_modules/react-svg-spinner/dist/index.js");
-/* harmony import */ var react_svg_spinner__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(react_svg_spinner__WEBPACK_IMPORTED_MODULE_4__);
+/* harmony import */ var prop_types__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! prop-types */ "./node_modules/prop-types/index.js");
+/* harmony import */ var prop_types__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(prop_types__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var react_svg_spinner__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! react-svg-spinner */ "./node_modules/react-svg-spinner/dist/index.js");
+/* harmony import */ var react_svg_spinner__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(react_svg_spinner__WEBPACK_IMPORTED_MODULE_3__);
+/* harmony import */ var _ProgressBar__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../ProgressBar */ "./src/rer/solrpush/browser/static/javascripts/ProgressBar/index.js");
 function _slicedToArray(arr, i) {
   return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _nonIterableRest();
 }
@@ -43362,7 +43413,8 @@ var ProgressBarContainer = function ProgressBarContainer(_ref) {
     in_progress: true,
     tot: 0,
     counter: 0,
-    message: ''
+    message: '',
+    error: false
   };
 
   var _useState = Object(react__WEBPACK_IMPORTED_MODULE_0__["useState"])(),
@@ -43402,18 +43454,13 @@ var ProgressBarContainer = function ProgressBarContainer(_ref) {
     setIntervalId(intervalId);
   };
 
-  var tot = data.tot,
-      counter = data.counter,
-      in_progress = data.in_progress,
-      message = data.message;
+  var in_progress = data.in_progress;
 
   if (reindexStart && !in_progress) {
     setReindexStart(false);
     clearInterval(intervalId);
   }
 
-  var progress = tot === 0 ? 0 : Math.floor(counter * 100 / tot);
-  console.log(data);
   return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
     className: "maintenance-wrapper"
   }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
@@ -43421,24 +43468,15 @@ var ProgressBarContainer = function ProgressBarContainer(_ref) {
   }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
     onClick: doReindex,
     disabled: reindexStart
-  }, "Start ", reindexStart ? react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_svg_spinner__WEBPACK_IMPORTED_MODULE_4___default.a, null) : ''), ' ', react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
+  }, "Start ", reindexStart ? react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_svg_spinner__WEBPACK_IMPORTED_MODULE_3___default.a, null) : ''), ' ', react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
     onClick: doCancel,
     disabled: reindexStart
-  }, "Cancel")), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
-    className: "status-bar"
-  }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(rc_progress__WEBPACK_IMPORTED_MODULE_2__["Line"], {
-    percent: progress,
-    strokeWidth: "2",
-    strokeLinecap: "butt",
-    strokeColor: progress === 100 ? '#008000' : '#007bb1'
-  }), message && react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
-    className: "status-message"
-  }, message), tot > 0 ? react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", null, counter, "/", tot, " (", progress, "%)") : ''));
+  }, "Cancel")), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_ProgressBar__WEBPACK_IMPORTED_MODULE_4__["default"], data));
 };
 
 ProgressBarContainer.propTypes = {
-  authenticator: prop_types__WEBPACK_IMPORTED_MODULE_3__["string"],
-  action: prop_types__WEBPACK_IMPORTED_MODULE_3__["string"]
+  authenticator: prop_types__WEBPACK_IMPORTED_MODULE_2__["string"],
+  action: prop_types__WEBPACK_IMPORTED_MODULE_2__["string"]
 };
 /* harmony default export */ __webpack_exports__["default"] = (ProgressBarContainer);
 

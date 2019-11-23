@@ -18,13 +18,18 @@
       description
     </p> 
 </metal:description>
-<metal:core fill-slot="content-core">
+<metal:core fill-slot="content-core" tal:define="is_active view/is_active">
   <div class="portalMessage warning" role="status">
       <strong>You might run into problems</strong>
       Please check your settings, be sure what you're doing is right.
   </div>
-  <div id="solr-maintenance" data-authenticator="${view/token}" data-action="${view/action}" />
-  <script src="${context/portal_url}/++plone++rer.solrpush/dist/dev/main.js"></script>
+  <p tal:condition="not:is_active" i18n:translate="reindex_solr_not_active">SOLR push is not active. Unable to sync with solr.</p>
+  <tal:active condition="is_active">
+    <div id="solr-maintenance"
+        data-authenticator="${view/token}"
+        data-action="${view/action}" />
+    <script src="${view/get_resource_js}"></script>
+  </tal:active>
 </metal:core>
 </body>
 </html>
