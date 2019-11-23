@@ -274,3 +274,26 @@ class TestSolrSearch(unittest.TestCase):
                 self.assertNotIn('Subject', doc.keys())
             else:
                 self.assertIn('Subject', doc.keys())
+
+    def test_search_sort_on(self):
+        """
+        """
+        # update modification date
+        self.doc2.reindexObject()
+        commit()
+        solr_results = search(
+            query={'portal_type': 'Document', 'sort_on': 'modified'}
+        )
+        self.assertEqual(solr_results.hits, 2)
+        self.assertEqual(solr_results.docs[0]['UID'], self.doc1.UID())
+        self.assertEqual(solr_results.docs[1]['UID'], self.doc2.UID())
+        solr_results = search(
+            query={
+                'portal_type': 'Document',
+                'sort_on': 'modified',
+                'sort_order': 'reverse',
+            }
+        )
+        self.assertEqual(solr_results.hits, 2)
+        self.assertEqual(solr_results.docs[0]['UID'], self.doc2.UID())
+        self.assertEqual(solr_results.docs[1]['UID'], self.doc1.UID())

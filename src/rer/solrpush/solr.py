@@ -204,9 +204,7 @@ def create_index_dict(item):
 
 def set_sort_parameter(query):
     sort_on = query.get('sort_on')
-    sort_order = query.get('sort_order', '')
-    if not sort_order:
-        return sort_on
+    sort_order = query.get('sort_order', 'asc')
     if sort_order in ['reverse']:
         return '{sort_on} desc'.format(sort_on=sort_on)
     return '{sort_on} {sort_order}'.format(
