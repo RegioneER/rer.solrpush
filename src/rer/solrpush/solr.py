@@ -36,7 +36,8 @@ def fix_value(value):
 
 def escape_special_characters(value):
     chars = []
-    value = value.decode('utf-8')
+    if six.PY2:
+        value = value.decode('utf-8')
     for c in value:
         if c in LUCENE_SPECIAL_CHARACTERS:
             chars.append(u'\{}'.format(c))
