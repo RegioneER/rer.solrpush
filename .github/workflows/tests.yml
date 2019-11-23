@@ -27,8 +27,8 @@ jobs:
           cp test_plone${{ matrix.plone }}.cfg buildout.cfg
       - name: Install buildout
         run: |
-          bin/buildout -N -t 3 code-analysis:return-status-codes=True annotate
-          bin/buildout -N -t 3 code-analysis:return-status-codes=True
+          buildout -N -t 3 code-analysis:return-status-codes=True annotate
+          buildout -N -t 3 code-analysis:return-status-codes=True
       - name: Before script
         run: |
           export DISPLAY=:99.0
