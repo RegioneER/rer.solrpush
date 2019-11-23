@@ -6,6 +6,7 @@ from plone.indexer.interfaces import IIndexableObject
 from pysolr import SolrError
 from rer.solrpush import _
 from rer.solrpush.interfaces.settings import IRerSolrpushSettings
+from six.moves import map
 from zope.component import queryMultiAdapter
 from zope.i18n import translate
 
@@ -14,18 +15,8 @@ import pysolr
 import requests
 import six
 import json
-from six.moves import map
 
 logger = logging.getLogger(__name__)
-
-DATE_FIELDS = [
-    'created',
-    'modified',
-    'effective',
-    'ModificationDate',
-    'EffectiveDate',
-    'CreationDate',
-]
 
 ADDITIONAL_FIELDS = ['searchwords']
 
@@ -51,7 +42,10 @@ def escape_special_characters(value):
             chars.append(u'\{}'.format(c))
         else:
             chars.append(c)
-    return u''.join(chars)
+    new_value = u''.join(chars)
+    if ' ' in new_value:
+        new_value = '"{}"'.format(new_value)
+    return new_value
 
 
 def get_setting(field):
@@ -207,6 +201,65 @@ def create_index_dict(item):
     return index_me
 
 
+def set_sort_parameter(query):
+    sort_on = query.get('sort_on')
+    sort_order = query.get('sort_order', '')
+    if not sort_order:
+        return sort_on
+    if sort_order in ['reverse']:
+        return '{sort_on} desc'.format(sort_on=sort_on)
+    return '{sort_on} {sort_order}'.format(
+        sort_on=sort_on, sort_order=sort_order
+    )
+
+
+def generate_query(
+    query,
+    fl='',
+    facets=False,
+    facet_fields=['Subject', 'portal_type'],
+    filtered_sites=[],
+):
+    """
+    """
+    index_fields = get_index_fields(field='index_fields')
+    index_ids = [x['id'] for x in index_fields]
+    solr_query = {
+        'q': '',
+        'fq': [],
+        'facet': facets and 'true' or 'false',
+        'start': query.get('b_start', 0),
+        'rows': query.get('b_size', 20),
+        'json.nl': 'arrmap',
+    }
+    for index, value in query.items():
+        if index == '*':
+            solr_query['q'] = '*:*'.format(value)
+            continue
+        if index not in index_ids:
+            continue
+        value = fix_value(value=value)
+        if index == 'SearchableText':
+            solr_query['q'] = u'SearchableText:{}'.format(value)
+        else:
+            solr_query['fq'].append(
+                '{index}:{value}'.format(index=index, value=value)
+            )
+    if not solr_query['q']:
+        solr_query['q'] = '*:*'
+    if filtered_sites:
+        solr_query['fq'].append(
+            'site_name:{}'.format(' OR '.join(filtered_sites))
+        )
+    if 'sort_on' in query:
+        solr_query['sort'] = set_sort_parameter(query)
+    if facets:
+        solr_query['facet.field'] = facet_fields
+    if fl:
+        solr_query['fl'] = fl
+    return solr_query
+
+
 def push_to_solr(item):
     """
     Perform push to solr
@@ -252,37 +305,21 @@ def reset_solr():
     solr.delete(q='*:*')
 
 
-def search(
-    query,
-    fl='',
-    facets=False,
-    facet_fields=['Subject', 'portal_type'],
-    filtered_sites=[],
-):
+def search(**kwargs):
     solr = get_solr_connection()
-    q, fq = generate_query(query)
-    if filtered_sites:
-        fq.append('site_name:{}'.format(' OR '.join(filtered_sites)))
     if not solr:
-        logger.error(
-            'Unable to search using solr. Configuration is incomplete.'
-        )
-        return
-    additional_parameters = {
-        'fq': fq,
-        'facet': facets and 'true' or 'false',
-        'start': query.get('b_start', 0),
-        'rows': query.get('b_size', 20),
-        'json.nl': 'arrmap',
-    }
-    if 'sort_on' in query:
-        additional_parameters['sort'] = set_sort_parameter(query)
-    if facets:
-        additional_parameters['facet.field'] = facet_fields
-    if fl:
-        additional_parameters['fl'] = fl
+        msg = u'Unable to search using solr. Configuration is incomplete.'
+        logger.error(msg)
+        return {
+            'error': True,
+            'message': translate(
+                _('solr_configuration_error_label', default=msg),
+                context=api.portal.get().REQUEST,
+            ),
+        }
+    solr_query = generate_query(**kwargs)
     try:
-        return solr.search(q=q, **additional_parameters)
+        return solr.search(**solr_query)
     except SolrError as e:
         logger.exception(e)
         return {
@@ -297,51 +334,3 @@ def search(
                 context=api.portal.get().REQUEST,
             ),
         }
-
-
-def set_sort_parameter(query):
-    sort_on = query.get('sort_on')
-    sort_order = query.get('sort_order', '')
-    if not sort_order:
-        return sort_on
-    if sort_order in ['reverse']:
-        return '{sort_on} desc'.format(sort_on=sort_on)
-    return '{sort_on} {sort_order}'.format(
-        sort_on=sort_on, sort_order=sort_order
-    )
-
-
-def generate_query(query):
-    """
-    by default makes queries only on current site
-    """
-    index_fields = get_index_fields(field='index_fields')
-    index_ids = [x['id'] for x in index_fields]
-    q = ''
-    fq = []
-    for index, value in query.items():
-        if index == '*':
-            q = '*:*'.format(value)
-            continue
-        if index not in index_ids:
-            continue
-        value = fix_value(value=value)
-        if index == 'SearchableText':
-            q = u'SearchableText:{}'.format(value)
-        else:
-            fq.append('{index}:{value}'.format(index=index, value=value))
-    if not q:
-        q = '*:*'
-    return q, fq
-
-
-# fq=+portal_type:(BookCrossing+OR+AdsCategory+OR+WildcardVideo+OR+File+OR+Image+OR+Circolare+OR+LinkNormativa+OR+Collection+OR+Document+OR+WildcardAudio+OR+BulletinBoard+OR+Link+OR+Advertisement+OR+Folder+OR+"News+Item"+OR+Aforisma+OR+Event)
-# fq=+allowedRolesAndUsers:(user$Cecchi_A+OR+Member+OR+Manager+OR+Authenticated+OR+user$Administrators+OR+user$AuthenticatedUsers+OR+Anonymous)
-# rows=20
-# facet.field=Subjec
-# facet.field=portal_type
-# enableElevation=false
-# facet=true
-# start=0
-# q=+path_parents:"\/orma"++(Title:(regione)^5+OR+Description:(regione)^2+OR+SearchableText:(regione)+OR+searchwords:(regione)^1000)+%0D%0A+(portal_type:Document^10+OR+portal_type:*)++(portal_type:*+-portal_type:Folder)^1000+OR+portal_type:Folder^0.01)++(portal_type:*+-portal_type:Circolare)^1000+OR+portal_type:Circolare^0.01)++(*:*+OR++searchwords:redazione^100)%0D%0A+showinsearch:True
-# fl=*+score+[elevated]
