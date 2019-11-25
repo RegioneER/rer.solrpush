@@ -166,10 +166,14 @@ class TestSolrSearch(unittest.TestCase):
             container=self.portal,
             type='Document',
             title='First Document',
+            description='lorem ipsum',
             subject=['foo', 'bar'],
         )
         self.doc2 = api.content.create(
-            container=self.portal, type='Document', title='Second Document'
+            container=self.portal,
+            type='Document',
+            title='Second Document',
+            description='lorem ipsum dolor sit amet',
         )
         self.unpublished_doc = api.content.create(
             container=self.portal,
@@ -180,7 +184,7 @@ class TestSolrSearch(unittest.TestCase):
             container=self.portal,
             type='News Item',
             title='Published News',
-            subject=['foo'],
+            subject=['foo', 'news category'],
         )
         self.unpublished_news = api.content.create(
             container=self.portal,
@@ -218,7 +222,6 @@ class TestSolrSearch(unittest.TestCase):
 
     def test_search_q(self):
         solr_results = search(query={'SearchableText': 'Document'})
-        # only published and indexable contents are on solr
         self.assertEqual(solr_results.hits, 2)
         uids = [x['UID'] for x in solr_results.docs]
         self.assertIn(self.doc1.UID(), uids)
@@ -228,6 +231,25 @@ class TestSolrSearch(unittest.TestCase):
         self.assertNotIn(self.unpublished_news.UID(), uids)
         self.assertNotIn(self.event.UID(), uids)
 
+        solr_results = search(query={'SearchableText': 'lorem ipsum'})
+        self.assertEqual(solr_results.hits, 2)
+        uids = [x['UID'] for x in solr_results.docs]
+        self.assertIn(self.doc1.UID(), uids)
+        self.assertIn(self.doc2.UID(), uids)
+
+        solr_results = search(query={'SearchableText': 'lorem amet'})
+        self.assertEqual(solr_results.hits, 1)
+        uids = [x['UID'] for x in solr_results.docs]
+        self.assertNotIn(self.doc1.UID(), uids)
+        self.assertIn(self.doc2.UID(), uids)
+
+        solr_results = search(query={'SearchableText': 'lorem OR amet'})
+        self.assertEqual(solr_results.hits, 2)
+        uids = [x['UID'] for x in solr_results.docs]
+        self.assertIn(self.doc1.UID(), uids)
+        self.assertIn(self.doc2.UID(), uids)
+
+    def test_search_fq(self):
         #  same result if we search by portal_type
         solr_results = search(query={'portal_type': 'Document'})
         self.assertEqual(solr_results.hits, 2)
@@ -240,6 +262,46 @@ class TestSolrSearch(unittest.TestCase):
         self.assertNotIn(self.event.UID(), uids)
 
         solr_results = search(query={'portal_type': 'News Item'})
+        self.assertEqual(solr_results.hits, 1)
+        uids = [x['UID'] for x in solr_results.docs]
+        self.assertNotIn(self.doc1.UID(), uids)
+        self.assertNotIn(self.doc2.UID(), uids)
+        self.assertIn(self.published_news.UID(), uids)
+        self.assertNotIn(self.unpublished_doc.UID(), uids)
+        self.assertNotIn(self.unpublished_news.UID(), uids)
+        self.assertNotIn(self.event.UID(), uids)
+
+        solr_results = search(query={'Subject': 'foo'})
+        self.assertEqual(solr_results.hits, 2)
+        uids = [x['UID'] for x in solr_results.docs]
+        self.assertIn(self.doc1.UID(), uids)
+        self.assertNotIn(self.doc2.UID(), uids)
+        self.assertIn(self.published_news.UID(), uids)
+        self.assertNotIn(self.unpublished_doc.UID(), uids)
+        self.assertNotIn(self.unpublished_news.UID(), uids)
+        self.assertNotIn(self.event.UID(), uids)
+
+        solr_results = search(query={'Subject': 'bar'})
+        self.assertEqual(solr_results.hits, 1)
+        uids = [x['UID'] for x in solr_results.docs]
+        self.assertIn(self.doc1.UID(), uids)
+        self.assertNotIn(self.doc2.UID(), uids)
+        self.assertNotIn(self.published_news.UID(), uids)
+        self.assertNotIn(self.unpublished_doc.UID(), uids)
+        self.assertNotIn(self.unpublished_news.UID(), uids)
+        self.assertNotIn(self.event.UID(), uids)
+
+        solr_results = search(query={'Subject': ['foo', 'bar']})
+        self.assertEqual(solr_results.hits, 2)
+        uids = [x['UID'] for x in solr_results.docs]
+        self.assertIn(self.doc1.UID(), uids)
+        self.assertNotIn(self.doc2.UID(), uids)
+        self.assertIn(self.published_news.UID(), uids)
+        self.assertNotIn(self.unpublished_doc.UID(), uids)
+        self.assertNotIn(self.unpublished_news.UID(), uids)
+        self.assertNotIn(self.event.UID(), uids)
+
+        solr_results = search(query={'Subject': ['news category']})
         self.assertEqual(solr_results.hits, 1)
         uids = [x['UID'] for x in solr_results.docs]
         self.assertNotIn(self.doc1.UID(), uids)

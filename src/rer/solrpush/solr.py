@@ -7,8 +7,6 @@ from plone.registry.interfaces import IRegistry
 from pysolr import SolrError
 from rer.solrpush import _
 from rer.solrpush.interfaces.settings import IRerSolrpushSettings
-from six.moves import map
-from six.moves.urllib.parse import quote
 from zope.component import getUtility
 from zope.component import queryMultiAdapter
 from zope.i18n import translate
@@ -18,6 +16,7 @@ import pysolr
 import requests
 import six
 import json
+import re
 
 try:
     # rer.agidtheme overrides site tile field
@@ -37,29 +36,29 @@ ADDITIONAL_FIELDS = ['searchwords']
 LUCENE_SPECIAL_CHARACTERS = '+-&|!(){}^"~?:\t\v\\/'
 
 
-def fix_value(value):
+def fix_value(value, wrap=True):
     if isinstance(value, six.string_types):
-        return escape_special_characters(value)
+        return escape_special_characters(value, wrap)
     elif isinstance(value, list):
-        return list(map(escape_special_characters, value))
+        return '({})'.format(
+            ' OR '.join([escape_special_characters(x, wrap) for x in value])
+        )
+        # return list(map(escape_special_characters, value))
     logger.warning(
         '[fix_value]: unable to escape value: {}. skipping'.format(value)
     )
     return
 
 
-def escape_special_characters(value):
-    chars = []
-    if six.PY2:
-        value = value.decode('utf-8')
-    for c in value:
-        if c in LUCENE_SPECIAL_CHARACTERS:
-            chars.append(u'\{}'.format(c))
-        else:
-            chars.append(c)
-    new_value = u''.join(chars)
-    if ' ' in new_value:
-        new_value = '"{}"'.format(new_value)
+ESCAPE_CHARS_RE = re.compile(r'(?<!\\)(?P<char>[&|+\-!(){}[\]^"~*?:])')
+
+
+def escape_special_characters(value, wrap):
+    new_value = ESCAPE_CHARS_RE.sub(r'\\\g<char>', value)
+    # if ('OR' not in new_value or 'AND' not in new_value) and ' ' in new_value:
+    #     new_value = '"{}"'.format(new_value)
+    if wrap:
+        return '"{}"'.format(new_value)
     return new_value
 
 
@@ -145,7 +144,7 @@ def init_solr_push():
 
         root = etree.fromstring(respo.content)
         chosen_fields = json.dumps(
-            list(map(extract_field, root.findall('.//field')))
+            extract_fields(nodes=root.findall('.//field'))
         )
         if six.PY2:
             chosen_fields = chosen_fields.decode('utf-8')
@@ -156,13 +155,16 @@ def init_solr_push():
     return _('No SOLR url provided')
 
 
-def extract_field(node):
-    field_name = node.get('name')
-    field_type = node.get('type')
-    if six.PY2:
-        field_name = six.text_type(field_name)
-        field_type = six.text_type(field_type)
-    return {'id': field_name, 'type': field_type}
+def extract_fields(nodes):
+    fields = {}
+    for node in nodes:
+        field_name = node.get('name')
+        field_type = node.get('type')
+        if six.PY2:
+            field_name = six.text_type(field_name)
+            field_type = six.text_type(field_type)
+        fields[field_name] = {'type': field_type}
+    return fields
 
 
 def is_solr_active():
@@ -199,8 +201,8 @@ def create_index_dict(item):
 
     index_me = {}
 
-    for field_infos in index_fields:
-        field = field_infos.get('id')
+    for field in index_fields.keys():
+        field_infos = index_fields[field]
         field_type = field_infos.get('type')
         if six.PY2:
             field = field.encode('ascii')
@@ -247,7 +249,7 @@ def generate_query(
     filtered_sites=[],
 ):
     index_fields = get_index_fields(field='index_fields')
-    index_ids = [x['id'] for x in index_fields]
+    # index_ids = [x['id'] for x in index_fields]
     solr_query = {
         'q': '',
         'fq': [],
@@ -260,21 +262,24 @@ def generate_query(
         if index == '*':
             solr_query['q'] = '*:*'.format(value)
             continue
-        if index not in index_ids:
+        index_infos = index_fields.get(index, {})
+        if not index_infos:
             continue
-        value = fix_value(value=value)
         if index == 'SearchableText':
-            solr_query['q'] = u'SearchableText:{}'.format(value)
+            solr_query['q'] = u'SearchableText:{}'.format(
+                fix_value(value=value, wrap=False)
+            )
         else:
+            if index_infos.get('type') not in ['date']:
+                value = fix_value(value=value)
             solr_query['fq'].append(
                 '{index}:{value}'.format(index=index, value=value)
             )
     if not solr_query['q']:
         solr_query['q'] = '*:*'
     if filtered_sites:
-        solr_query['fq'].append(
-            'site_name:{}'.format(' OR '.join(filtered_sites))
-        )
+        sites = ['"{}"'.format(x) for x in filtered_sites]
+        solr_query['fq'].append('site_name:({})'.format(' OR '.join(sites)))
     if 'sort_on' in query:
         solr_query['sort'] = set_sort_parameter(query)
     if facets:
@@ -326,7 +331,7 @@ def reset_solr():
     if not solr:
         logger.error('Unable to push to solr. Configuration is incomplete.')
         return
-    solr.delete(q='site_name:{}'.format(quote(get_site_title())))
+    solr.delete(q='site_name:"{}"'.format(get_site_title()))
 
 
 def search(**kwargs):
@@ -342,6 +347,7 @@ def search(**kwargs):
             ),
         }
     solr_query = generate_query(**kwargs)
+    logger.info('QUERY: %s' % solr_query)
     try:
         return solr.search(**solr_query)
     except SolrError as e:
