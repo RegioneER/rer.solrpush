@@ -1,4 +1,4 @@
-name: Plone tests
+name: Tests
 
 on: [push]
 

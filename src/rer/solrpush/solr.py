@@ -3,10 +3,13 @@ from DateTime import DateTime
 from lxml import etree
 from plone import api
 from plone.indexer.interfaces import IIndexableObject
+from plone.registry.interfaces import IRegistry
 from pysolr import SolrError
 from rer.solrpush import _
 from rer.solrpush.interfaces.settings import IRerSolrpushSettings
 from six.moves import map
+from six.moves.urllib.parse import quote
+from zope.component import getUtility
 from zope.component import queryMultiAdapter
 from zope.i18n import translate
 
@@ -15,6 +18,17 @@ import pysolr
 import requests
 import six
 import json
+
+try:
+    # rer.agidtheme overrides site tile field
+    from rer.agidtheme.base.interfaces import IRERSiteSchema as ISiteSchema
+    from rer.agidtheme.base.utility.interfaces import ICustomFields
+
+    RER_THEME = True
+except ImportError:
+    from Products.CMFPlone.interfaces.controlpanel import ISiteSchema
+
+    RER_THEME = False
 
 logger = logging.getLogger(__name__)
 
@@ -66,6 +80,19 @@ def get_index_fields(field):
         field, interface=IRerSolrpushSettings, default=''
     )
     return json.loads(json_str)
+
+
+def get_site_title():
+    registry = getUtility(IRegistry)
+    site_settings = registry.forInterface(
+        ISiteSchema, prefix='plone', check=False
+    )
+    site_title = getattr(site_settings, 'site_title') or ''
+    if not RER_THEME:
+        return site_title
+    fields_value = getUtility(ICustomFields)
+
+    return fields_value.titleLang(site_title)
 
 
 def get_solr_connection():
@@ -194,7 +221,7 @@ def create_index_dict(item):
         if value is not None:
             index_me[field] = value
     portal = api.portal.get()
-    index_me['site_name'] = portal.getId()
+    index_me['site_name'] = get_site_title()
     if frontend_url:
         index_me['url'] = item.absolute_url().replace(
             portal.portal_url(), frontend_url
@@ -219,8 +246,6 @@ def generate_query(
     facet_fields=['Subject', 'portal_type'],
     filtered_sites=[],
 ):
-    """
-    """
     index_fields = get_index_fields(field='index_fields')
     index_ids = [x['id'] for x in index_fields]
     solr_query = {
@@ -301,7 +326,7 @@ def reset_solr():
     if not solr:
         logger.error('Unable to push to solr. Configuration is incomplete.')
         return
-    solr.delete(q='*:*')
+    solr.delete(q='site_name:{}'.format(quote(get_site_title())))
 
 
 def search(**kwargs):

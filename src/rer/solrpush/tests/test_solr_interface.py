@@ -256,24 +256,24 @@ class TestSolrSearch(unittest.TestCase):
         solr_results = search(query={'*': '*'})
         self.assertEqual(solr_results.hits, 3)
         for doc in solr_results.docs:
-            self.assertIn('UID', doc.keys())
-            self.assertIn('Title', doc.keys())
+            self.assertIn('UID', list(doc.keys()))
+            self.assertIn('Title', list(doc.keys()))
 
         solr_results = search(query={'*': '*'}, fl='UID')
         self.assertEqual(solr_results.hits, 3)
         for doc in solr_results.docs:
-            self.assertIn('UID', doc.keys())
-            self.assertNotIn('Title', doc.keys())
+            self.assertIn('UID', list(doc.keys()))
+            self.assertNotIn('Title', list(doc.keys()))
 
         solr_results = search(query={'*': '*'}, fl='UID Subject')
         self.assertEqual(solr_results.hits, 3)
         for doc in solr_results.docs:
-            self.assertIn('UID', doc.keys())
-            self.assertNotIn('Title', doc.keys())
+            self.assertIn('UID', list(doc.keys()))
+            self.assertNotIn('Title', list(doc.keys()))
             if not api.content.get(UID=doc['UID']).Subject():
-                self.assertNotIn('Subject', doc.keys())
+                self.assertNotIn('Subject', list(doc.keys()))
             else:
-                self.assertIn('Subject', doc.keys())
+                self.assertIn('Subject', list(doc.keys()))
 
     def test_search_sort_on(self):
         """
