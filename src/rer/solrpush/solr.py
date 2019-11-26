@@ -242,6 +242,8 @@ def fix_py2_strings(value):
         if not isinstance(value, unicode):
             value = value.decode('utf-8')
         return fix_text(value)
+    if isinstance(value, list):
+        return list(map(fix_py2_strings, value))
     return value
 
 
