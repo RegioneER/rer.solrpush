@@ -214,8 +214,8 @@ def create_index_dict(item):
             continue
         if callable(value):
             value = value()
-        if isinstance(value, unicode) and six.PY2:
-            value = fix_text(value)
+        if six.PY2:
+            value = fix_py2_strings(value)
         if isinstance(value, DateTime):
             value = parse_date_as_datetime(value)
         else:
@@ -234,6 +234,15 @@ def create_index_dict(item):
             portal.portal_url(), frontend_url
         )
     return index_me
+
+
+def fix_py2_strings(value):
+    """ REMOVE ON PYTHON 3 """
+    if isinstance(value, six.string_types):
+        if not isinstance(value, unicode):
+            value = value.decode('utf-8')
+        return fix_text(value)
+    return value
 
 
 def set_sort_parameter(query):
