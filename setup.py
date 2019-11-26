@@ -54,7 +54,7 @@ setup(
         'setuptools',
         'plone.api>=1.8.4',
         'pysolr',
-        'ftfy=4.4.3;python_version<"3"',
+        'ftfy==4.4.3;python_version<="2.7"',
     ],
     extras_require={
         'test': [
