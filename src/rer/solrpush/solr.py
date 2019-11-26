@@ -17,6 +17,7 @@ import requests
 import six
 import json
 import re
+from six.moves import map
 
 if six.PY2:
     from ftfy import fix_text
@@ -239,11 +240,13 @@ def create_index_dict(item):
 def fix_py2_strings(value):
     """ REMOVE ON PYTHON 3 """
     if isinstance(value, six.string_types):
-        if not isinstance(value, unicode):
+        if not isinstance(value, six.text_type):
             value = value.decode('utf-8')
         return fix_text(value)
     if isinstance(value, list):
         return list(map(fix_py2_strings, value))
+    if isinstance(value, tuple):
+        return tuple(map(fix_py2_strings, value))
     return value
 
 
