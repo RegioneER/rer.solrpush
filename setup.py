@@ -25,8 +25,11 @@ setup(
         "Framework :: Plone",
         "Framework :: Plone :: Addon",
         "Framework :: Plone :: 5.1",
+        "Framework :: Plone :: 5.2",
         "Programming Language :: Python",
         "Programming Language :: Python :: 2.7",
+        "Programming Language :: Python :: 3.6",
+        "Programming Language :: Python :: 3.7",
         "Operating System :: OS Independent",
         "License :: OSI Approved :: GNU General Public License v2 (GPLv2)",
     ],
@@ -49,12 +52,9 @@ setup(
     python_requires="==2.7",
     install_requires=[
         'setuptools',
-        # -*- Extra requirements: -*-
-        'z3c.jbot',
         'plone.api>=1.8.4',
-        'plone.restapi',
-        'plone.app.dexterity',
         'pysolr',
+        'ftfy=4.4.3;python_version<"3"',
     ],
     extras_require={
         'test': [

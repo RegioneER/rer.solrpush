@@ -18,6 +18,9 @@ import six
 import json
 import re
 
+if six.PY2:
+    from ftfy import fix_text
+
 try:
     # rer.agidtheme overrides site tile field
     from rer.agidtheme.base.interfaces import IRERSiteSchema as ISiteSchema
@@ -211,6 +214,8 @@ def create_index_dict(item):
             continue
         if callable(value):
             value = value()
+        if isinstance(value, unicode) and six.PY2:
+            value = fix_text(value)
         if isinstance(value, DateTime):
             value = parse_date_as_datetime(value)
         else:
