@@ -6,7 +6,7 @@
       metal:use-macro="here/prefs_main_template/macros/master"
       i18n:domain="plone">
 <body>
-<div metal:fill-slot="prefs_configlet_main">
+  <div metal:fill-slot="prefs_configlet_main">
 
     <a id="setup-link" class="link-parent"
        tal:attributes="href view/control_panel_url"
@@ -43,6 +43,6 @@
         </div>
     </div>
 
-</div>
+  </div>
 </body>
 </html>
