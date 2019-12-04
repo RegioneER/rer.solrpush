@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2019-11-23 06:17+0000\n"
+"POT-Creation-Date: 2019-11-28 15:02+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI +ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -20,7 +20,7 @@ msgstr "Attivo"
 
 #: ../browser/controlpanel.py:53
 msgid "Cancel"
-msgstr "Annull  "
+msgstr "Annulla"
 
 #: ../browser/controlpanel.py:41
 msgid "Changes saved."
@@ -54,7 +54,7 @@ msgstr "Installa l'add-on rer.solrpush."
 msgid "Loaded schema.xml from SOLR"
 msgstr "schema.xml caricato correttamente da SOLR"
 
-#: ../solr.py:133
+#: ../solr.py:153
 msgid "No SOLR url provided"
 msgstr "Nessun url di connessione a SOLR fornito"
 
@@ -64,7 +64,7 @@ msgstr ""
 
 #: ../configure.zcml:32
 msgid "RER: Solr push (uninstall)"
-msgstr ""
+msgstr "RER: Solr push (disinstalla)"
 
 #: ../interfaces/settings.py:94
 msgid "Ready"
@@ -117,7 +117,7 @@ msgid "content_indexed_error"
 msgstr "Si è verificato un problema indicizzando questo contenuto su SOLR. Contatta l'amministratore per maggiori informazioni."
 
 #. Default: "There was a problem removing this content from SOLR.  Please contact site administrator."
-#: ../solr.py:233
+#: ../solr.py:326
 msgid "content_remove_error"
 msgstr "Si è verificato un problema rimuovendo questo contenuto da SOLR. Contatta l'amministratore per maggiori informazioni."
 
@@ -158,7 +158,7 @@ msgstr "Elenco di campi utilizzati per indicizzare su SOLR."
 #. Default: "Search words"
 #: ../behaviors/solr_fields.py:31
 msgid "label_searchwords"
-msgstr "Search words"
+msgstr "Parole di ricerca"
 
 #. Default: "Show in search"
 #: ../behaviors/solr_fields.py:23
@@ -171,12 +171,12 @@ msgid "maintenance_cancel_action"
 msgstr "Azione annullata"
 
 #. Default: "Get all Plone contents and reindex them on SOLR."
-#: ../browser/maintenance.py:295
+#: ../browser/maintenance.py:294
 msgid "maintenance_reindex_help"
 msgstr "Recupera tutti i contenuti da Plone e reindicizzali su SOLR."
 
 #. Default: "Reindex SOLR"
-#: ../browser/maintenance.py:294
+#: ../browser/maintenance.py:293
 msgid "maintenance_reindex_label"
 msgstr "Reindicizza SOLR"
 
@@ -196,12 +196,12 @@ msgid "maintenance_reset_success"
 msgstr "Indice SOLR azzerato"
 
 #. Default: "Remove no more existing contents from SOLR and sync with Plone."
-#: ../browser/maintenance.py:305
+#: ../browser/maintenance.py:304
 msgid "maintenance_sync_help"
 msgstr "Rimuove da SOLR gli elementi non più presenti su Plone, e fa il sync con Plone"
 
 #. Default: "Sync SOLR"
-#: ../browser/maintenance.py:304
+#: ../browser/maintenance.py:303
 msgid "maintenance_sync_label"
 msgstr "Sincronizza SOLR"
 
@@ -211,9 +211,13 @@ msgid "reindex_solr_not_active"
 msgstr "SOLR push non è attivo. Impossibile sincronizzarsi."
 
 #. Default: "Unable to perform a search with SOLR. Please contact the site administrator or wait some minutes."
-#: ../solr.py:285
+#: ../solr.py:363
 msgid "search_error_label"
 msgstr "Impossibile eseguire la ricerca su SOLR. Contatta l'amministratore del sito o riprova tra qualche minuto."
+
+#: ../solr.py:350
+msgid "solr_configuration_error_label"
+msgstr "Impossibile cercare usando SOLR. Configurazione incompleta o errata."
 
 #. Default: "There have been problems connecting to SOLR. Contact site administrator."
 #: ../browser/maintenance.py:105
