@@ -6,7 +6,7 @@
 rer.solrpush
 ============
 
-.. image:: https://github.com/PloneGov-IT/rer.solrpush/workflows/Tests/badge.svg
+.. image:: https://github.com/RegioneER/rer.solrpush/workflows/Tests/badge.svg
 
 
 Prodotto per il push delle modifiche di un sito regionale su SOLR per
