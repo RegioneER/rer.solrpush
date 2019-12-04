@@ -326,6 +326,8 @@ def remove_from_solr(uid):
     """
     Perform remove item from solr
     """
+    if not is_solr_active():
+        return
     solr = get_solr_connection()
     portal = api.portal.get()
     if not solr:
