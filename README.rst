@@ -1,7 +1,3 @@
-.. This README is meant for consumption by humans and pypi. Pypi can render rst files so please do not use Sphinx features.
-   If you want to learn more about writing documentation, please check out: http://docs.plone.org/about/documentation_styleguide.html
-   This text does not appear on pypi or github. It is a comment.
-
 ============
 rer.solrpush
 ============
@@ -9,94 +5,62 @@ rer.solrpush
 .. image:: https://github.com/RegioneER/rer.solrpush/workflows/Tests/badge.svg
 
 
-Prodotto per il push delle modifiche di un sito regionale su SOLR per
-ottimizzare l'indicizzazione.
+Product that allows SOLR indexing/searching of a Plone website.
 
 
 Control Panel
 -------------
 
-- Active: specifica se il push deve essere effettuato
-- Solr URL: l'indirizzo a cui connettersi a SOLR
-- Site ID
-- Portal types da indicizzare
-- Configurazione elevate
-- Flag debug query solr
+- Active: flag to enable/disable SOLR integration
+- Solr URL: SOLR core url
+- Portal types to index in SOLR
+- Public frontend url
 
 
-Campi del registro nascosti
-'''''''''''''''''''''''''''
-
-Ci sono degli altri campi del registro che però non sono visibili dal pannello
-di controllo in modo che non vengano modificati per sbaglio.
-
-- ready: un flag che specifica se il prodotto è pronto/inizializzato ed è
-  usabile. Principalmente segnala se lo schema.xml è stato caricato da SOLR ed
-  è stato parsato
-- index_fields: è una lista di stringhe dei vari field/attributi da indicizzare.
-  Questa lista viene popolata leggendo direttamente il file schema.xml del solr
-  regionale
-
-
-Caricamento schema.xml
+Hidden registry fields
 ''''''''''''''''''''''
 
-I campi da indicizzare su SOLR li leggiamo direttamente dal file `schema.xml`
-che SOLR stesso espone (ed è proprio il suo file di configurazione).
+There are some "service" registry fields hidden to disallow users to edit them.
 
-Dopo aver inserito l'url di SOLR (e aver salvato il form), cliccare sul
-bottone "Load schema.xml".
-
-Le logiche di questo caricamento e parsing dell'xml sono all'interno del form
-del pannello di controllo del prodotto (`RerSolrpushEditForm`).
-Non le abbiamo messe in altri punti del transaction manager che andiamo ad
-aggiungere perchè altrimenti ci saremmo ritrovati *nel mezzo* di una transazione
-e non avremmo potuto apportare modifiche al registry.
+- ready: a flag that specifies if the product is ready/initialized.
+  It basically indicates that schema.xml has been loaded.
+- index_fields: is the list of SOLR fields loaded from schema.xml file.
 
 
-Buildout di sviluppo
+schema.xml load
+'''''''''''''''
+
+SOLR fields are directly read from `schema.xml` file exposed by SOLR.
+
+This schema is stored in Plone registry for performance reasons
+and is always synced when you save `solr-controlpanel` form
+or click on `Reload schema.xml` button.
+
+Development buildout
 --------------------
 
-Il buildout del pacchetto contiene già una recipe di `solr` che permette di
-avere in locale un server `solr` funzionante da poter provare e da usare
-per i test.
+In the buildout there is a solr configuration (in `conf` folder) and a recipe that builds a solr instance locally.
+
+To use it, simply run::
+
+    > ./bin/solr-foreground
 
 
-Ricerca
--------
 
-Campi data:
+Search
+------
+
+Date fields:
 
 from DateTime import DateTime
 timezone = DateTime().timezone()
 DateTime(value).toZone(timezone).ISO8601()
 
 
-Examples
---------
-
-This add-on can be seen in action at the following sites:
-- Is there a page on the internet where everybody can see the features?
-
-
-Documentation
--------------
-
-Full documentation for end users can be found in the "docs" folder, and is also available online at http://docs.plone.org/foo/bar
-
-
-Translations
-------------
-
-This product has been translated into
-
-- Klingon (thanks, K'Plai)
-
-
 Installation
 ------------
 
-Install rer.solrpush by adding it to your buildout::
+Add rer.solrpush to buildout::
 
     [buildout]
 
@@ -106,25 +70,36 @@ Install rer.solrpush by adding it to your buildout::
         rer.solrpush
 
 
-and then running ``bin/buildout``
+and run ``bin/buildout`` command.
 
 
 Contribute
 ----------
 
-- Issue Tracker: https://github.com/collective/rer.solrpush/issues
-- Source Code: https://github.com/collective/rer.solrpush
-- Documentation: https://docs.plone.org/foo/bar
+- Issue Tracker: https://github.com/RegioneER/rer.solrpush/issues
+- Source Code: https://github.com/RegioneER/rer.solrpush
+
+Compatibility
+-------------
+
+This product has been tested on Plone 5.1 and 5.2
 
 
-Support
+Credits
 -------
 
-If you are having issues, please let us know.
-We have a mailing list located at: project@example.com
+Developed with the support of `Regione Emilia Romagna`__;
 
+Regione Emilia Romagna supports the `PloneGov initiative`__.
 
-License
+__ http://www.regione.emilia-romagna.it/
+__ http://www.plonegov.it/
+
+Authors
 -------
 
-The project is licensed under the GPLv2.
+This product was developed by RedTurtle Technology team.
+
+.. image:: http://www.redturtle.net/redturtle_banner.png
+   :alt: RedTurtle Technology Site
+   :target: http://www.redturtle.net/
