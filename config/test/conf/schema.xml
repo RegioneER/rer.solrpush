@@ -203,7 +203,6 @@
         or to add multiple fields to the same field for easier/faster searching.  -->
 
    <!-- Text fields from SolrCell to search by default in our catch-all field "Searchabletext" -->
-   <copyField source="url" dest="SearchableText"/>
    <copyField source="SearchableText" dest="SearchableText_no_stem"/>
   
    <!-- Above, multiple source fields are copied to the [text] field. 
