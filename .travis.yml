@@ -6,14 +6,14 @@ cache:
     - eggs
     - downloads
 python:
-  - "2.7"
+  - '2.7'
 matrix:
   include:
-    - python: "2.7"
+    - python: '2.7'
       env: PLONE_VERSION=51
-    - python: "2.7"
+    - python: '2.7'
       env: PLONE_VERSION=52
-    - python: "3.7"
+    - python: '3.7'
       env: PLONE_VERSION=52
       dist: xenial
   sudo: true
@@ -34,11 +34,11 @@ install:
   - bin/buildout -N -t 3 code-analysis:return-status-codes=True annotate
   - bin/buildout -N -t 3 code-analysis:return-status-codes=True
 
-before_script:
-  - "export DISPLAY=:99.0"
-  - Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
-  - sleep 3
-  - firefox -v
+# before_script:
+#   - "export DISPLAY=:99.0"
+#   - Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
+#   - sleep 3
+#   - firefox -v
 
 script:
   # Run code-analysis, except on Python 3.6, which mysteriously fails to find zc.buildout.
