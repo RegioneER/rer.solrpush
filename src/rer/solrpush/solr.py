@@ -177,19 +177,22 @@ def is_solr_active():
     return get_setting(field="active")
 
 
+def is_right_portal_type(item):
+    enabled_types = get_setting(field="enabled_types")
+    if not enabled_types:
+        return True
+    return item.portal_type in enabled_types
+
+
 def can_index(item):
     """ Check if the item passed as argument can and has to be indexed
     """
     with api.env.adopt_roles(["Anonymous"]):
         if not api.user.has_permission("View", obj=item):
             return False
-    enabled_types = get_setting(field="enabled_types")
-    active = get_setting(field="active")
-    if not active:
+    if not is_solr_active():
         return False
-    if not enabled_types:
-        return True
-    return item.portal_type in enabled_types
+    return is_right_portal_type(item)
 
 
 def create_index_dict(item):
@@ -230,6 +233,8 @@ def create_index_dict(item):
             index_me[field] = value
     portal = api.portal.get()
     index_me["site_name"] = get_site_title()
+    index_me["path"] = '/'.join(item.getPhysicalPath())
+    index_me["path_depth"] = len(item.getPhysicalPath()) - 2
     if frontend_url:
         index_me["url"] = item.absolute_url().replace(
             portal.portal_url(), frontend_url

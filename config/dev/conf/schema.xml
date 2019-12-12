@@ -174,6 +174,7 @@
 <!-- campi aggiunti -->
    <field name="site_name" type="string" indexed="true" stored="true" required="false" multiValued="false" termVectors="false" termPositions="false" termOffsets="false"/>
    <field name="path" type="string" indexed="true" stored="true" required="false" multiValued="false" termVectors="false" termPositions="false" termOffsets="false"/>
+   <field name="path_depth" type="pint" indexed="false" stored="true" required="false" multiValued="false" termVectors="false" termPositions="false" termOffsets="false"/>
 
   <!-- <copyField source="Title" dest="title"/> -->
   <copyField source="portal_type" dest="@type"/>
