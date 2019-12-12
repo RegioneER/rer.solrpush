@@ -5,7 +5,8 @@ Changelog
 0.1.2 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Remove noisy logger for queries.
+  [cekk]
 
 
 0.1.1 (2019-12-12)

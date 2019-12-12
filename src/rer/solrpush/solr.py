@@ -379,7 +379,6 @@ def search(**kwargs):
             ),
         }
     solr_query = generate_query(**kwargs)
-    logger.info("QUERY: %s" % solr_query)
     try:
         return solr.search(**solr_query)
     except SolrError as e:
