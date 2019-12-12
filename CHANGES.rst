@@ -2,7 +2,7 @@ Changelog
 =========
 
 
-0.1.1 (unreleased)
+0.1.1 (2019-12-12)
 ------------------
 
 - Add new index: path_depth
