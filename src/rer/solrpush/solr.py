@@ -91,11 +91,12 @@ def get_site_title():
         ISiteSchema, prefix="plone", check=False
     )
     site_title = getattr(site_settings, "site_title") or ""
-    if not RER_THEME:
-        return site_title
-    fields_value = getUtility(ICustomFields)
-
-    return fields_value.titleLang(site_title)
+    if RER_THEME:
+        fields_value = getUtility(ICustomFields)
+        site_title = fields_value.titleLang(site_title)
+    if six.PY2:
+        site_title = site_title.decode('utf-8')
+    return site_title
 
 
 def get_solr_connection():
@@ -304,8 +305,11 @@ def generate_query(
     if not solr_query["q"]:
         solr_query["q"] = "*:*"
     if filtered_sites:
-        sites = ['"{}"'.format(x) for x in filtered_sites]
-        solr_query["fq"].append("site_name:({})".format(" OR ".join(sites)))
+        if six.PY2:
+            sites = [u'"{}"'.format(x) for x in filtered_sites]
+        else:
+            sites = ['"{}"'.format(x) for x in filtered_sites]
+        solr_query["fq"].append(u"site_name:({})".format(" OR ".join(sites)))
     if "sort_on" in query:
         solr_query["sort"] = set_sort_parameter(query)
     if facets:

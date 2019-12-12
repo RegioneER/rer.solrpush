@@ -20,7 +20,7 @@ class AvailableSitesVocabularyFactory(object):
         terms = []
         for facet in facets:
             for key in facet.keys():
-                terms.append(SimpleTerm(value=key, token=key, title=key))
+                terms.append(SimpleTerm(value=key, token=key.encode('utf-8'), title=key))
         return terms
 
     def __call__(self, context):
