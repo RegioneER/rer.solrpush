@@ -1,0 +1,11 @@
+<configure
+    xmlns="http://namespaces.zope.org/zope"
+    i18n_domain="rer.solrpush">
+
+    <adapter
+      for="plone.app.contenttypes.interfaces.IFile"
+      provides="rer.solrpush.interfaces.adapter.IExtractFileFromTika"
+      factory=".file.FileExtractor"
+      />
+
+</configure>

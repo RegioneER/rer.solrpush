@@ -7,6 +7,7 @@ from plone.registry.interfaces import IRegistry
 from pysolr import SolrError
 from rer.solrpush import _
 from rer.solrpush.interfaces.settings import IRerSolrpushSettings
+from rer.solrpush.interfaces.adapter import IExtractFileFromTika
 from zope.component import getUtility
 from zope.component import queryMultiAdapter
 from zope.i18n import translate
@@ -196,6 +197,14 @@ def can_index(item):
     return is_right_portal_type(item)
 
 
+def enhance_searchable_text(item, text):
+    try:
+        provider = IExtractFileFromTika(item)
+        return text + ' ' + provider.extract_from_tika()
+    except TypeError:
+        return text
+
+
 def create_index_dict(item):
     """ Restituisce un dizionario pronto per essere 'mandato' a SOLR per
     l'indicizzazione.
@@ -233,6 +242,11 @@ def create_index_dict(item):
         if value is not None:
             index_me[field] = value
     portal = api.portal.get()
+
+    index_me['SearchableText'] = enhance_searchable_text(
+        item=item, text=index_me['SearchableText']
+    )
+
     index_me["site_name"] = get_site_title()
     index_me["path"] = '/'.join(item.getPhysicalPath())
     index_me["path_depth"] = len(item.getPhysicalPath()) - 2
