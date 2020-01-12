@@ -40,7 +40,7 @@ class TestTika(unittest.TestCase):
             container=self.portal, type='File', title=filename
         )
         with open(
-            os.path.join(os.path.dirname(__file__), 'docs', filename)
+            os.path.join(os.path.dirname(__file__), 'docs', filename), 'rb'
         ) as f:
             file_item.file = NamedFile(data=f.read(), filename=filename)
         return file_item
