@@ -48,10 +48,9 @@ class TestTika(unittest.TestCase):
     def test_index_and_extract_pdf(self):
         file_item = self.create_file_item(u'example.pdf')
         commit()
-        solr_results = search(query={'*': '*'}, fl='UID SearchableText')
+        solr_results = search(query={'*': '*'}, fl='UID')
         self.assertEqual(solr_results.hits, 1)
-        self.assertIn('lorem ipsum', solr_results.docs[0]['SearchableText'])
-        st_results = search(query={'SearchableText': 'lorem'}, fl='UID')
+        st_results = search(query={'SearchablesText': 'lorem'}, fl='UID')
         self.assertEqual(st_results.hits, 1)
         self.assertEqual(file_item.UID(), st_results.docs[0]['UID'])
 
@@ -60,8 +59,7 @@ class TestTika(unittest.TestCase):
         commit()
         solr_results = search(query={'*': '*'}, fl='UID SearchableText')
         self.assertEqual(solr_results.hits, 1)
-        self.assertIn('lorem ipsum', solr_results.docs[0]['SearchableText'])
-        st_results = search(query={'SearchableText': 'lorem'}, fl='UID')
+        st_results = search(query={'SearchableText': 'ipsum'}, fl='UID')
         self.assertEqual(st_results.hits, 1)
         self.assertEqual(file_item.UID(), st_results.docs[0]['UID'])
 
@@ -70,7 +68,6 @@ class TestTika(unittest.TestCase):
         commit()
         solr_results = search(query={'*': '*'}, fl='UID SearchableText')
         self.assertEqual(solr_results.hits, 1)
-        self.assertIn('xxx', solr_results.docs[0]['SearchableText'])
         st_results = search(query={'SearchableText': 'yyy'}, fl='UID')
         self.assertEqual(st_results.hits, 1)
         self.assertEqual(file_item.UID(), st_results.docs[0]['UID'])

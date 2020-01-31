@@ -197,12 +197,15 @@ def can_index(item):
     return is_right_portal_type(item)
 
 
-def enhance_searchable_text(item, text):
+def attachment_to_index(item):
+    """
+    If item has a provider to extract text, return the file to be indexed
+    """
     try:
         provider = IExtractFileFromTika(item)
-        return text + ' ' + provider.extract_from_tika()
+        return provider.get_file_to_index()
     except TypeError:
-        return text
+        return None
 
 
 def create_index_dict(item):
@@ -242,10 +245,6 @@ def create_index_dict(item):
         if value is not None:
             index_me[field] = value
     portal = api.portal.get()
-
-    index_me['SearchableText'] = enhance_searchable_text(
-        item=item, text=index_me['SearchableText']
-    )
 
     index_me["site_name"] = get_site_title()
     index_me["path"] = '/'.join(item.getPhysicalPath())
@@ -339,12 +338,41 @@ def push_to_solr(item):
     """
     if not can_index(item):
         return
+    index_me = create_index_dict(item)
+    attachment = attachment_to_index(item)
     solr = get_solr_connection()
     if not solr:
         logger.error("Unable to push to solr. Configuration is incomplete.")
         return
-    index_me = create_index_dict(item)
-    solr.add([index_me])
+    if attachment:
+        add_with_attachment(solr=solr, attachment=attachment, fields=index_me)
+    else:
+        solr.add([index_me])
+
+
+def add_with_attachment(solr, attachment, fields):
+    params = {
+        "extractOnly": "false",
+        "lowernames": "false",
+        "fmap.content": 'SearchableText',
+        "fmap.title": 'SearchableText',
+        "fmap.created": 'ignore_created',
+        "fmap.modified": 'ignore_modified',
+        "literalsOverride": 'false',
+        "commit": "true",
+    }
+    params.update(
+        {
+            'literal.{key}'.format(key=key): value
+            for (key, value) in fields.items()
+        }
+    )
+    return solr._send_request(
+        "post",
+        "update/extract",
+        body=params,
+        files={"file": ('extracted', attachment)},
+    )
 
 
 def remove_from_solr(uid):
@@ -360,7 +388,7 @@ def remove_from_solr(uid):
         return
     try:
         solr.delete(q="UID:{}".format(uid), commit=True)
-    except (pysolr.SolrError, TypeError) as err:
+    except (SolrError, TypeError) as err:
         logger.error(err)
         message = _(
             "content_remove_error",

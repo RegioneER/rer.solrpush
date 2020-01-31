@@ -136,7 +136,7 @@
    <field name="Language" type="string" indexed="true" stored="true" required="false" multiValued="false" termVectors="false" termPositions="false" termOffsets="false"/>
    <field name="ModificationDate" type="date" indexed="false" stored="true" required="false" multiValued="false" termVectors="false" termPositions="false" termOffsets="false"/>
 <!-- catchall field, containing all other searchable text fields (implemented via copyField further on in this schema -->
-   <field name="SearchableText" type="text_it" indexed="true" stored="true" required="false" multiValued="false" termVectors="false" termPositions="false" termOffsets="false"/>
+   <field name="SearchableText" type="text_it" indexed="true" stored="false" required="false" multiValued="true" termVectors="false" termPositions="false" termOffsets="false"/>
    <field name="Subject" type="string" indexed="true" stored="true" required="false" multiValued="true" termVectors="false" termPositions="false" termOffsets="false"/>
    <field name="Title" type="text_it" indexed="true" stored="true" required="false" multiValued="false" termVectors="false" termPositions="false" termOffsets="false"/>
    <field name="title" type="text_it" indexed="false" stored="true" required="false" multiValued="false" termVectors="false" termPositions="false" termOffsets="false"/>
