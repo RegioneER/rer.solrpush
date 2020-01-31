@@ -2,6 +2,7 @@
 from rer.solrpush.interfaces.adapter import IExtractFileFromTika
 from zope.interface import implementer
 from rer.solrpush.solr import get_solr_connection
+from rer.solrpush.solr import create_index_dict
 
 import json
 
@@ -14,17 +15,24 @@ class FileExtractor(object):
     def call_solr(self, file_obj):
         solr = get_solr_connection()
         params = {
-            "extractOnly": "true",
-            "lowernames": "true",
+            "extractOnly": "false",
+            "lowernames": "false",
             "wt": "json",
-            "extractFormat": "text",
+            # "extractFormat": "text",
         }
-        return solr._send_request(
+        params.update(
+            {
+                'literal.{key}'.format(key=key): value
+                for (key, value) in create_index_dict(self.context).items()
+            }
+        )
+        res = solr._send_request(
             "post",
             "update/extract",
             body=params,
             files={"file": ('extracted', file_obj)},
         )
+        return res
 
     def extract_from_tika(self):
         """
