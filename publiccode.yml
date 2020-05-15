@@ -1,0 +1,118 @@
+# This repository adheres to the publiccode.yml standard by including this 
+# metadata file that makes public software easily discoverable.
+# More info at https://github.com/italia/publiccode.yml
+
+publiccodeYmlVersion: '0.2'
+categories:
+  - application-development
+  - content-management
+  - seo
+  - data-collection
+dependsOn:
+  open:
+    - name: Plone
+      optional: false
+      version: ''
+      versionMax: ''
+      versionMin: '5.1'
+logo: docs/rer-logo.png
+description:
+  it:
+    features:
+      - SOLR
+      - Ricerca
+      - Indicizzazione
+      - Pannello di controllo
+    genericName: Plone addon
+    longDescription: >
+      Product that allows SOLR indexing/searching of a Plone website.
+
+
+      Prodotto che permette a SOLR di indicizzare e cercare in un sito Plone.
+
+
+      ## Control Panel
+
+
+      Nel pannello di controllo sono disponibili:
+
+
+      - Flag abilitare o disabilitare l'integrazione di SOLR
+
+      - Solr URL: SOLR core URL
+
+      - Portal types da indicizzare in SOLR
+
+      - URL del frontend pubblico
+
+
+      ### Campi del registro nascosti
+
+
+      There are some "service" registry fields hidden to disallow users to edit
+      them.
+
+
+      Ci sono alcuni campi del registro di servizio che sono nascosti per non
+      permettere agli utenti di modificarli:
+
+
+      - ready: un flag che specifica se il prodotto è pronto e inizializzato.
+      Indica che lo schema xml è stato caricato.
+
+      - index\_fields: è la lista dei campi di SOLR caricati dal file schema.xml
+
+
+      ### Caricamento del file schema.xml
+
+
+      I campi di SOLR sono letti direttamente dal schema.xml esposto da SOLR.
+
+      Questo schema è salvato nel registry di Plone per questioni di performance
+      ed è sempre sincronizzato quando vengono salvate le configurazioni nel
+      pannello di controllo o si clicca manualmente sul bottone "Ricarica
+      schema.xml".
+    shortDescription: >-
+      Prodotto per Regione Emilia-Romagna relativo all'indicizzazione dei
+      contenuti con SOLR
+developmentStatus: stable
+it:
+  conforme:
+    gdpr: true
+    lineeGuidaDesign: false
+    misureMinimeSicurezza: true
+    modelloInteroperabilita: true
+  countryExtensionVersion: '0.2'
+  piattaforme:
+    anpr: false
+    cie: false
+    pagopa: false
+    spid: false
+legal:
+  license: GPL-2.0-only
+  mainCopyrightOwner: Regione Emilia-Romagna
+  repoOwner: Regione Emilia-Romagna
+localisation:
+  availableLanguages:
+    - it
+    - en
+  localisationReady: true
+maintenance:
+  contacts:
+    - affiliation: Regione Emilia-Romagna
+      email: webmaster@regione.emilia-romagna.it
+      name: Sara Turra
+  contractors:
+    - name: RedTurtle
+      until: '2020-08-31'
+      website: 'https://www.redturtle.it/'
+  type: contract
+name: rer.solrpush
+platforms:
+  - web
+releaseDate: '2019-12-05'
+softwareType: addon
+softwareVersion: 0.1.2
+url: 'https://github.com/RegioneER/rer.solrpush'
+usedBy:
+  - Regione Emilia-Romagna
