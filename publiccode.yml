@@ -25,8 +25,6 @@ description:
       - Pannello di controllo
     genericName: Plone addon
     longDescription: >
-      Product that allows SOLR indexing/searching of a Plone website.
-
 
       Prodotto che permette a SOLR di indicizzare e cercare in un sito Plone.
 
@@ -48,11 +46,6 @@ description:
 
       ### Campi del registro nascosti
 
-
-      There are some "service" registry fields hidden to disallow users to edit
-      them.
-
-
       Ci sono alcuni campi del registro di servizio che sono nascosti per non
       permettere agli utenti di modificarli:
 
@@ -72,6 +65,7 @@ description:
       ed è sempre sincronizzato quando vengono salvate le configurazioni nel
       pannello di controllo o si clicca manualmente sul bottone "Ricarica
       schema.xml".
+ 
     shortDescription: >-
       Prodotto per Regione Emilia-Romagna relativo all'indicizzazione dei
       contenuti con SOLR
