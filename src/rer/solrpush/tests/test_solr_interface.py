@@ -329,16 +329,12 @@ class TestSolrSearch(unittest.TestCase):
         # update modification date
         self.doc2.reindexObject()
         commit()
-        solr_results = search(query={"portal_type": "Document", "sort_on": "modified"})
+        solr_results = search(query={"portal_type": "Document", "sort_on": "id"})
         self.assertEqual(solr_results.hits, 2)
         self.assertEqual(solr_results.docs[0]["UID"], self.doc1.UID())
         self.assertEqual(solr_results.docs[1]["UID"], self.doc2.UID())
         solr_results = search(
-            query={
-                "portal_type": "Document",
-                "sort_on": "modified",
-                "sort_order": "reverse",
-            }
+            query={"portal_type": "Document", "sort_on": "id", "sort_order": "reverse"}
         )
         self.assertEqual(solr_results.hits, 2)
         self.assertEqual(solr_results.docs[0]["UID"], self.doc2.UID())
