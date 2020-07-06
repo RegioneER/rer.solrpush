@@ -45,18 +45,28 @@ class IRerSolrpushConf(model.Schema):
     )
 
     enabled_types = schema.List(
-        title=_(u'enabled_types_label', default=u'Enabled portal types'),
+        title=_(u"enabled_types_label", default=u"Enabled portal types"),
         description=_(
-            u'enabled_types_help',
-            default=u'Select a list of portal types to index in solr. '
-            u'Empty list means that all portal types will be indexed.',
+            u"enabled_types_help",
+            default=u"Select a list of portal types to index in solr. "
+            u"Empty list means that all portal types will be indexed.",
         ),
         required=False,
         default=[],
         missing_value=[],
-        value_type=schema.Choice(
-            vocabulary='plone.app.vocabularies.PortalTypes'
+        value_type=schema.Choice(vocabulary="plone.app.vocabularies.PortalTypes"),
+    )
+
+    custom_query = schema.Text(
+        title=_("custom_query_label", default=u"Custom query"),
+        description=_(
+            "custom_query_help",
+            default=u"Insert a custom query that will be used in SOLR searches. "
+            'By default the query is "SearchableText: {value}" where "value" is '
+            "the searched term. You can create a custom query to replace the default "
+            "one, using {value} where you want to insert the searched term.",
         ),
+        default=u"",
     )
 
     # elevate_xml = schema.Text(
@@ -77,14 +87,14 @@ class IRerSolrpushConf(model.Schema):
     # directives.widget(index_fields=SolrFieldsFieldWidget)
     index_fields = schema.SourceText(
         title=_(
-            'index_fields_label',
-            default=u'List of fields loaded from SOLR that we use for indexing.',
+            "index_fields_label",
+            default=u"List of fields loaded from SOLR that we use for indexing.",
         ),
         description=_(
-            u'index_fields_help',
-            default=u'We store this list for performance'
-            u' reasons. If the configuration changes, you need to click on'
-            u' Reload button',
+            u"index_fields_help",
+            default=u"We store this list for performance"
+            u" reasons. If the configuration changes, you need to click on"
+            u" Reload button",
         ),
         required=False,
     )

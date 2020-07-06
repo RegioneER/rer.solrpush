@@ -227,6 +227,7 @@ def create_index_dict(item):
             value = value()
         if six.PY2:
             value = fix_py2_strings(value)
+
         if isinstance(value, DateTime):
             value = parse_date_as_datetime(value)
         else:
@@ -296,8 +297,11 @@ def generate_query(
         if not index_infos:
             continue
         if index == "SearchableText":
-            solr_query["q"] = u"SearchableText:{}".format(
-                fix_value(value=value, wrap=False)
+            searchable_text_query = (
+                get_setting(field="custom_query") or u"SearchableText:{value}"
+            )
+            solr_query["q"] = searchable_text_query.format(
+                value=fix_value(value=value, wrap=False)
             )
         else:
             if index_infos.get("type") not in ["date"]:
