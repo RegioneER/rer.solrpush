@@ -83,7 +83,7 @@ class TestSolrIndexActions(unittest.TestCase):
         solr_results = search(query={"*": "*", "b_size": 100000}, fl="UID Description")
         self.assertEqual(solr_results.hits, 1)
         self.assertEqual(solr_results.docs[0]["UID"], self.published_doc.UID())
-        self.assertNotIn("Description", solr_results.docs[0])
+        self.assertEqual(solr_results.docs[0].get("Description", ""), "")
 
         self.published_doc.description = "foo description"
         push_to_solr(self.published_doc)
