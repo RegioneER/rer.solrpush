@@ -8,6 +8,7 @@ from pysolr import SolrError
 from rer.solrpush import _
 from rer.solrpush.interfaces.settings import IRerSolrpushSettings
 from rer.solrpush.interfaces.adapter import IExtractFileFromTika
+from rer.solrpush.restapi.services.search.batch import DEFAULT_BATCH_SIZE
 from zope.component import getUtility
 from zope.component import queryMultiAdapter
 from zope.i18n import translate
@@ -286,7 +287,7 @@ def generate_query(
         "fq": [],
         "facet": facets and "true" or "false",
         "start": query.get("b_start", 0),
-        "rows": query.get("b_size", 20),
+        "rows": query.get("b_size", DEFAULT_BATCH_SIZE),
         "json.nl": "arrmap",
     }
     for index, value in query.items():

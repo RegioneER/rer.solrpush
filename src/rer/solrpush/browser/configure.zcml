@@ -13,14 +13,25 @@
   <!-- Pannello di controllo -->
   <browser:page
       name="solrpush-conf"
+      layer="rer.solrpush.interfaces.IRerSolrpushLayer"
       for="Products.CMFPlone.interfaces.IPloneSiteRoot"
       class=".controlpanel.RerSolrpushView"
       permission="cmf.ManagePortal"
       />
+  
+  <!-- <browser:page
+    for="Products.CMFCore.interfaces.ISiteRoot"
+    name="test-query"
+    layer="rer.solrpush.interfaces.IRerSolrpushLayer"
+    permission="zope2.View"
+    class=".test_query.View"
+    template="templates/test_query.pt"
+    /> -->
 
   <browser:page
     for="Products.CMFCore.interfaces.ISiteRoot"
     name="reindex-solr"
+    layer="rer.solrpush.interfaces.IRerSolrpushLayer"
     permission="cmf.ManagePortal"
     class=".maintenance.ReindexSolrView"
     template="templates/reindex_solr.pt"
@@ -28,6 +39,7 @@
     <browser:page
     for="Products.CMFCore.interfaces.ISiteRoot"
     name="sync-solr"
+    layer="rer.solrpush.interfaces.IRerSolrpushLayer"
     permission="cmf.ManagePortal"
     class=".maintenance.SyncSolrView"
     template="templates/reindex_solr.pt"
@@ -36,24 +48,28 @@
    <browser:page
         for="Products.CMFCore.interfaces.ISiteRoot"
         name="reindex-progress"
+        layer="rer.solrpush.interfaces.IRerSolrpushLayer"
         permission="cmf.ManagePortal"
         class=".maintenance.ReindexProgressView"
     />
     <browser:page
         for="Products.CMFCore.interfaces.ISiteRoot"
         name="do-reindex"
+        layer="rer.solrpush.interfaces.IRerSolrpushLayer"
         permission="cmf.ManagePortal"
         class=".maintenance.DoReindexView"
     />
     <browser:page
         for="Products.CMFCore.interfaces.ISiteRoot"
         name="do-sync"
+        layer="rer.solrpush.interfaces.IRerSolrpushLayer"
         permission="cmf.ManagePortal"
         class=".maintenance.DoSyncView"
     />
   <browser:page
           for="Products.CMFCore.interfaces.ISiteRoot"
           name="reset-solr"
+          layer="rer.solrpush.interfaces.IRerSolrpushLayer"
           permission="cmf.ManagePortal"
           class=".maintenance.ResetSolr"
           />

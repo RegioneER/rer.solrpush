@@ -1,0 +1,66 @@
+# -*- coding: utf-8 -*-
+from Products.CMFCore.utils import getToolByName
+from plone.restapi.search.handler import SearchHandler as BaseHandler
+from rer.solrpush.solr import search as solr_search
+from rer.solrpush.restapi.services.search.batch import SolrHypermediaBatch
+
+DEFAULT_METADATA_FIELDS = set(["@id", "@type", "description", "review_state", "title"])
+FIELD_ACCESSORS = {
+    "@id": "getURL",
+    "@type": "PortalType",
+    "description": "Description",
+    "title": "Title",
+}
+
+NON_METADATA_ATTRIBUTES = set(["getPath", "getURL"])
+
+BLACKLISTED_ATTRIBUTES = set(["getDataOrigin", "getObject", "getUserData"])
+
+
+class SolrSearchHandler(BaseHandler):
+    """Executes a solr search based on a query dict, and returns
+    JSON compatible results.
+    """
+
+    def __init__(self, context, request):
+        self.context = context
+        self.request = request
+        self.catalog = getToolByName(self.context, "portal_catalog")
+
+    def search(self, query=None):
+        if query is None:
+            query = {}
+        fl = self.get_fields_list(query)
+        return self.serialize_results(solr_search(query=query, fl=fl))
+
+    def get_fields_list(self, query):
+        if "fullobjects" in query:
+            return ""
+
+        fields = []
+        for field in self.metadata_fields(query):
+            if field.startswith("_") or field in BLACKLISTED_ATTRIBUTES:
+                continue
+            fields.append(field)
+        return " ".join(fields)
+
+    def metadata_fields(self, query):
+
+        additional_metadata_fields = query.get("metadata_fields", [])
+        if not isinstance(additional_metadata_fields, list):
+            additional_metadata_fields = [additional_metadata_fields]
+        additional_metadata_fields = set(additional_metadata_fields)
+        return DEFAULT_METADATA_FIELDS | additional_metadata_fields
+
+    def serialize_results(self, solr_results):
+        batch = SolrHypermediaBatch(self.request, solr_results)
+        results = {}
+        results["@id"] = batch.canonical_url
+        results["items_total"] = solr_results.hits
+        links = batch.links
+        if links:
+            results["batching"] = links
+
+        results["items"] = solr_results.docs
+
+        return results

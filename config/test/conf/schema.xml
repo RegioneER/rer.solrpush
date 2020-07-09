@@ -161,6 +161,7 @@
    <field name="start" type="date" indexed="true" stored="true" required="false" multiValued="false" termVectors="false" termPositions="false" termOffsets="false"/>
    <field name="url" type="string" indexed="false" stored="true" required="false" multiValued="false" termVectors="false" termPositions="false" termOffsets="false"/>
    <field name="@id" type="string" indexed="false" stored="true" required="false" multiValued="false" termVectors="false" termPositions="false" termOffsets="false"/>
+   <field name="description" type="text_it" indexed="false" stored="true" required="false" multiValued="false" termVectors="false" termPositions="false" termOffsets="false"/>
 <!-- catchall field per spellcheck, containing all other searchable text fields (implemented via copyField further on in this schema -->
    <field name="SearchableText_no_stem" type="text_no_stem_it" indexed="true" stored="false" required="false" multiValued="true" termVectors="false" termPositions="false" termOffsets="false"/>
 <!-- bandi -->

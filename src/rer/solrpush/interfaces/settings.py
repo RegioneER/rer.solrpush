@@ -66,7 +66,15 @@ class IRerSolrpushConf(model.Schema):
             "the searched term. You can create a custom query to replace the default "
             "one, using {value} where you want to insert the searched term.",
         ),
+        required=False,
         default=u"",
+    )
+
+    search_with_solr = schema.Bool(
+        title=u"Enable search with SOLR",
+        description=u"If selected, the search will be performed through SOLR instead of Plone.",  # noqa
+        default=False,
+        required=False,
     )
 
     # elevate_xml = schema.Text(
