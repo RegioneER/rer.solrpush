@@ -279,3 +279,4 @@ class TestSolrSearch(unittest.TestCase):
 
         # reset elevate
         set_registry_record("elevate_schema", u"[]", interface=IRerSolrpushSettings)
+        commit()

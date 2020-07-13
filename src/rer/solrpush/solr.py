@@ -356,7 +356,7 @@ def manage_elevate(query):
             # if s in text:
 
             # contains regexp
-            if re.search("(^|\s+)" + config.get("text", "") + "(\s+|$)", text):  #  noqa
+            if re.search("(^|\s+)" + config.get("text", "") + "(\s+|$)", text):  # noqa
                 params["enableElevation"] = "true"
                 params["elevateIds"] = ",".join(config.get("ids", []))
                 break
