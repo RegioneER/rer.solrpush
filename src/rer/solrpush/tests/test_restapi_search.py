@@ -11,7 +11,6 @@ from rer.solrpush.interfaces.settings import IRerSolrpushSettings
 from rer.solrpush.testing import RER_SOLRPUSH_API_FUNCTIONAL_TESTING
 from rer.solrpush.solr import init_solr_push
 from rer.solrpush.solr import reset_solr
-from rer.solrpush.solr import search as solr_search
 
 from transaction import commit
 import unittest
@@ -91,20 +90,11 @@ class SearchBandiTest(unittest.TestCase):
         reset_solr()
         self.api_session.close()
 
-    def test_search_in_plone_by_default(self):
+    def test_search_works(self):
 
-        response = self.api_session.get("/@search")
-        results = response.json()
-        self.assertEqual(results[u"items_total"], 6)
-        self.assertNotEqual(results[u"items_total"], solr_search(query={}).hits)
-
-    def test_search_in_solr_if_flag_is_set(self):
-        set_registry_record("search_with_solr", True, interface=IRerSolrpushSettings)
-        commit()
-
-        response = self.api_session.get("/@search")
-        results = response.json()
-        self.assertEqual(results[u"items_total"], 3)
-        self.assertEqual(results[u"items_total"], solr_search(query={}).hits)
-        pc = api.portal.get_tool(name="portal_catalog")
-        self.assertNotEqual(results[u"items_total"], len(pc()))
+        solr_response = self.api_session.get("/@solr-search")
+        plone_response = self.api_session.get("/@search")
+        solr_results = solr_response.json()
+        plone_results = plone_response.json()
+        self.assertEqual(plone_results[u"items_total"], 6)
+        self.assertEqual(solr_results[u"items_total"], 3)

@@ -2,7 +2,8 @@
 from Products.CMFCore.utils import getToolByName
 from plone.restapi.search.handler import SearchHandler as BaseHandler
 from rer.solrpush.solr import search as solr_search
-from rer.solrpush.restapi.services.search.batch import SolrHypermediaBatch
+from rer.solrpush.restapi.services.solr_search.batch import SolrHypermediaBatch
+from plone.restapi.deserializer import boolean_value
 
 DEFAULT_METADATA_FIELDS = set(["@id", "@type", "description", "review_state", "title"])
 FIELD_ACCESSORS = {
@@ -31,12 +32,19 @@ class SolrSearchHandler(BaseHandler):
         if query is None:
             query = {}
         fl = self.get_fields_list(query)
-        return self.serialize_results(solr_search(query=query, fl=fl))
+        facets = boolean_value(query.get("facets", False))
+        query_params = {"fl": fl}
+        if facets:
+            query_params["facets"] = facets
+            if "facets" in query:
+                del query["facets"]
+        query_params["query"] = query
+        return self.serialize_results(solr_search(**query_params))
 
     def get_fields_list(self, query):
         if "fullobjects" in query:
+            del query["fullobjects"]
             return ""
-
         fields = []
         for field in self.metadata_fields(query):
             if field.startswith("_") or field in BLACKLISTED_ATTRIBUTES:
@@ -57,6 +65,8 @@ class SolrSearchHandler(BaseHandler):
         results = {}
         results["@id"] = batch.canonical_url
         results["items_total"] = solr_results.hits
+        if solr_results.facets:
+            results["facets"] = solr_results.facets.get("facet_fields", {})
         links = batch.links
         if links:
             results["batching"] = links

@@ -250,3 +250,32 @@ class TestSolrSearch(unittest.TestCase):
         solr_results = search(query={"SearchableText": "page"}, fl="UID Title").docs
 
         self.assertEqual(solr_results[0]["UID"], self.doc2.UID())
+
+    def test_search_with_elevate(self):
+        doc3 = api.content.create(
+            container=self.portal, type="Document", title="Third page"
+        )
+        doc4 = api.content.create(
+            container=self.portal, type="Document", title="Fourth page"
+        )
+        api.content.transition(obj=doc3, transition="publish")
+        commit()
+        api.content.transition(obj=doc4, transition="publish")
+        commit()
+        solr_results = search(query={"SearchableText": "page"}, fl="UID Title").docs
+        self.assertNotEqual(solr_results[0]["UID"], doc4.UID())
+
+        # now let's set an elevate for third document
+        set_registry_record(
+            "elevate_schema",
+            u'[{{"text": "page", "ids": ["{}"]}}]'.format(doc4.UID()),
+            interface=IRerSolrpushSettings,
+        )
+        set_registry_record("custom_query", u"", interface=IRerSolrpushSettings)
+        commit()
+        solr_results = search(query={"SearchableText": "page"}, fl="UID Title").docs
+
+        self.assertEqual(solr_results[0]["UID"], doc4.UID())
+
+        # reset elevate
+        set_registry_record("elevate_schema", u"[]", interface=IRerSolrpushSettings)

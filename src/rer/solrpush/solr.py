@@ -8,7 +8,7 @@ from pysolr import SolrError
 from rer.solrpush import _
 from rer.solrpush.interfaces.settings import IRerSolrpushSettings
 from rer.solrpush.interfaces.adapter import IExtractFileFromTika
-from rer.solrpush.restapi.services.search.batch import DEFAULT_BATCH_SIZE
+from rer.solrpush.restapi.services.solr_search.batch import DEFAULT_BATCH_SIZE
 from zope.component import getUtility
 from zope.component import queryMultiAdapter
 from zope.i18n import translate
@@ -20,6 +20,8 @@ import six
 import json
 import re
 from six.moves import map
+
+TRIM = re.compile(r"\s+")
 
 if six.PY2:
     from ftfy import fix_text
@@ -222,7 +224,7 @@ def create_index_dict(item):
         if six.PY2:
             field = field.encode("ascii")
         value = getattr(adapter, field, None)
-        if not value:
+        if value is None:
             continue
         if callable(value):
             value = value()
@@ -322,7 +324,43 @@ def generate_query(
         solr_query["facet.field"] = facet_fields
     if fl:
         solr_query["fl"] = fl
+    solr_query.update(manage_elevate(query))
     return solr_query
+
+
+def manage_elevate(query):
+    params = {}
+    params["enableElevation"] = "false"
+    searchableText = query.get("SearchableText", "")
+    if not searchableText:
+        return params
+    if not searchableText.replace(" ", ""):
+        return params
+    elevate_map = json.loads(get_setting("elevate_schema"))
+    if not elevate_map:
+        return params
+    try:
+        if six.PY2:
+            text = TRIM.sub(" ", searchableText).strip().decode("utf-8").lower()
+        else:
+            text = TRIM.sub(" ", searchableText).strip().lower()
+    except Exception:
+        logger.exception("error parsing %r", searchableText)
+        text = None
+    if text:
+        for config in elevate_map:
+            # exact match
+            # if text == s:
+
+            # contains
+            # if s in text:
+
+            # contains regexp
+            if re.search("(^|\s+)" + config.get("text", "") + "(\s+|$)", text):  #  noqa
+                params["enableElevation"] = "true"
+                params["elevateIds"] = ",".join(config.get("ids", []))
+                break
+    return params
 
 
 def push_to_solr(item):

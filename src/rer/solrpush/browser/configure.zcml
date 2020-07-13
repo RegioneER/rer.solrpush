@@ -73,4 +73,13 @@
           permission="cmf.ManagePortal"
           class=".maintenance.ResetSolr"
           />
+  
+  <browser:page
+    for="Products.CMFCore.interfaces.ISiteRoot"
+    name="search-debug"
+    layer="rer.solrpush.interfaces.IRerSolrpushLayer"
+    permission="zope2.View"
+    class=".search_debug.View"
+    template="templates/search_debug.pt"
+    />
 </configure>

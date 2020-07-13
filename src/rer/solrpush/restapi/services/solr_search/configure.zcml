@@ -6,7 +6,7 @@
     method="GET"
     for="zope.interface.Interface"
     factory=".get.SearchGet"
-    name="@search"
+    name="@solr-search"
     permission="zope2.View"
     layer="rer.solrpush.interfaces.IRerSolrpushLayer"
     />

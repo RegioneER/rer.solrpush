@@ -67,6 +67,7 @@
     "axios": "^0.19.0",
     "rc-progress": "^2.5.2",
     "react": "^16.8.5",
+    "react-debounce-input": "^3.2.2",
     "react-dom": "^16.8.5",
     "react-svg-spinner": "^1.0.4",
     "svg-loaders-react": "^2.0.1"
