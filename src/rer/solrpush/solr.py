@@ -379,6 +379,8 @@ def push_to_solr(item):
         add_with_attachment(solr=solr, attachment=attachment, fields=index_me)
     else:
         solr.add([index_me])
+        if solr.session:
+            solr.session.close()
 
 
 def add_with_attachment(solr, attachment, fields):
@@ -398,6 +400,8 @@ def add_with_attachment(solr, attachment, fields):
     return solr._send_request(
         "post", "update/extract", body=params, files={"file": ("extracted", attachment)}
     )
+    if solr.session:
+        solr.session.close()
 
 
 def remove_from_solr(uid):
@@ -413,6 +417,8 @@ def remove_from_solr(uid):
         return
     try:
         solr.delete(q="UID:{}".format(uid), commit=True)
+        if solr.session:
+            solr.session.close()
     except (SolrError, TypeError) as err:
         logger.error(err)
         message = _(
@@ -429,6 +435,8 @@ def reset_solr():
         logger.error("Unable to push to solr. Configuration is incomplete.")
         return
     solr.delete(q='site_name:"{}"'.format(get_site_title()))
+    if solr.session:
+        solr.session.close()
 
 
 def search(**kwargs):
