@@ -66,6 +66,9 @@ class SolrIndexProcessor(object):
     def commit(self, wait=None):
         # TODO: è possibile con sol anche mandare un set di comandi (add+delete) in un
         #  unica volta, anzichè uno alla volta, valutare le due opzioni
+        if not self.active:
+            self.queue = []
+            return
         for action, obj, args in self.queue:
             try:
                 if action == INDEX:

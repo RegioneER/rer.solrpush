@@ -186,11 +186,11 @@ def is_right_portal_type(item):
 def can_index(item):
     """ Check if the item passed as argument can and has to be indexed
     """
+    if not is_solr_active():
+        return False
     with api.env.adopt_roles(["Anonymous"]):
         if not api.user.has_permission("View", obj=item):
             return False
-    if not is_solr_active():
-        return False
     return is_right_portal_type(item)
 
 
@@ -367,14 +367,14 @@ def push_to_solr(item):
     """
     Perform push to solr
     """
-    if not can_index(item):
-        return
-    index_me = create_index_dict(item)
-    attachment = attachment_to_index(item)
     solr = get_solr_connection()
     if not solr:
         logger.error("Unable to push to solr. Configuration is incomplete.")
         return
+    if not can_index(item):
+        return
+    index_me = create_index_dict(item)
+    attachment = attachment_to_index(item)
     if attachment:
         add_with_attachment(solr=solr, attachment=attachment, fields=index_me)
     else:
@@ -453,7 +453,10 @@ def search(**kwargs):
         }
     solr_query = generate_query(**kwargs)
     try:
-        return solr.search(**solr_query)
+        res = solr.search(**solr_query)
+        if solr.session:
+            solr.session.close()
+        return res
     except SolrError as e:
         logger.exception(e)
         return {
