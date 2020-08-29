@@ -10,17 +10,19 @@ class AvailableSitesVocabularyFactory(object):
     @property
     def terms(self):
         solr_results = search(
-            query={'*': '*'}, fl='UID', facets=True, facet_fields='site_name'
+            query={"*": "*"}, fl="UID", facets=True, facet_fields="site_name"
         )
-        if isinstance(solr_results, dict) and solr_results.get('error', False):
+        if isinstance(solr_results, dict) and solr_results.get("error", False):
             return []
-        facets = solr_results.facets['facet_fields'].get('site_name', [])
+        facets = solr_results.facets["facet_fields"].get("site_name", [])
         if not facets:
             return []
         terms = []
         for facet in facets:
             for key in facet.keys():
-                terms.append(SimpleTerm(value=key, token=key.encode('utf-8'), title=key))
+                terms.append(
+                    SimpleTerm(value=key, token=key.encode("utf-8"), title=key)
+                )
         return terms
 
     def __call__(self, context):

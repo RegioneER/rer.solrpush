@@ -12,8 +12,7 @@ from zope.interface import Invalid
 
 
 def elevateConstraint(value):
-    """Check if is a valid xml
-    """
+    """Check if is a valid xml"""
     try:
         fromstring(value)
         return True
@@ -22,8 +21,7 @@ def elevateConstraint(value):
 
 
 class IRerSolrpushConf(model.Schema):
-    """
-    """
+    """"""
 
     active = schema.Bool(
         title=_(u"Active"),
@@ -45,17 +43,17 @@ class IRerSolrpushConf(model.Schema):
     )
 
     enabled_types = schema.List(
-        title=_(u'enabled_types_label', default=u'Enabled portal types'),
+        title=_(u"enabled_types_label", default=u"Enabled portal types"),
         description=_(
-            u'enabled_types_help',
-            default=u'Select a list of portal types to index in solr. '
-            u'Empty list means that all portal types will be indexed.',
+            u"enabled_types_help",
+            default=u"Select a list of portal types to index in solr. "
+            u"Empty list means that all portal types will be indexed.",
         ),
         required=False,
         default=[],
         missing_value=[],
         value_type=schema.Choice(
-            vocabulary='plone.app.vocabularies.PortalTypes'
+            vocabulary="plone.app.vocabularies.PortalTypes"
         ),
     )
 
@@ -77,14 +75,14 @@ class IRerSolrpushConf(model.Schema):
     # directives.widget(index_fields=SolrFieldsFieldWidget)
     index_fields = schema.SourceText(
         title=_(
-            'index_fields_label',
-            default=u'List of fields loaded from SOLR that we use for indexing.',
+            "index_fields_label",
+            default=u"List of fields loaded from SOLR that we use for indexing.",
         ),
         description=_(
-            u'index_fields_help',
-            default=u'We store this list for performance'
-            u' reasons. If the configuration changes, you need to click on'
-            u' Reload button',
+            u"index_fields_help",
+            default=u"We store this list for performance"
+            u" reasons. If the configuration changes, you need to click on"
+            u" Reload button",
         ),
         required=False,
     )

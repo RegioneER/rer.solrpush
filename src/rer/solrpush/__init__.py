@@ -4,4 +4,4 @@
 from zope.i18nmessageid import MessageFactory
 
 
-_ = MessageFactory('rer.solrpush')
+_ = MessageFactory("rer.solrpush")

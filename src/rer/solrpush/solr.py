@@ -48,7 +48,9 @@ def fix_value(value, wrap=True):
             " OR ".join([escape_special_characters(x, wrap) for x in value])
         )
         # return list(map(escape_special_characters, value))
-    logger.warning("[fix_value]: unable to escape value: {}. skipping".format(value))
+    logger.warning(
+        "[fix_value]: unable to escape value: {}. skipping".format(value)
+    )
     return
 
 
@@ -85,7 +87,9 @@ def get_index_fields(field):
 
 def get_site_title():
     registry = getUtility(IRegistry)
-    site_settings = registry.forInterface(ISiteSchema, prefix="plone", check=False)
+    site_settings = registry.forInterface(
+        ISiteSchema, prefix="plone", check=False
+    )
     site_title = getattr(site_settings, "site_title") or ""
     if RER_THEME:
         fields_value = getUtility(ICustomFields)
@@ -105,8 +109,7 @@ def get_solr_connection():
 
 
 def parse_date_as_datetime(value):
-    """ Sistemiamo le date
-    """
+    """Sistemiamo le date"""
     if value:
         format = "%Y-%m-%dT%H:%M:%S"
         return value.utcdatetime().strftime(format) + "Z"
@@ -144,7 +147,9 @@ def init_solr_push():
             return ErrorMessage
 
         root = etree.fromstring(respo.content)
-        chosen_fields = json.dumps(extract_fields(nodes=root.findall(".//field")))
+        chosen_fields = json.dumps(
+            extract_fields(nodes=root.findall(".//field"))
+        )
         if six.PY2:
             chosen_fields = chosen_fields.decode("utf-8")
         set_setting(field="index_fields", value=chosen_fields)
@@ -167,8 +172,7 @@ def extract_fields(nodes):
 
 
 def is_solr_active():
-    """ Just checking if solr indexing is set to active in control panel
-    """
+    """Just checking if solr indexing is set to active in control panel"""
     return get_setting(field="active")
 
 
@@ -180,8 +184,7 @@ def is_right_portal_type(item):
 
 
 def can_index(item):
-    """ Check if the item passed as argument can and has to be indexed
-    """
+    """Check if the item passed as argument can and has to be indexed"""
     with api.env.adopt_roles(["Anonymous"]):
         if not api.user.has_permission("View", obj=item):
             return False
@@ -191,7 +194,7 @@ def can_index(item):
 
 
 def create_index_dict(item):
-    """ Restituisce un dizionario pronto per essere 'mandato' a SOLR per
+    """Restituisce un dizionario pronto per essere 'mandato' a SOLR per
     l'indicizzazione.
     """
 
@@ -200,7 +203,6 @@ def create_index_dict(item):
 
     catalog = api.portal.get_tool(name="portal_catalog")
     adapter = queryMultiAdapter((item, catalog), IIndexableObject)
-
     index_me = {}
 
     for field in index_fields.keys():
@@ -231,7 +233,9 @@ def create_index_dict(item):
     index_me["path"] = "/".join(item.getPhysicalPath())
     index_me["path_depth"] = len(item.getPhysicalPath()) - 2
     if frontend_url:
-        index_me["url"] = item.absolute_url().replace(portal.portal_url(), frontend_url)
+        index_me["url"] = item.absolute_url().replace(
+            portal.portal_url(), frontend_url
+        )
     else:
         index_me["url"] = item.absolute_url()
     return index_me
@@ -255,7 +259,9 @@ def set_sort_parameter(query):
     sort_order = query.get("sort_order", "asc")
     if sort_order in ["reverse"]:
         return "{sort_on} desc".format(sort_on=sort_on)
-    return "{sort_on} {sort_order}".format(sort_on=sort_on, sort_order=sort_order)
+    return "{sort_on} {sort_order}".format(
+        sort_on=sort_on, sort_order=sort_order
+    )
 
 
 def generate_query(
@@ -277,7 +283,8 @@ def generate_query(
     }
     for index, value in query.items():
         if index == "*":
-            solr_query["q"] = "*:*".format(value)
+            # ???
+            solr_query["q"] = "*:*"
             continue
         index_infos = index_fields.get(index, {})
         if not index_infos:
@@ -289,7 +296,9 @@ def generate_query(
         else:
             if index_infos.get("type") not in ["date"]:
                 value = fix_value(value=value)
-            solr_query["fq"].append("{index}:{value}".format(index=index, value=value))
+            solr_query["fq"].append(
+                "{index}:{value}".format(index=index, value=value)
+            )
     if not solr_query["q"]:
         solr_query["q"] = "*:*"
     if filtered_sites:
@@ -319,6 +328,7 @@ def push_to_solr(item):
         return
     index_me = create_index_dict(item)
     solr.add([index_me])
+    # why ???
     if solr.session:
         solr.session.close()
 
@@ -336,6 +346,7 @@ def remove_from_solr(uid):
         return
     try:
         solr.delete(q="UID:{}".format(uid), commit=True)
+        # why ?
         if solr.session:
             solr.session.close()
     except (pysolr.SolrError, TypeError) as err:
@@ -345,7 +356,9 @@ def remove_from_solr(uid):
             default=u"There was a problem removing this content from SOLR. "
             " Please contact site administrator.",
         )
-        api.portal.show_message(message=message, request=portal.REQUEST, type="error")
+        api.portal.show_message(
+            message=message, request=portal.REQUEST, type="error"
+        )
 
 
 def reset_solr():
@@ -353,7 +366,7 @@ def reset_solr():
     if not solr:
         logger.error("Unable to push to solr. Configuration is incomplete.")
         return
-    solr.delete(q='site_name:"{}"'.format(get_site_title()))
+    solr.delete(q='site_name:"{}"'.format(get_site_title()), commit=True)
     if solr.session:
         solr.session.close()
 

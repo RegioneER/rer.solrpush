@@ -24,8 +24,8 @@ BIN_DIR = os.path.dirname(os.path.realpath(sys.argv[0]))
 
 class SolrLayer(Layer):
     """Solr test layer that fires up and shuts down a Solr instance. This
-       layer can be used to unit test a Solr configuration without having to
-       fire up Plone.
+    layer can be used to unit test a Solr configuration without having to
+    fire up Plone.
     """
 
     proc = None
@@ -48,8 +48,7 @@ class SolrLayer(Layer):
         )
 
     def setUp(self):
-        """Start Solr and poll until it is up and running.
-        """
+        """Start Solr and poll until it is up and running."""
         self.proc = subprocess.call(
             "./solr-start", shell=True, close_fds=True, cwd=BIN_DIR
         )
@@ -71,8 +70,7 @@ class SolrLayer(Layer):
                 sys.stdout.write("Solr Instance could not be started !!!")
 
     def tearDown(self):
-        """Stop Solr.
-        """
+        """Stop Solr."""
         solr_clean_url = "{0}/update?stream.body=<delete><query>*:*</query></delete>&commit=true".format(  # noqa
             self.solr_url
         )
@@ -126,18 +124,18 @@ class RerSolrpushLayer(PloneSandboxLayer):
 
     def setUpPloneSite(self, portal):
         self.solr_layer.setUp()
-        applyProfile(portal, 'rer.solrpush:default')
-        set_registry_record('active', True, interface=IRerSolrpushSettings)
+        applyProfile(portal, "rer.solrpush:default")
+        set_registry_record("active", True, interface=IRerSolrpushSettings)
         set_registry_record(
-            'solr_url',
+            "solr_url",
             self.solr_layer.solr_url,
             interface=IRerSolrpushSettings,
         )
 
     def tearDownPloneSite(self, portal):
-        set_registry_record('active', True, interface=IRerSolrpushSettings)
+        set_registry_record("active", True, interface=IRerSolrpushSettings)
         set_registry_record(
-            'solr_url',
+            "solr_url",
             self.solr_layer.solr_url,
             interface=IRerSolrpushSettings,
         )
@@ -148,12 +146,12 @@ RER_SOLRPUSH_FIXTURE = RerSolrpushLayer()
 
 
 RER_SOLRPUSH_INTEGRATION_TESTING = IntegrationTesting(
-    bases=(RER_SOLRPUSH_FIXTURE,), name='RerSolrpushLayer:IntegrationTesting'
+    bases=(RER_SOLRPUSH_FIXTURE,), name="RerSolrpushLayer:IntegrationTesting"
 )
 
 
 RER_SOLRPUSH_FUNCTIONAL_TESTING = FunctionalTesting(
-    bases=(RER_SOLRPUSH_FIXTURE,), name='RerSolrpushLayer:FunctionalTesting'
+    bases=(RER_SOLRPUSH_FIXTURE,), name="RerSolrpushLayer:FunctionalTesting"
 )
 
 
@@ -163,5 +161,5 @@ RER_SOLRPUSH_ACCEPTANCE_TESTING = FunctionalTesting(
         REMOTE_LIBRARY_BUNDLE_FIXTURE,
         z2.ZSERVER_FIXTURE,
     ),
-    name='RerSolrpushLayer:AcceptanceTesting',
+    name="RerSolrpushLayer:AcceptanceTesting",
 )
