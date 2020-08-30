@@ -99,13 +99,39 @@ def get_site_title():
     return site_title
 
 
-def get_solr_connection():
+def get_solr_connection(context=None, **kwargs):
+    # TODO: fix sporadic
+    # ResourceWarning: Enable tracemalloc to get the object allocation traceback
+    # ResourceWarning: unclosed <socket.socket ... raddr=('127.0.0.1', 8983)>
+    # -> avoid explicit close connection
+
+    # XXX: rivalutare il default True per always_commit !
+    if "always_commit" not in kwargs:
+        kwargs["always_commit"] = True
     is_ready = get_setting(field="ready")
     solr_url = get_setting(field="solr_url")
-
     if not is_ready or not solr_url:
         return
-    return pysolr.Solr(solr_url, always_commit=True)
+    if context is None:
+        context = api.portal.get()
+    if context is None:
+        client = pysolr.Solr(solr_url, **kwargs)
+    else:
+        jar = getattr(context, "_p_jar", None)
+        oid = getattr(context, "_p_oid", None)
+        if jar is None or oid is None:
+            # object is not persistent or is not yet associated with a
+            # connection
+            cache = context._v_solr_client_cache = {}
+        else:
+            cache = getattr(jar, "foreign_connections", None)
+            if cache is None:
+                cache = jar.foreign_connections = {}
+        cache_key = "solr_%s_%s" % (solr_url, kwargs)
+        client = cache.get(cache_key)
+        if client is None:
+            client = cache[cache_key] = pysolr.Solr(solr_url, **kwargs)
+    return client
 
 
 def parse_date_as_datetime(value):
@@ -154,6 +180,7 @@ def init_solr_push():
             chosen_fields = chosen_fields.decode("utf-8")
         set_setting(field="index_fields", value=chosen_fields)
         set_setting(field="ready", value=True)
+        set_setting(field="active", value=True)
         return
 
     return _("No SOLR url provided")
@@ -316,21 +343,24 @@ def generate_query(
     return solr_query
 
 
-def push_to_solr(item):
+def push_to_solr(item_or_obj):
     """
     Perform push to solr
     """
-    if not can_index(item):
-        return
     solr = get_solr_connection()
     if not solr:
         logger.error("Unable to push to solr. Configuration is incomplete.")
         return
-    index_me = create_index_dict(item)
-    solr.add([index_me])
-    # why ???
-    if solr.session:
-        solr.session.close()
+    if not isinstance(item_or_obj, dict):
+        if can_index(item_or_obj):
+            item_or_obj = create_index_dict(item_or_obj)
+        else:
+            item_or_obj = None
+    if item_or_obj:
+        solr.add([item_or_obj])
+        return True
+    else:
+        return False
 
 
 def remove_from_solr(uid):
@@ -346,9 +376,6 @@ def remove_from_solr(uid):
         return
     try:
         solr.delete(q="UID:{}".format(uid), commit=True)
-        # why ?
-        if solr.session:
-            solr.session.close()
     except (pysolr.SolrError, TypeError) as err:
         logger.error(err)
         message = _(
@@ -367,11 +394,14 @@ def reset_solr():
         logger.error("Unable to push to solr. Configuration is incomplete.")
         return
     solr.delete(q='site_name:"{}"'.format(get_site_title()), commit=True)
-    if solr.session:
-        solr.session.close()
 
 
 def search(**kwargs):
+    """[summary]
+
+    Returns:
+        [type]: [description]
+    """
     solr = get_solr_connection()
     if not solr:
         msg = u"Unable to search using solr. Configuration is incomplete."
@@ -386,8 +416,6 @@ def search(**kwargs):
     solr_query = generate_query(**kwargs)
     try:
         res = solr.search(**solr_query)
-        if solr.session:
-            solr.session.close()
         return res
     except SolrError as e:
         logger.exception(e)

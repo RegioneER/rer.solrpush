@@ -14,7 +14,7 @@ from transaction import commit
 import unittest
 
 
-class TestShowInSearch(unittest.TestCase):
+class TestSearch(unittest.TestCase):
     """Test show in search field behavior."""
 
     layer = RER_SOLRPUSH_FUNCTIONAL_TESTING
@@ -33,14 +33,16 @@ class TestShowInSearch(unittest.TestCase):
             interface=IRerSolrpushSettings,
         )
         init_solr_push()
-        self.document = api.content.create(
-            container=self.portal, type="Document", title="Document foo"
-        )
-        api.content.transition(obj=self.document, transition="publish")
-        self.news = api.content.create(
-            container=self.portal, type="News Item", title="News bar"
-        )
-        api.content.transition(obj=self.news, transition="publish")
+        # set_registry_record("active", True, interface=IRerSolrpushSettings)
+        self.document = {}
+        for i in range(10):
+            self.document[i] = api.content.create(
+                container=self.portal,
+                type="Document",
+                id="doc-%03d" % i,
+                title="Document %s" % i,
+            )
+            api.content.transition(obj=self.document[i], transition="publish")
         commit()
 
     def tearDown(self):
@@ -49,11 +51,4 @@ class TestShowInSearch(unittest.TestCase):
 
     def test_items_are_indexed_by_default(self):
         solr_results = search(query={"*": "*", "b_size": 100000}, fl="UID")
-        self.assertEqual(solr_results.hits, 2)
-
-    def test_items_are_unindexed_when_set_false(self):
-        self.document.showinsearch = False
-        self.document.reindexObject()
-        commit()
-        solr_results = search(query={"*": "*", "b_size": 100000}, fl="UID")
-        self.assertEqual(solr_results.hits, 1)
+        self.assertEqual(solr_results.hits, 10)

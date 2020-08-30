@@ -156,15 +156,21 @@ class ReindexBaseView(BrowserView):
                 brains_to_reindex.actual_result_count
             )
         )
-        for i, brain in enumerate(brains_to_reindex):
+        skipped = 0
+        indexed = 0
+        for brain in brains_to_reindex:
             status["counter"] = status["counter"] + 1
             commit()
             obj = brain.getObject()
             try:
-                push_to_solr(obj)
+                if push_to_solr(obj):
+                    indexed += 1
+                else:
+                    skipped += 1
                 logger.info(
-                    "[{index}/{total}] {path} ({type})".format(
-                        index=i + 1,
+                    "[{indexed}+{skipped}/{total}] {path} ({type})".format(
+                        indexed=indexed,
+                        skipped=skipped,
                         total=brains_to_reindex.actual_result_count,
                         path=brain.getPath(),
                         type=brain.portal_type,

@@ -125,7 +125,6 @@ class RerSolrpushLayer(PloneSandboxLayer):
     def setUpPloneSite(self, portal):
         self.solr_layer.setUp()
         applyProfile(portal, "rer.solrpush:default")
-        set_registry_record("active", True, interface=IRerSolrpushSettings)
         set_registry_record(
             "solr_url",
             self.solr_layer.solr_url,
@@ -133,12 +132,6 @@ class RerSolrpushLayer(PloneSandboxLayer):
         )
 
     def tearDownPloneSite(self, portal):
-        set_registry_record("active", True, interface=IRerSolrpushSettings)
-        set_registry_record(
-            "solr_url",
-            self.solr_layer.solr_url,
-            interface=IRerSolrpushSettings,
-        )
         self.solr_layer.tearDown()
 
 
