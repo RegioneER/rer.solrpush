@@ -72,35 +72,9 @@ class SolrIndexProcessor(object):
 
     def begin(self):
         pass
-        # self.queue = []
 
     def commit(self, wait=None):
         if self.active and self.queue:
-            # optimize queue (args are ignored)
-            # res = {}
-            # for key, iop, obj, args in self.queue:
-            #     # hash_id = hash(obj)
-            #     hash_id = key
-            #     # func = getattr(obj, 'getPhysicalPath', None)
-            #     # if callable(func):
-            #     #     hash_id = hash_id, func()
-            #     op, dummy = res.get(hash_id, (0, obj))
-            #     # If we are going to delete an item that was added in this
-            #     # transaction, ignore it
-            #     if op == INDEX and iop == UNINDEX:
-            #         del res[hash_id]
-            #     else:
-            #         if op == UNINDEX and iop == REINDEX:
-            #             op = REINDEX
-            #         else:
-            #             # Operators are -1, 0 or 1 which makes it safe to add them
-            #             op += iop
-            #             # operator always within -1 and 1
-            #             op = min(max(op, UNINDEX), INDEX)
-            #         res[hash_id] = (op, obj)
-            #
-            # print('finished reducing; %d -> %d item(s) in queue...', len(self.queue), len(res))
-
             # TODO: è possibile con sol anche mandare un set di comandi (add+delete) in un
             #  unica volta, anzichè uno alla volta, valutare le due opzioni
             # Sort so unindex operations come first

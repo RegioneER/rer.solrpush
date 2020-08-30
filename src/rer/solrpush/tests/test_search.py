@@ -8,6 +8,7 @@ from rer.solrpush.interfaces.settings import IRerSolrpushSettings
 from rer.solrpush.solr import init_solr_push
 from rer.solrpush.solr import reset_solr
 from rer.solrpush.solr import search
+from rer.solrpush.solr import escape_special_characters
 from rer.solrpush.testing import RER_SOLRPUSH_FUNCTIONAL_TESTING  # noqa: E501
 from transaction import commit
 
@@ -34,21 +35,68 @@ class TestSearch(unittest.TestCase):
         )
         init_solr_push()
         # set_registry_record("active", True, interface=IRerSolrpushSettings)
-        self.document = {}
-        for i in range(10):
-            self.document[i] = api.content.create(
+        self.docs = {}
+        for i in range(20):
+            id = "doc-%03d" % i
+            if i == 5:
+                id = "odd"
+                title = "Document %s" % i
+            elif i % 2 == 0:
+                title = "Document %s even even" % i
+            else:
+                title = "Document %s odd odd" % i
+            obj = self.docs[i] = api.content.create(
                 container=self.portal,
                 type="Document",
-                id="doc-%03d" % i,
-                title="Document %s" % i,
+                id=id,
+                title=title,
             )
-            api.content.transition(obj=self.document[i], transition="publish")
+            # obj.reindexObject(idxs=['Title'])
+            api.content.transition(obj=obj, transition="publish")
         commit()
 
     def tearDown(self):
         reset_solr()
         commit()
 
-    def test_items_are_indexed_by_default(self):
-        solr_results = search(query={"*": "*", "b_size": 100000}, fl="UID")
-        self.assertEqual(solr_results.hits, 10)
+    def test_all_items(self):
+        solr_results = search(query={}, fl="UID")
+        self.assertEqual(solr_results.hits, len(self.docs))
+
+    def test_search_odd(self):
+        solr_results = search(query={"SearchableText": "odd"}, fl="UID")
+        self.assertEqual(solr_results.hits, len(self.docs) / 2)
+
+    def test_search_qf(self):
+        solr_results = search(query={"": "odd"}, fl=["UID", "id", "Title"])
+        self.assertEqual(solr_results.hits, len(self.docs) / 2)
+        self.assertNotEqual(solr_results.docs[0]["id"], "odd")
+
+        solr_results = search(
+            query={"": "odd"},
+            fl=["UID", "id", "Title"],
+            defType="edismax",
+            qf="id^1000.0 SearchableText^1.0",
+        )
+        self.assertEqual(solr_results.hits, len(self.docs) / 2)
+        self.assertEqual(solr_results.docs[0]["id"], "odd")
+
+    def test_search_bq(self):
+        solr_results = search(query={"": "odd"}, fl=["UID", "id", "Title"])
+        self.assertEqual(solr_results.hits, len(self.docs) / 2)
+        self.assertNotEqual(solr_results.docs[0]["id"], "odd")
+
+        solr_results = search(
+            query={"": "odd"},
+            fl=["UID", "id", "Title"],
+            defType="edismax",
+            bq="id:odd",
+        )
+        self.assertEqual(solr_results.hits, len(self.docs) / 2)
+        self.assertEqual(solr_results.docs[0]["id"], "odd")
+
+    def test_escape_chars(self):
+        self.assertEqual(escape_special_characters("*:*", False), "\\*\\:\\*")
+        self.assertEqual(
+            escape_special_characters("* : *", True), '"\\* \\: \\*"'
+        )

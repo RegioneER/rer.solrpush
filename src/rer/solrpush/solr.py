@@ -297,21 +297,27 @@ def generate_query(
     facets=False,
     facet_fields=["Subject", "portal_type"],
     filtered_sites=[],
+    **kwargs
 ):
     index_fields = get_index_fields(field="index_fields")
     # index_ids = [x['id'] for x in index_fields]
-    solr_query = {
-        "q": "",
-        "fq": [],
-        "facet": facets and "true" or "false",
-        "start": query.get("b_start", 0),
-        "rows": query.get("b_size", 20),
-        "json.nl": "arrmap",
-    }
+    solr_query = kwargs
+    solr_query.update(
+        {
+            "q": "",
+            "fq": [],
+            "facet": facets and "true" or "false",
+            "start": query.get("b_start", 0),
+            "rows": query.get("b_size", 20),
+            "json.nl": "arrmap",
+        }
+    )
     for index, value in query.items():
         if index == "*":
-            # ???
             solr_query["q"] = "*:*"
+            continue
+        if index == "":
+            solr_query["q"] = fix_value(value, wrap=False)
             continue
         index_infos = index_fields.get(index, {})
         if not index_infos:
@@ -396,8 +402,22 @@ def reset_solr():
     solr.delete(q='site_name:"{}"'.format(get_site_title()), commit=True)
 
 
-def search(**kwargs):
-    """[summary]
+def search(
+    query,
+    fl="",
+    facets=False,
+    facet_fields=["Subject", "portal_type"],
+    filtered_sites=[],
+    **kwargs
+):
+    """[summary] TODO
+
+    Args:
+        query ([type]): [description] TODO
+        fl (str, optional): [description]. Defaults to "".
+        facets (bool, optional): [description]. Defaults to False.
+        facet_fields (list, optional): [description]. Defaults to ["Subject", "portal_type"].
+        filtered_sites (list, optional): [description]. Defaults to [].
 
     Returns:
         [type]: [description]
@@ -413,7 +433,14 @@ def search(**kwargs):
                 context=api.portal.get().REQUEST,
             ),
         }
-    solr_query = generate_query(**kwargs)
+    solr_query = generate_query(
+        query,
+        fl=fl,
+        facets=facets,
+        facet_fields=facet_fields,
+        filtered_sites=filtered_sites,
+        **kwargs
+    )
     try:
         res = solr.search(**solr_query)
         return res
