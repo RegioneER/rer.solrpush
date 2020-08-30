@@ -105,10 +105,10 @@ class SolrIndexProcessor(object):
             #  unica volta, anzichè uno alla volta, valutare le due opzioni
             # Sort so unindex operations come first
             # for iop, obj in sorted(res.values(), key=itemgetter(0)):
-            for uid, iop, obj, args in self.queue:
+            for uid, iop, data, args in self.queue:
                 try:
                     if iop in (INDEX, REINDEX):
-                        push_to_solr(obj)
+                        push_to_solr(data)
                     elif iop == UNINDEX:
                         remove_from_solr(uid)
                 except SolrError:
@@ -119,7 +119,7 @@ class SolrIndexProcessor(object):
                         "contact site administrator.",
                     )
                     api.portal.show_message(
-                        message=message, request=obj.REQUEST, type="error"
+                        message=message, request=getRequest(), type="error"
                     )
             self.queue = []
 
