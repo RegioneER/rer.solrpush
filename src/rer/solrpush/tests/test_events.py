@@ -133,9 +133,9 @@ class TestEvents(unittest.TestCase):
         self.assertEqual(res["response"]["numFound"], 1)
         res_doc = res["response"]["docs"][0]
         self.assertEqual("foo", res_doc.get("Title", ""))
-        self.assertNotIn("Description", res_doc)
-        doc.description = "foo description"
+        self.assertEqual(res_doc.get("Description", ""), "")
 
+        doc.setDescription("foo description")
         notify(ObjectModifiedEvent(doc))
         commit()
 
