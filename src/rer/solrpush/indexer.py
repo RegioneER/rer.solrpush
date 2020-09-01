@@ -47,9 +47,7 @@ class SolrIndexProcessor(object):
         )
 
     def index(self, obj, attributes=None):
-        if self.active \
-                and getattr(obj, "showinsearch", True) \
-                and can_index(obj):
+        if self.active and getattr(obj, "showinsearch", True) and can_index(obj):
             uid = obj.UID()
             data = create_index_dict(obj)
             self.queue = [item for item in self.queue if item[0] != uid] + [
