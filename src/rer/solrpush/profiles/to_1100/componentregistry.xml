@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<componentregistry>
+  <utilities>
+    <utility 
+        interface="rer.solrpush.interfaces.ISolrIndexQueueProcessor"
+        name="solrpush.utility"
+        remove="True" />
+  </utilities>
+</componentregistry>

@@ -30,6 +30,14 @@
       provides="Products.GenericSetup.interfaces.EXTENSION"
       post_handler=".setuphandlers.uninstall"
       />
+  
+  <genericsetup:registerProfile
+      name="to_1100"
+      title="RER: Solr push remove persistent utility"
+      directory="profiles/to_1100"
+      description=""
+      provides="Products.GenericSetup.interfaces.EXTENSION"
+      />
 
   <utility
       factory=".setuphandlers.HiddenProfiles"

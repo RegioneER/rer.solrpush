@@ -7,9 +7,7 @@ from zope.interface import implementer
 class HiddenProfiles(object):
     def getNonInstallableProfiles(self):
         """Hide uninstall profile from site-creation and quickinstaller."""
-        return [
-            "rer.solrpush:uninstall",
-        ]
+        return ["rer.solrpush:uninstall", "rer.solrpush:1100"]
 
 
 def post_install(context):

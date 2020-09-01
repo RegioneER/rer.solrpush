@@ -1,9 +1,7 @@
 # -*- coding: utf-8 -*-
-from plone.app.upgrade.utils import loadMigrationProfile
+from plone import api
 
 
-def reload_gs_profile(context):
-    loadMigrationProfile(
-        context,
-        "profile-rer.solrpush:default",
-    )
+def to_1100(context):
+    setupTool = api.portal.get_tool(name="portal_setup")
+    setupTool.runAllImportStepsFromProfile("profile-rer.solrpush:1100")
