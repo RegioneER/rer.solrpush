@@ -30,10 +30,10 @@ import pkg_resources
 
 
 JS_TEMPLATE = (
-    '{portal_url}/++plone++rer.solrpush/dist/{env_mode}/{name}.js?v={version}'
+    "{portal_url}/++plone++rer.solrpush/dist/{env_mode}/{name}.js?v={version}"
 )
 CSS_TEMPLATE = (
-    '{portal_url}/++plone++rer.solrpush/dist/{env_mode}/{name}.css?v={version}'
+    "{portal_url}/++plone++rer.solrpush/dist/{env_mode}/{name}.css?v={version}"
 )
 
 
@@ -103,9 +103,9 @@ class ReindexBaseView(BrowserView):
     def solr_error_message(self):
         return translate(
             _(
-                'solr_error_connection',
-                default=u'There have been problems connecting to SOLR. '
-                u'Contact site administrator.',
+                "solr_error_connection",
+                default=u"There have been problems connecting to SOLR. "
+                u"Contact site administrator.",
             ),
             context=self.request,
         )
@@ -156,15 +156,21 @@ class ReindexBaseView(BrowserView):
                 brains_to_reindex.actual_result_count
             )
         )
-        for i, brain in enumerate(brains_to_reindex):
+        skipped = 0
+        indexed = 0
+        for brain in brains_to_reindex:
             status["counter"] = status["counter"] + 1
             commit()
             obj = brain.getObject()
             try:
-                push_to_solr(obj)
+                if push_to_solr(obj):
+                    indexed += 1
+                else:
+                    skipped += 1
                 logger.info(
-                    "[{index}/{total}] {path} ({type})".format(
-                        index=i + 1,
+                    "[{indexed}+{skipped}/{total}] {path} ({type})".format(
+                        indexed=indexed,
+                        skipped=skipped,
                         total=brains_to_reindex.actual_result_count,
                         path=brain.getPath(),
                         type=brain.portal_type,
@@ -254,16 +260,16 @@ class ReactView(BrowserView):
 
     @ram.cache(lambda *args: time() // (60 * 60))
     def get_version(self):
-        return pkg_resources.get_distribution('rer.solrpush').version
+        return pkg_resources.get_distribution("rer.solrpush").version
 
     def get_env_mode(self):
         return (
-            api.portal.get_registry_record('plone.resources.development')
-            and 'dev'  # noqa
-            or 'prod'  # noqa
+            api.portal.get_registry_record("plone.resources.development")
+            and "dev"  # noqa
+            or "prod"  # noqa
         )
 
-    def get_resource_js(self, name='main'):
+    def get_resource_js(self, name="main"):
         return JS_TEMPLATE.format(
             portal_url=api.portal.get().absolute_url(),
             env_mode=self.get_env_mode(),
@@ -271,7 +277,7 @@ class ReactView(BrowserView):
             version=self.get_version(),
         )
 
-    def get_resource_css(self, name='main'):
+    def get_resource_css(self, name="main"):
         return CSS_TEMPLATE.format(
             portal_url=api.portal.get().absolute_url(),
             env_mode=self.get_env_mode(),

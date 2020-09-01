@@ -15,21 +15,19 @@ logger = logging.getLogger(__name__)
 
 
 class RerSolrpushEditForm(RegistryEditForm):
-    """ Nel form del pannello di controllo mettiamo anche le logiche per
+    """Nel form del pannello di controllo mettiamo anche le logiche per
     il caricamento
     """
 
     schema = IRerSolrpushSettings
     label = _(u"Solr Push Configuration")
 
-    formErrorsMessage = (
-        "Sono presenti degli errori, si prega di ricontrollare i dati inseriti"
-    )  # noqa
+    formErrorsMessage = "Sono presenti degli errori, si prega di ricontrollare i dati inseriti"  # noqa
 
     def updateFields(self):
         super(RerSolrpushEditForm, self).updateFields()
         # self.fields['index_fields'].mode = HIDDEN_MODE
-        self.fields['ready'].mode = HIDDEN_MODE
+        self.fields["ready"].mode = HIDDEN_MODE
 
     @button.buttonAndHandler(_("Save"), name=None)
     def handleSave(self, action):
@@ -72,4 +70,4 @@ class RerSolrpushEditForm(RegistryEditForm):
 
 class RerSolrpushView(ControlPanelFormWrapper):
     form = RerSolrpushEditForm
-    index = ViewPageTemplateFile('templates/controlpanel_layout.pt')
+    index = ViewPageTemplateFile("templates/controlpanel_layout.pt")

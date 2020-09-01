@@ -40,5 +40,10 @@
     name="rer.solrpush.vocabularies.AvailableSites"
     component=".vocabularies.AvailableSitesVocabulary"
     />
-    
+
+    <utility 
+        factory=".indexer.SolrIndexProcessor" 
+        name="solrpush.utility"
+        />
+
 </configure>

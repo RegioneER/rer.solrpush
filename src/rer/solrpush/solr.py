@@ -95,22 +95,47 @@ def get_site_title():
         fields_value = getUtility(ICustomFields)
         site_title = fields_value.titleLang(site_title)
     if six.PY2:
-        site_title = site_title.decode('utf-8')
+        site_title = site_title.decode("utf-8")
     return site_title
 
 
-def get_solr_connection():
+def get_solr_connection(context=None, **kwargs):
+    # TODO: fix sporadic
+    # ResourceWarning: Enable tracemalloc to get the object allocation traceback
+    # ResourceWarning: unclosed <socket.socket ... raddr=('127.0.0.1', 8983)>
+    # -> avoid explicit close connection
+
+    # XXX: rivalutare il default True per always_commit !
+    if "always_commit" not in kwargs:
+        kwargs["always_commit"] = True
     is_ready = get_setting(field="ready")
     solr_url = get_setting(field="solr_url")
-
     if not is_ready or not solr_url:
         return
-    return pysolr.Solr(solr_url, always_commit=True)
+    if context is None:
+        context = api.portal.get()
+    if context is None:
+        client = pysolr.Solr(solr_url, **kwargs)
+    else:
+        jar = getattr(context, "_p_jar", None)
+        oid = getattr(context, "_p_oid", None)
+        if jar is None or oid is None:
+            # object is not persistent or is not yet associated with a
+            # connection
+            cache = context._v_solr_client_cache = {}
+        else:
+            cache = getattr(jar, "foreign_connections", None)
+            if cache is None:
+                cache = jar.foreign_connections = {}
+        cache_key = "solr_%s_%s" % (solr_url, kwargs)
+        client = cache.get(cache_key)
+        if client is None:
+            client = cache[cache_key] = pysolr.Solr(solr_url, **kwargs)
+    return client
 
 
 def parse_date_as_datetime(value):
-    """ Sistemiamo le date
-    """
+    """Sistemiamo le date"""
     if value:
         format = "%Y-%m-%dT%H:%M:%S"
         return value.utcdatetime().strftime(format) + "Z"
@@ -155,6 +180,7 @@ def init_solr_push():
             chosen_fields = chosen_fields.decode("utf-8")
         set_setting(field="index_fields", value=chosen_fields)
         set_setting(field="ready", value=True)
+        set_setting(field="active", value=True)
         return
 
     return _("No SOLR url provided")
@@ -173,8 +199,7 @@ def extract_fields(nodes):
 
 
 def is_solr_active():
-    """ Just checking if solr indexing is set to active in control panel
-    """
+    """Just checking if solr indexing is set to active in control panel"""
     return get_setting(field="active")
 
 
@@ -186,8 +211,7 @@ def is_right_portal_type(item):
 
 
 def can_index(item):
-    """ Check if the item passed as argument can and has to be indexed
-    """
+    """Check if the item passed as argument can and has to be indexed"""
     with api.env.adopt_roles(["Anonymous"]):
         if not api.user.has_permission("View", obj=item):
             return False
@@ -197,7 +221,7 @@ def can_index(item):
 
 
 def create_index_dict(item):
-    """ Restituisce un dizionario pronto per essere 'mandato' a SOLR per
+    """Restituisce un dizionario pronto per essere 'mandato' a SOLR per
     l'indicizzazione.
     """
 
@@ -206,7 +230,6 @@ def create_index_dict(item):
 
     catalog = api.portal.get_tool(name="portal_catalog")
     adapter = queryMultiAdapter((item, catalog), IIndexableObject)
-
     index_me = {}
 
     for field in index_fields.keys():
@@ -234,7 +257,7 @@ def create_index_dict(item):
             index_me[field] = value
     portal = api.portal.get()
     index_me["site_name"] = get_site_title()
-    index_me["path"] = '/'.join(item.getPhysicalPath())
+    index_me["path"] = "/".join(item.getPhysicalPath())
     index_me["path_depth"] = len(item.getPhysicalPath()) - 2
     if frontend_url:
         index_me["url"] = item.absolute_url().replace(
@@ -274,20 +297,27 @@ def generate_query(
     facets=False,
     facet_fields=["Subject", "portal_type"],
     filtered_sites=[],
+    **kwargs
 ):
     index_fields = get_index_fields(field="index_fields")
     # index_ids = [x['id'] for x in index_fields]
-    solr_query = {
-        "q": "",
-        "fq": [],
-        "facet": facets and "true" or "false",
-        "start": query.get("b_start", 0),
-        "rows": query.get("b_size", 20),
-        "json.nl": "arrmap",
-    }
+    solr_query = kwargs
+    solr_query.update(
+        {
+            "q": "",
+            "fq": [],
+            "facet": facets and "true" or "false",
+            "start": query.get("b_start", 0),
+            "rows": query.get("b_size", 20),
+            "json.nl": "arrmap",
+        }
+    )
     for index, value in query.items():
         if index == "*":
-            solr_query["q"] = "*:*".format(value)
+            solr_query["q"] = "*:*"
+            continue
+        if index == "":
+            solr_query["q"] = fix_value(value, wrap=False)
             continue
         index_infos = index_fields.get(index, {})
         if not index_infos:
@@ -319,18 +349,24 @@ def generate_query(
     return solr_query
 
 
-def push_to_solr(item):
+def push_to_solr(item_or_obj):
     """
     Perform push to solr
     """
-    if not can_index(item):
-        return
     solr = get_solr_connection()
     if not solr:
         logger.error("Unable to push to solr. Configuration is incomplete.")
         return
-    index_me = create_index_dict(item)
-    solr.add([index_me])
+    if not isinstance(item_or_obj, dict):
+        if can_index(item_or_obj):
+            item_or_obj = create_index_dict(item_or_obj)
+        else:
+            item_or_obj = None
+    if item_or_obj:
+        solr.add([item_or_obj])
+        return True
+    else:
+        return False
 
 
 def remove_from_solr(uid):
@@ -363,10 +399,29 @@ def reset_solr():
     if not solr:
         logger.error("Unable to push to solr. Configuration is incomplete.")
         return
-    solr.delete(q='site_name:"{}"'.format(get_site_title()))
+    solr.delete(q='site_name:"{}"'.format(get_site_title()), commit=True)
 
 
-def search(**kwargs):
+def search(
+    query,
+    fl="",
+    facets=False,
+    facet_fields=["Subject", "portal_type"],
+    filtered_sites=[],
+    **kwargs
+):
+    """[summary] TODO
+
+    Args:
+        query ([type]): [description] TODO
+        fl (str, optional): [description]. Defaults to "".
+        facets (bool, optional): [description]. Defaults to False.
+        facet_fields (list, optional): [description]. Defaults to ["Subject", "portal_type"].
+        filtered_sites (list, optional): [description]. Defaults to [].
+
+    Returns:
+        [type]: [description]
+    """
     solr = get_solr_connection()
     if not solr:
         msg = u"Unable to search using solr. Configuration is incomplete."
@@ -378,9 +433,17 @@ def search(**kwargs):
                 context=api.portal.get().REQUEST,
             ),
         }
-    solr_query = generate_query(**kwargs)
+    solr_query = generate_query(
+        query,
+        fl=fl,
+        facets=facets,
+        facet_fields=facet_fields,
+        filtered_sites=filtered_sites,
+        **kwargs
+    )
     try:
-        return solr.search(**solr_query)
+        res = solr.search(**solr_query)
+        return res
     except SolrError as e:
         logger.exception(e)
         return {

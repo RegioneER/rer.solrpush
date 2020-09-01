@@ -1,19 +1,25 @@
 # -*- coding: utf-8 -*-
+# from operator import itemgetter
 from plone import api
+from Products.CMFCore.indexing import INDEX
+from Products.CMFCore.indexing import REINDEX
+from Products.CMFCore.indexing import UNINDEX
 from pysolr import SolrError
 from rer.solrpush import _
+from rer.solrpush.interfaces import IRerSolrpushLayer
 from rer.solrpush.interfaces import ISolrIndexQueueProcessor
 from rer.solrpush.interfaces.settings import IRerSolrpushSettings
+from rer.solrpush.solr import can_index
+from rer.solrpush.solr import create_index_dict
 from rer.solrpush.solr import push_to_solr
 from rer.solrpush.solr import remove_from_solr
+from zope.globalrequest import getRequest
 from zope.interface import implementer
 
 import logging
 
-logger = logging.getLogger(__name__)
 
-INDEX = 1
-UNINDEX = 2
+logger = logging.getLogger(__name__)
 
 
 @implementer(ISolrIndexQueueProcessor)
@@ -22,68 +28,74 @@ class SolrIndexProcessor(object):
 
     @property
     def active(self):
-        return api.portal.get_registry_record(
-            'active', interface=IRerSolrpushSettings, default=''
+        return IRerSolrpushLayer.providedBy(
+            getRequest()
+        ) and api.portal.get_registry_record(
+            "active", interface=IRerSolrpushSettings, default=False
         )
 
     @property
     def enabled_types(self):
         return api.portal.get_registry_record(
-            'enabled_types', interface=IRerSolrpushSettings, default=[]
+            "enabled_types", interface=IRerSolrpushSettings, default=[]
         )
 
     @property
     def index_fields(self):
         return api.portal.get_registry_record(
-            'index_fields', interface=IRerSolrpushSettings, default=None
+            "index_fields", interface=IRerSolrpushSettings, default=None
         )
 
-    def has_right_permission(self, obj):
-        with api.env.adopt_roles(['Anonymous']):
-            return api.user.has_permission('View', obj=obj)
-
     def index(self, obj, attributes=None):
-        if getattr(obj, 'showinsearch', True):
-            self.queue.append((INDEX, obj, attributes))
+        if self.active \
+                and getattr(obj, "showinsearch", True) \
+                and can_index(obj):
+            uid = obj.UID()
+            data = create_index_dict(obj)
+            self.queue = [item for item in self.queue if item[0] != uid] + [
+                (uid, INDEX, data, attributes)
+            ]
+            return True
+        return False
 
     def reindex(self, obj, attributes=None, update_metadata=None):
-        """
-        Here we check only if the object has the right state
-        """
-        if self.has_right_permission(obj) and getattr(
-            obj, 'showinsearch', True
-        ):
-            self.index(obj, attributes=attributes)
-        else:
-            self.unindex(obj)
-        return
+        if self.active:
+            if not self.index(obj, attributes):
+                self.unindex(obj)
 
     def unindex(self, obj):
-        self.queue.append((UNINDEX, obj, []))
+        if self.active:
+            uid = obj.UID()
+            self.queue = [item for item in self.queue if item[0] != uid] + [
+                (uid, UNINDEX, None, None)
+            ]
 
     def begin(self):
-        self.queue = []
+        pass
 
     def commit(self, wait=None):
-        # TODO: è possibile con sol anche mandare un set di comandi (add+delete) in un
-        #  unica volta, anzichè uno alla volta, valutare le due opzioni
-        for action, obj, args in self.queue:
-            try:
-                if action == INDEX:
-                    push_to_solr(obj)
-                elif action == UNINDEX:
-                    remove_from_solr(obj.UID())
-            except SolrError as err:
-                logger.exception(err)
-                message = _(
-                    'content_indexed_error',
-                    default=u'There was a problem indexing this content. Please '
-                    'contact site administrator.',
-                )
-                api.portal.show_message(
-                    message=message, request=obj.REQUEST, type='error'
-                )
-        self.queue = []
+        if self.active and self.queue:
+            # TODO: è possibile con sol anche mandare un set di comandi (add+delete) in un
+            #  unica volta, anzichè uno alla volta, valutare le due opzioni
+            # Sort so unindex operations come first
+            # for iop, obj in sorted(res.values(), key=itemgetter(0)):
+            for uid, iop, data, args in self.queue:
+                try:
+                    if iop in (INDEX, REINDEX):
+                        push_to_solr(data)
+                    elif iop == UNINDEX:
+                        remove_from_solr(uid)
+                except SolrError:
+                    logger.exception("error indexing %s %s", iop, uid)
+                    message = _(
+                        "content_indexed_error",
+                        default=u"There was a problem indexing this content. Please "
+                        "contact site administrator.",
+                    )
+                    api.portal.show_message(
+                        message=message, request=getRequest(), type="error"
+                    )
+            self.queue = []
 
     def abort(self):
         self.queue = []
