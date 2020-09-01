@@ -7,6 +7,7 @@ from plone.registry.interfaces import IRegistry
 from pysolr import SolrError
 from rer.solrpush import _
 from rer.solrpush.interfaces.settings import IRerSolrpushSettings
+from rer.solrpush.restapi.services.solr_search.batch import DEFAULT_BATCH_SIZE
 from zope.component import getUtility
 from zope.component import queryMultiAdapter
 from zope.i18n import translate
@@ -48,9 +49,7 @@ def fix_value(value, wrap=True):
             " OR ".join([escape_special_characters(x, wrap) for x in value])
         )
         # return list(map(escape_special_characters, value))
-    logger.warning(
-        "[fix_value]: unable to escape value: {}. skipping".format(value)
-    )
+    logger.warning("[fix_value]: unable to escape value: {}. skipping".format(value))
     return
 
 
@@ -87,9 +86,7 @@ def get_index_fields(field):
 
 def get_site_title():
     registry = getUtility(IRegistry)
-    site_settings = registry.forInterface(
-        ISiteSchema, prefix="plone", check=False
-    )
+    site_settings = registry.forInterface(ISiteSchema, prefix="plone", check=False)
     site_title = getattr(site_settings, "site_title") or ""
     if RER_THEME:
         fields_value = getUtility(ICustomFields)
@@ -173,9 +170,7 @@ def init_solr_push():
             return ErrorMessage
 
         root = etree.fromstring(respo.content)
-        chosen_fields = json.dumps(
-            extract_fields(nodes=root.findall(".//field"))
-        )
+        chosen_fields = json.dumps(extract_fields(nodes=root.findall(".//field")))
         if six.PY2:
             chosen_fields = chosen_fields.decode("utf-8")
         set_setting(field="index_fields", value=chosen_fields)
@@ -260,9 +255,7 @@ def create_index_dict(item):
     index_me["path"] = "/".join(item.getPhysicalPath())
     index_me["path_depth"] = len(item.getPhysicalPath()) - 2
     if frontend_url:
-        index_me["url"] = item.absolute_url().replace(
-            portal.portal_url(), frontend_url
-        )
+        index_me["url"] = item.absolute_url().replace(portal.portal_url(), frontend_url)
     else:
         index_me["url"] = item.absolute_url()
     return index_me
@@ -286,9 +279,7 @@ def set_sort_parameter(query):
     sort_order = query.get("sort_order", "asc")
     if sort_order in ["reverse"]:
         return "{sort_on} desc".format(sort_on=sort_on)
-    return "{sort_on} {sort_order}".format(
-        sort_on=sort_on, sort_order=sort_order
-    )
+    return "{sort_on} {sort_order}".format(sort_on=sort_on, sort_order=sort_order)
 
 
 def generate_query(
@@ -308,7 +299,7 @@ def generate_query(
             "fq": [],
             "facet": facets and "true" or "false",
             "start": query.get("b_start", 0),
-            "rows": query.get("b_size", 20),
+            "rows": query.get("b_size", DEFAULT_BATCH_SIZE),
             "json.nl": "arrmap",
         }
     )
@@ -329,9 +320,7 @@ def generate_query(
         else:
             if index_infos.get("type") not in ["date"]:
                 value = fix_value(value=value)
-            solr_query["fq"].append(
-                "{index}:{value}".format(index=index, value=value)
-            )
+            solr_query["fq"].append("{index}:{value}".format(index=index, value=value))
     if not solr_query["q"]:
         solr_query["q"] = "*:*"
     if filtered_sites:
@@ -389,9 +378,7 @@ def remove_from_solr(uid):
             default=u"There was a problem removing this content from SOLR. "
             " Please contact site administrator.",
         )
-        api.portal.show_message(
-            message=message, request=portal.REQUEST, type="error"
-        )
+        api.portal.show_message(message=message, request=portal.REQUEST, type="error")
 
 
 def reset_solr():

@@ -52,9 +52,7 @@ class IRerSolrpushConf(model.Schema):
         required=False,
         default=[],
         missing_value=[],
-        value_type=schema.Choice(
-            vocabulary="plone.app.vocabularies.PortalTypes"
-        ),
+        value_type=schema.Choice(vocabulary="plone.app.vocabularies.PortalTypes"),
     )
 
     # elevate_xml = schema.Text(
@@ -71,6 +69,13 @@ class IRerSolrpushConf(model.Schema):
     #     u'per il debug. Solo per gli amministratori del sito.',
     #     required=False,
     # )
+
+    search_with_solr = schema.Bool(
+        title=u"Enable search with SOLR",
+        description=u"If selected, the search will be performed through SOLR instead of Plone.",  # noqa
+        default=False,
+        required=False,
+    )
 
     # directives.widget(index_fields=SolrFieldsFieldWidget)
     index_fields = schema.SourceText(
