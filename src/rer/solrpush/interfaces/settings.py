@@ -1,23 +1,45 @@
 # -*- coding: utf-8 -*-
-from lxml.etree import fromstring
-from lxml.etree import XMLSyntaxError
-
-# from plone.autoform import directives
+from jsonschema import validate
+from jsonschema import ValidationError
 from plone.supermodel import model
 from rer.solrpush import _
-
-# from rer.solrpush.browser.solr_fields import SolrFieldsFieldWidget
 from zope import schema
 from zope.interface import Invalid
 
+import json
 
-def elevateConstraint(value):
-    """Check if is a valid xml"""
+ELEVATE_SCHEMA = {
+    "type": "object",
+    "properties": {
+        "text": {"type": "string"},
+        "id": {"type": "array", "items": {"type": "string"}},
+    },
+}
+
+
+def validate_cfg_json(value):
+    """check that we have at least valid json and its a dict
+    """
     try:
-        fromstring(value)
-        return True
-    except XMLSyntaxError as e:
-        raise Invalid(e.message)
+        jv = json.loads(value)
+        if not isinstance(jv, list):
+            raise Invalid(
+                _(
+                    "invalid_json_format",
+                    "JSON is not valid. It should be a list of values.",
+                )
+            )
+        for item in jv:
+            validate(instance=item, schema=ELEVATE_SCHEMA)
+    except (ValueError, ValidationError) as e:
+        raise Invalid(
+            _(
+                "invalid_json",
+                "JSON is not valid, parser complained: ${message}",
+                mapping={"message": e.message},
+            )
+        )
+    return True
 
 
 class IRerSolrpushConf(model.Schema):
@@ -52,27 +74,18 @@ class IRerSolrpushConf(model.Schema):
         required=False,
         default=[],
         missing_value=[],
-        value_type=schema.Choice(
-            vocabulary="plone.app.vocabularies.PortalTypes"
-        ),
+        value_type=schema.Choice(vocabulary="plone.app.vocabularies.PortalTypes"),
     )
 
-    # elevate_xml = schema.Text(
-    #     title=u'Configurazione elevate',
-    #     description=u'Inserisci una configurazione per l\'elevate come '
-    #     u'se fosse un file xml.',
-    #     required=False,
-    #     constraint=elevateConstraint,
-    # )
+    elevate_schema = schema.SourceText(
+        title=u"Elevate configuration",
+        description=u"Insert a list of values for elevate. Each elevate item should"
+        u' have the following structure: {"text": "some text", "ids": ["12345677"]}.',
+        required=False,
+        constraint=validate_cfg_json,
+        default=u"[]",
+    )
 
-    # enable_query_debug = schema.Bool(
-    #     title=u'Abilita il debug delle query solr',
-    #     description=u'Se selezionato, mostra la query effettuata su solr, '
-    #     u'per il debug. Solo per gli amministratori del sito.',
-    #     required=False,
-    # )
-
-    # directives.widget(index_fields=SolrFieldsFieldWidget)
     index_fields = schema.SourceText(
         title=_(
             "index_fields_label",
