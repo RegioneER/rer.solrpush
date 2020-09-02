@@ -39,8 +39,10 @@ or click on `Reload schema.xml` button.
 Search configuration
 ''''''''''''''''''''
 
+In solr controlpanel (*/@@solrpush-conf*) there are some field that allows admins to setup some query parameters.
+
 'qf' specifies a list of fields, each of which is assigned a boost factor to increase
-or decrease that particular field’s importance in the query.
+or decrease that particular field’s relevance in the query.
 
 For example if you want to give more relevance to results that contains searched
 text into their title than in the text, you could set something like this::
