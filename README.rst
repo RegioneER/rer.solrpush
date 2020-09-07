@@ -60,7 +60,7 @@ Solr will improve ranking for results that have "*something*" in their searchwor
 
 `bf` specifies functions (with optional boosts) that will be used to construct FunctionQueries
 which will be added to the user’s main query as optional clauses that will influence the score.
-Any function supported natively by Solr can be used, along with a boost value.
+Any `function supported natively <https://lucene.apache.org/solr/guide/6_6/function-queries.html>`_ by Solr can be used, along with a boost value.
 For example if we want to give less relevance to items deeper in the tree we can set something like this::
 
     recip(path_depth,10,100,1)
