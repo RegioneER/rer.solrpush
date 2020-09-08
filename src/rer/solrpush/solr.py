@@ -49,7 +49,9 @@ def fix_value(value, wrap=True):
             " OR ".join([escape_special_characters(x, wrap) for x in value])
         )
         # return list(map(escape_special_characters, value))
-    logger.warning("[fix_value]: unable to escape value: {}. skipping".format(value))
+    logger.warning(
+        "[fix_value]: unable to escape value: {}. skipping".format(value)
+    )
     return
 
 
@@ -86,7 +88,9 @@ def get_index_fields(field):
 
 def get_site_title():
     registry = getUtility(IRegistry)
-    site_settings = registry.forInterface(ISiteSchema, prefix="plone", check=False)
+    site_settings = registry.forInterface(
+        ISiteSchema, prefix="plone", check=False
+    )
     site_title = getattr(site_settings, "site_title") or ""
     if RER_THEME:
         fields_value = getUtility(ICustomFields)
@@ -170,7 +174,9 @@ def init_solr_push():
             return ErrorMessage
 
         root = etree.fromstring(respo.content)
-        chosen_fields = json.dumps(extract_fields(nodes=root.findall(".//field")))
+        chosen_fields = json.dumps(
+            extract_fields(nodes=root.findall(".//field"))
+        )
         if six.PY2:
             chosen_fields = chosen_fields.decode("utf-8")
         set_setting(field="index_fields", value=chosen_fields)
@@ -265,7 +271,9 @@ def create_index_dict(item):
     index_me["path"] = "/".join(item.getPhysicalPath())
     index_me["path_depth"] = len(item.getPhysicalPath()) - 2
     if frontend_url:
-        index_me["url"] = item.absolute_url().replace(portal.portal_url(), frontend_url)
+        index_me["url"] = item.absolute_url().replace(
+            portal.portal_url(), frontend_url
+        )
     else:
         index_me["url"] = item.absolute_url()
 
@@ -293,7 +301,9 @@ def set_sort_parameter(query):
     sort_order = query.get("sort_order", "asc")
     if sort_order in ["reverse"]:
         return "{sort_on} desc".format(sort_on=sort_on)
-    return "{sort_on} {sort_order}".format(sort_on=sort_on, sort_order=sort_order)
+    return "{sort_on} {sort_order}".format(
+        sort_on=sort_on, sort_order=sort_order
+    )
 
 
 def generate_query(
@@ -312,7 +322,7 @@ def generate_query(
         "json.nl": "arrmap",
     }
     solr_query.update(extract_from_query(query=query))
-    
+
     if not solr_query["q"]:
         solr_query["q"] = "*:*"
     if filtered_sites:
@@ -427,7 +437,9 @@ def push_to_solr(item_or_obj):
     if "attachment" in item_or_obj:
         attachment = item_or_obj["attachment"]
         del item_or_obj["attachment"]
-        add_with_attachment(solr=solr, attachment=attachment, fields=item_or_obj)
+        add_with_attachment(
+            solr=solr, attachment=attachment, fields=item_or_obj
+        )
     else:
         solr.add([item_or_obj])
     return True
@@ -445,10 +457,16 @@ def add_with_attachment(solr, attachment, fields):
         "commit": "true",
     }
     params.update(
-        {"literal.{key}".format(key=key): value for (key, value) in fields.items()}
+        {
+            "literal.{key}".format(key=key): value
+            for (key, value) in fields.items()
+        }
     )
     return solr._send_request(
-        "post", "update/extract", body=params, files={"file": ("extracted", attachment)}
+        "post",
+        "update/extract",
+        body=params,
+        files={"file": ("extracted", attachment)},
     )
 
 
@@ -472,7 +490,9 @@ def remove_from_solr(uid):
             default=u"There was a problem removing this content from SOLR. "
             " Please contact site administrator.",
         )
-        api.portal.show_message(message=message, request=portal.REQUEST, type="error")
+        api.portal.show_message(
+            message=message, request=portal.REQUEST, type="error"
+        )
 
 
 def reset_solr():
