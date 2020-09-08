@@ -25,50 +25,71 @@ description:
       - Pannello di controllo
     genericName: Plone addon
     longDescription: >
-
-      Prodotto che permette a SOLR di indicizzare e cercare in un sito Plone.
-
-
-      ## Control Panel
+      Plugin per Plone che permette a SOLR di indicizzare un sito Plone per poi
+      poter usare SOLR come motore di ricerca nel sito. 
 
 
-      Nel pannello di controllo sono disponibili:
+      Comprende i seguenti componenti. 
 
 
-      - Flag abilitare o disabilitare l'integrazione di SOLR
+      ### Control Panel 
 
-      - Solr URL: SOLR core URL
 
-      - Portal types da indicizzare in SOLR
+      Nel pannello di controllo sono disponibili: 
 
-      - URL del frontend pubblico
+
+      - Flag per abilitare o disabilitare l'integrazione di SOLR 
+
+      - Solr URL: URL del core di SOLR 
+
+      - i Tipi di contenuto da indicizzare in SOLR 
+
+      - URL del frontend pubblico 
+
+      - pulsante per forzare l'aggiornamento dell'indice 
+
+
+      ### Campi aggiuntivi 
+
+
+      Vengono aggiunti a tutti i tipi di contenuto i seguenti campi: 
+
+
+      - Mostra nella ricerca: per poter eventualmente indicare singoli contenuti
+      che non devono essere indicizzati 
+
+      - Parole di ricerca: per indicare specifiche parole chiave che fanno sì
+      che quel contenuto abbia un ranking maggiore nei risultati delle ricerche
+      (Elevate). 
 
 
       ### Campi del registro nascosti
 
+
       Ci sono alcuni campi del registro di servizio che sono nascosti per non
-      permettere agli utenti di modificarli:
+      permettere agli utenti di modificarli: 
 
 
       - ready: un flag che specifica se il prodotto è pronto e inizializzato.
-      Indica che lo schema xml è stato caricato.
+      Indica che lo schema xml è stato caricato. 
 
-      - index\_fields: è la lista dei campi di SOLR caricati dal file schema.xml
+      - index\_fields: è la lista dei campi di SOLR caricati dal file
+      schema.xml 
 
 
-      ### Caricamento del file schema.xml
+      ### Caricamento del file schema.xml 
 
 
       I campi di SOLR sono letti direttamente dal schema.xml esposto da SOLR.
-
       Questo schema è salvato nel registry di Plone per questioni di performance
       ed è sempre sincronizzato quando vengono salvate le configurazioni nel
       pannello di controllo o si clicca manualmente sul bottone "Ricarica
       schema.xml".
- 
+
     shortDescription: >-
-      Prodotto per Regione Emilia-Romagna relativo all'indicizzazione dei
-      contenuti con SOLR
+      Modulo per indicizzare i contenuti Plone con SOLR
+    screenshots: 
+      - docs/Solr-Push_Configurazione.jpg
 developmentStatus: stable
 it:
   riuso:
@@ -103,7 +124,7 @@ maintenance:
       until: '2020-08-31'
       website: 'https://www.redturtle.it/'
   type: contract
-name: rer.solrpush
+name: Indicizzare con SOLR i contenuti del CMS Plone
 platforms:
   - web
 releaseDate: '2019-12-05'

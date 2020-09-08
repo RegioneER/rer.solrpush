@@ -37,8 +37,8 @@ except ImportError:
 logger = logging.getLogger(__name__)
 
 ADDITIONAL_FIELDS = ["searchwords"]
-
 LUCENE_SPECIAL_CHARACTERS = '+-&|!(){}^"~?:\t\v\\/'
+TRIM = re.compile(r"\s+")
 
 
 def fix_value(value, wrap=True):
@@ -302,39 +302,17 @@ def generate_query(
     facets=False,
     facet_fields=["Subject", "portal_type"],
     filtered_sites=[],
-    **kwargs
 ):
-    index_fields = get_index_fields(field="index_fields")
-    # index_ids = [x['id'] for x in index_fields]
-    solr_query = kwargs
-    solr_query.update(
-        {
-            "q": "",
-            "fq": [],
-            "facet": facets and "true" or "false",
-            "start": query.get("b_start", 0),
-            "rows": query.get("b_size", 20),
-            "json.nl": "arrmap",
-        }
-    )
-    for index, value in query.items():
-        if index == "*":
-            solr_query["q"] = "*:*"
-            continue
-        if index == "":
-            solr_query["q"] = fix_value(value, wrap=False)
-            continue
-        index_infos = index_fields.get(index, {})
-        if not index_infos:
-            continue
-        if index == "SearchableText":
-            solr_query["q"] = u"SearchableText:{}".format(
-                fix_value(value=value, wrap=False)
-            )
-        else:
-            if index_infos.get("type") not in ["date"]:
-                value = fix_value(value=value)
-            solr_query["fq"].append("{index}:{value}".format(index=index, value=value))
+    solr_query = {
+        "q": "",
+        "fq": [],
+        "facet": facets and "true" or "false",
+        "start": query.get("b_start", 0),
+        "rows": query.get("b_size", 20),
+        "json.nl": "arrmap",
+    }
+    solr_query.update(extract_from_query(query=query))
+    
     if not solr_query["q"]:
         solr_query["q"] = "*:*"
     if filtered_sites:
@@ -349,7 +327,85 @@ def generate_query(
         solr_query["facet.field"] = facet_fields
     if fl:
         solr_query["fl"] = fl
+
+    solr_query.update(add_query_tweaks())
+    # elevate
+    solr_query.update(manage_elevate(query))
     return solr_query
+
+
+def manage_elevate(query):
+    params = {}
+    params["enableElevation"] = "false"
+    searchableText = query.get("SearchableText", "")
+    if not searchableText:
+        return params
+    if not searchableText.replace(" ", ""):
+        return params
+    elevate_map = json.loads(get_setting("elevate_schema"))
+    if not elevate_map:
+        return params
+    try:
+        if six.PY2:
+            text = (
+                TRIM.sub(" ", searchableText).strip().decode("utf-8").lower()
+            )
+        else:
+            text = TRIM.sub(" ", searchableText).strip().lower()
+    except Exception:
+        logger.exception("error parsing %r", searchableText)
+        text = None
+    if text:
+        for config in elevate_map:
+            # exact match
+            # if text == s:
+
+            # contains
+            # if s in text:
+
+            # contains regexp
+            if re.search(
+                "(^|\s+)" + config.get("text", "") + "(\s+|$)", text  # noqa
+            ):
+                params["enableElevation"] = "true"
+                params["elevateIds"] = ",".join(config.get("ids", []))
+                break
+    return params
+
+
+def extract_from_query(query):
+    index_fields = get_index_fields(field="index_fields")
+    params = {"q": "", "fq": []}
+    for index, value in query.items():
+        if index == "*":
+            params["q"] = "*:*"
+            continue
+        if index in ["", "SearchableText"]:
+            params["q"] = fix_value(value, wrap=False)
+
+            continue
+        index_infos = index_fields.get(index, {})
+        if not index_infos:
+            continue
+        # other indexes will be added in fq
+        if index_infos.get("type") not in ["date"]:
+            value = fix_value(value=value)
+        params["fq"].append("{index}:{value}".format(index=index, value=value))
+    return params
+
+
+def add_query_tweaks():
+    """
+    Add query tweaks set in control panel
+    """
+    params = {}
+    for id in ["qf", "bq", "bf"]:
+        value = get_setting(field=id)
+        if value:
+            params[id] = value
+    if params:
+        params["defType"] = "edismax"
+    return params
 
 
 def push_to_solr(item_or_obj):
@@ -464,7 +520,6 @@ def search(
         facets=facets,
         facet_fields=facet_fields,
         filtered_sites=filtered_sites,
-        **kwargs
     )
     try:
         res = solr.search(**solr_query)
