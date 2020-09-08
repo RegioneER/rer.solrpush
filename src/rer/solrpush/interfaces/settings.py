@@ -109,7 +109,48 @@ class IRerSolrpushConf(model.Schema):
     )
 
 
-class IRerSolrpushSettings(IRerSolrpushConf):
+class IRerSolrpushSearchConf(model.Schema):
+
+    qf = schema.TextLine(
+        title=_("qf_label", default=u"qf (query fields)"),
+        description=_(
+            "qf_help",
+            default=u"Set a list of fields, each of which is assigned a boost factor "
+            u"to increase or decrease that particular field’s importance in the query."
+            u" For example: fieldOne^1000.0 fieldTwo fieldThree^10.0",
+        ),
+        required=False,
+        default=u"",
+    )
+    bq = schema.TextLine(
+        title=_("bq_label", default=u"bq (boost query)"),
+        description=_(
+            "bq_help",
+            default=u"Set a list query clauses that will be added to the main query "
+            u"to influence the score. For example if we want to boost results that"
+            u' have a specific "searchwords" term: searchwords:something^1000',
+        ),
+        required=False,
+        default=u"",
+    )
+
+    bf = schema.TextLine(
+        title=_("bf_label", default=u"bf (boost functions)"),
+        description=_(
+            "bf_help",
+            default=u"Set a list of functions (with optional boosts) that will be "
+            u"used to construct FunctionQueries which will be added to the main query "
+            u"as optional clauses that will influence the score. Any function "
+            u"supported natively by Solr can be used, along with a boost value. "
+            u"For example if we want to give less relevance to items deeper in the "
+            u"tree we can set something like this: recip(path_depth,10,100,1)",
+        ),
+        required=False,
+        default=u"",
+    )
+
+
+class IRerSolrpushSettings(IRerSolrpushConf, IRerSolrpushSearchConf):
     """
     Marker interface for settings
     """

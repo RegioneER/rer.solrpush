@@ -16,6 +16,7 @@
       for="Products.CMFPlone.interfaces.IPloneSiteRoot"
       class=".controlpanel.RerSolrpushView"
       permission="cmf.ManagePortal"
+      layer="rer.solrpush.interfaces.IRerSolrpushLayer"
       />
 
   <browser:page
@@ -24,6 +25,7 @@
     permission="cmf.ManagePortal"
     class=".maintenance.ReindexSolrView"
     template="templates/reindex_solr.pt"
+    layer="rer.solrpush.interfaces.IRerSolrpushLayer"
     />
     <browser:page
     for="Products.CMFCore.interfaces.ISiteRoot"
@@ -31,6 +33,7 @@
     permission="cmf.ManagePortal"
     class=".maintenance.SyncSolrView"
     template="templates/reindex_solr.pt"
+    layer="rer.solrpush.interfaces.IRerSolrpushLayer"
     />
 
    <browser:page
@@ -38,23 +41,27 @@
         name="reindex-progress"
         permission="cmf.ManagePortal"
         class=".maintenance.ReindexProgressView"
+        layer="rer.solrpush.interfaces.IRerSolrpushLayer"
     />
     <browser:page
         for="Products.CMFCore.interfaces.ISiteRoot"
         name="do-reindex"
         permission="cmf.ManagePortal"
         class=".maintenance.DoReindexView"
+        layer="rer.solrpush.interfaces.IRerSolrpushLayer"
     />
     <browser:page
         for="Products.CMFCore.interfaces.ISiteRoot"
         name="do-sync"
         permission="cmf.ManagePortal"
         class=".maintenance.DoSyncView"
+        layer="rer.solrpush.interfaces.IRerSolrpushLayer"
     />
   <browser:page
           for="Products.CMFCore.interfaces.ISiteRoot"
           name="reset-solr"
           permission="cmf.ManagePortal"
           class=".maintenance.ResetSolr"
+          layer="rer.solrpush.interfaces.IRerSolrpushLayer"
           />
 </configure>
