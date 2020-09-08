@@ -27,7 +27,9 @@ class TestSolrSearch(unittest.TestCase):
         self.request = self.layer["request"]
         setRoles(self.portal, TEST_USER_ID, ["Manager"])
         set_registry_record(
-            "enabled_types", ["Document", "News Item"], interface=IRerSolrpushSettings
+            "enabled_types",
+            ["Document", "News Item"],
+            interface=IRerSolrpushSettings,
         )
 
         init_solr_push()
@@ -73,7 +75,9 @@ class TestSolrSearch(unittest.TestCase):
     def tearDown(self):
         set_registry_record("active", True, interface=IRerSolrpushSettings)
         #  reset elevate
-        set_registry_record("elevate_schema", u"[]", interface=IRerSolrpushSettings)
+        set_registry_record(
+            "elevate_schema", u"[]", interface=IRerSolrpushSettings
+        )
         reset_solr()
         commit()
 
@@ -88,7 +92,9 @@ class TestSolrSearch(unittest.TestCase):
         api.content.transition(obj=doc4, transition="publish")
         commit()
 
-        solr_results = search(query={"SearchableText": "page"}, fl="UID Title").docs
+        solr_results = search(
+            query={"SearchableText": "page"}, fl="UID Title"
+        ).docs
         self.assertNotEqual(solr_results[0]["UID"], doc4.UID())
 
         # now let's set an elevate for fourth document
@@ -98,6 +104,9 @@ class TestSolrSearch(unittest.TestCase):
             interface=IRerSolrpushSettings,
         )
         commit()
-        solr_results = search(query={"SearchableText": "page"}, fl="UID Title").docs
+
+        solr_results = search(
+            query={"SearchableText": "page"}, fl="UID Title"
+        ).docs
 
         self.assertEqual(solr_results[0]["UID"], doc4.UID())
