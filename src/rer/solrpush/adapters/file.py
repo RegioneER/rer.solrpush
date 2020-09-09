@@ -13,14 +13,4 @@ class FileExtractor(object):
         """
         if not self.context.file:
             return ""
-        form = self.context.REQUEST.form
-        if (
-            form.get("form.widgets.file", None)
-            and form.get("form.widgets.file.action", "") != "nochange"  # noqa
-        ):
-            # object blob hasn't already created
-            file_obj = self.context.REQUEST.form["form.widgets.file"]
-            file_obj.seek(0)
-        else:
-            file_obj = self.context.file.data
-        return file_obj
+        return self.context.file.data
