@@ -1,17 +1,18 @@
 # -*- coding: utf-8 -*-
+from collective.z3cform.datagridfield import DataGridFieldFactory
 from plone import api
 from plone.app.registry.browser.controlpanel import ControlPanelFormWrapper
 from plone.app.registry.browser.controlpanel import RegistryEditForm
 from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
 from rer.solrpush import _
-from rer.solrpush.interfaces.settings import IRerSolrpushSettings
 from rer.solrpush.interfaces.settings import IRerSolrpushConf
 from rer.solrpush.interfaces.settings import IRerSolrpushSearchConf
+from rer.solrpush.interfaces.settings import IRerSolrpushSettings
 from rer.solrpush.solr import init_solr_push
 from z3c.form import button
-from z3c.form.interfaces import HIDDEN_MODE
 from z3c.form import field
 from z3c.form import group
+from z3c.form.interfaces import HIDDEN_MODE
 
 
 import logging
@@ -23,11 +24,14 @@ class FormDefault(group.Group):
     label = _("settings_default_label", default=u"Settings")
     fields = field.Fields(IRerSolrpushConf)
 
+    fields["elevate_schema"].widgetFactory = DataGridFieldFactory
+
 
 class FormSearch(group.Group):
     label = _("settings_search_label", default=u"Search")
     description = _(
-        "settings_search_help", default=u"Use these settings to tweak search results."
+        "settings_search_help",
+        default=u"Use these settings to tweak search results.",
     )
     fields = field.Fields(IRerSolrpushSearchConf)
 
@@ -62,7 +66,9 @@ class RerSolrpushEditForm(RegistryEditForm):
         api.portal.show_message(_(u"Changes saved."), request=self.request)
         init_error = init_solr_push()
         if init_error:
-            api.portal.show_message(init_error, type="error", request=self.request)
+            api.portal.show_message(
+                init_error, type="error", request=self.request
+            )
         else:
             api.portal.show_message(
                 _(u"Loaded schema.xml from SOLR"), request=self.request
@@ -79,7 +85,9 @@ class RerSolrpushEditForm(RegistryEditForm):
 
         init_error = init_solr_push()
         if init_error:
-            api.portal.show_message(init_error, type="error", request=self.request)
+            api.portal.show_message(
+                init_error, type="error", request=self.request
+            )
         else:
             api.portal.show_message(
                 _(u"Reloaded schema.xml from SOLR"), request=self.request

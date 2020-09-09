@@ -76,7 +76,7 @@ class TestSolrSearch(unittest.TestCase):
         set_registry_record("active", True, interface=IRerSolrpushSettings)
         #  reset elevate
         set_registry_record(
-            "elevate_schema", u"[]", interface=IRerSolrpushSettings
+            "elevate_schema", [], interface=IRerSolrpushSettings
         )
         reset_solr()
         commit()
@@ -100,7 +100,7 @@ class TestSolrSearch(unittest.TestCase):
         # now let's set an elevate for fourth document
         set_registry_record(
             "elevate_schema",
-            u'[{{"text": "page", "ids": ["{}"]}}]'.format(doc4.UID()),
+            [{"text": u"page", "uid": [doc4.UID()]}],
             interface=IRerSolrpushSettings,
         )
         commit()
