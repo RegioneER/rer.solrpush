@@ -1,10 +1,14 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime
 from DateTime import DateTime
-from ZTUtils.Lazy import Lazy
 from rer.solrpush.solr import get_index_fields
 from rer.solrpush.solr import get_site_title
 from OFS.Traversable import path2url
+
+try:
+    from ZTUtils.Lazy import Lazy
+except ImportError:
+    from Products.ZCatalog.Lazy import Lazy
 
 timezone = DateTime().timezone()
 
