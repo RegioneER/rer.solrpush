@@ -97,11 +97,12 @@ class QueryBuilder(BaseView):
             if parsedquery["searchWithSolr"]["query"]:
                 search_with_solr = True
             del parsedquery["searchWithSolr"]
-
         if not empty_query:
             if search_with_solr:
                 results = SolrResponse(
-                    data=self.do_search_with_solr(query=parsedquery)
+                    data=solr_search(
+                        **self.clean_query_for_solr(query=parsedquery)
+                    )
                 )
             else:
                 results = catalog(**parsedquery)
@@ -118,10 +119,6 @@ class QueryBuilder(BaseView):
             results = Batch(results, b_size, start=b_start)
         return results
 
-    def do_search_with_solr(self, query):
-        results = solr_search(**self.clean_query_for_solr(query=query))
-        return results
-
     def clean_query_for_solr(self, query):
         fixed_query = {}
         filtered_sites = []
@@ -136,16 +133,14 @@ class QueryBuilder(BaseView):
             if k == "path":
                 portal = api.portal.get()
                 portal_path = "/".join(portal.getPhysicalPath())
-                if (
-                    len(val) == 1
-                    and val[0].rstrip("/") == portal_path  # noqa
-                    and "solr_sites" not in query.keys()  # noqa
-                ):
-                    filtered_sites.append(get_site_title())
+                if len(val) == 1 and val[0].rstrip("/") == portal_path:  # noqa
+                    if "solr_sites" not in query.keys():
+                        filtered_sites.append(get_site_title())
                 else:
                     fixed_query["path_parents"] = val
             elif k == "solr_sites" and val != "null":
                 filtered_sites = val
             else:
                 fixed_query[k] = val
+
         return {"query": fixed_query, "filtered_sites": filtered_sites}

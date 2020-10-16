@@ -118,7 +118,7 @@ class SolrResponse(Lazy):
     __allow_access_to_unprotected_subobjects__ = True
 
     def __init__(self, data=None):
-        if not getattr(data, "hits", None) and data.get("error", False):
+        if getattr(data, "hits", None) is None and data.get("error", False):
             self.actual_result_count = 0
             self._data = {}
         else:
