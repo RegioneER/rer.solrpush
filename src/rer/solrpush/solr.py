@@ -78,9 +78,9 @@ def set_setting(field, value):
     )
 
 
-def get_index_fields(field):
+def get_index_fields():
     json_str = api.portal.get_registry_record(
-        field, interface=IRerSolrpushSettings, default=""
+        "index_fields", interface=IRerSolrpushSettings, default=""
     )
     return json.loads(json_str)
 
@@ -225,7 +225,7 @@ def create_index_dict(item):
     l'indicizzazione.
     """
 
-    index_fields = get_index_fields(field="index_fields")
+    index_fields = get_index_fields()
     frontend_url = get_setting(field="frontend_url")
 
     catalog = api.portal.get_tool(name="portal_catalog")
@@ -259,6 +259,8 @@ def create_index_dict(item):
     index_me["site_name"] = get_site_title()
     index_me["path"] = "/".join(item.getPhysicalPath())
     index_me["path_depth"] = len(item.getPhysicalPath()) - 2
+    # set all parent paths leading up to the object
+    index_me["path_parents"] = get_path_parents(item)
     if frontend_url:
         index_me["url"] = item.absolute_url().replace(
             portal.portal_url(), frontend_url
@@ -266,6 +268,12 @@ def create_index_dict(item):
     else:
         index_me["url"] = item.absolute_url()
     return index_me
+
+
+def get_path_parents(obj):
+    """ return all parent paths leading up to the object """
+    elements = obj.getPhysicalPath()
+    return ["/".join(elements[: n + 1]) for n in range(1, len(elements))]
 
 
 def fix_py2_strings(value):
@@ -284,6 +292,8 @@ def fix_py2_strings(value):
 def set_sort_parameter(query):
     sort_on = query.get("sort_on")
     sort_order = query.get("sort_order", "asc")
+    if sort_order == "ascending":
+        sort_order = "asc"
     if sort_order in ["reverse"]:
         return "{sort_on} desc".format(sort_on=sort_on)
     return "{sort_on} {sort_order}".format(
@@ -368,12 +378,15 @@ def manage_elevate(query):
 
 
 def extract_from_query(query):
-    index_fields = get_index_fields(field="index_fields")
+    index_fields = get_index_fields()
     params = {"q": "", "fq": []}
     for index, value in query.items():
         if index == "*":
             params["q"] = "*:*"
             continue
+        if isinstance(value, dict):
+            if "query" in value:
+                value = value["query"]
         if index in ["", "SearchableText"]:
             params["q"] = fix_value(value, wrap=False)
 
