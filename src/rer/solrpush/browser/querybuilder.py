@@ -123,24 +123,30 @@ class QueryBuilder(BaseView):
         fixed_query = {}
         filtered_sites = []
         for k, v in query.items():
-            if isinstance(v, dict) and "query" in v:
-                val = v["query"]
-            else:
-                val = v
             if k == "sort_on":
-                val = SORT_ON_MAPPING.get(val, val)
+                v = SORT_ON_MAPPING.get(v, v)
 
             if k == "path":
                 portal = api.portal.get()
                 portal_path = "/".join(portal.getPhysicalPath())
-                if len(val) == 1 and val[0].rstrip("/") == portal_path:  # noqa
+                path = self.extract_value(v)
+                if (
+                    len(path) == 1 and path[0].rstrip("/") == portal_path
+                ):  # noqa
                     if "solr_sites" not in query.keys():
                         filtered_sites.append(get_site_title())
                 else:
-                    fixed_query["path_parents"] = val
-            elif k == "solr_sites" and val != "null":
-                filtered_sites = val
+                    fixed_query["path_parents"] = path
+            elif k == "solr_sites":
+                sites = self.extract_value(v)
+                if sites != "null":
+                    filtered_sites = sites
             else:
-                fixed_query[k] = val
+                fixed_query[k] = v
 
         return {"query": fixed_query, "filtered_sites": filtered_sites}
+
+    def extract_value(self, value):
+        if isinstance(value, dict) and "query" in value:
+            return value["query"]
+        return value

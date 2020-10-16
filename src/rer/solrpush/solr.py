@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from datetime import datetime
 from DateTime import DateTime
 from lxml import etree
 from plone import api
@@ -40,8 +41,25 @@ LUCENE_SPECIAL_CHARACTERS = '+-&|!(){}^"~?:\t\v\\/'
 TRIM = re.compile(r"\s+")
 
 
-def fix_value(value, wrap=True):
+def fix_value(value, index_type="", wrap=True):
+    if isinstance(value, dict):
+        query = value.get("query", "")
+        range = value.get("range", "")
+        if range:
+            if range == "min":
+                value = "[{} TO *]".format(parse_date_str(query))
+            if range == "max":
+                value = "[* TO {}]".format(parse_date_str(query))
+            if range == "minmax":
+                value = "[{} TO {}]".format(
+                    parse_date_str(query[0]), parse_date_str(query[1])
+                )
+            return value
+        else:
+            value = query
     if isinstance(value, six.string_types):
+        if index_type == "date":
+            return value
         return escape_special_characters(value, wrap)
     elif isinstance(value, list):
         return "({})".format(
@@ -143,6 +161,8 @@ def parse_date_as_datetime(value):
 
 
 def parse_date_str(value):
+    if isinstance(value, datetime):
+        value = DateTime(value)
     return parse_date_as_datetime(DateTime(value))
 
 
@@ -384,19 +404,15 @@ def extract_from_query(query):
         if index == "*":
             params["q"] = "*:*"
             continue
-        if isinstance(value, dict):
-            if "query" in value:
-                value = value["query"]
         if index in ["", "SearchableText"]:
             params["q"] = fix_value(value, wrap=False)
-
             continue
         index_infos = index_fields.get(index, {})
         if not index_infos:
+            # unknown index. skipped
             continue
         # other indexes will be added in fq
-        if index_infos.get("type") not in ["date"]:
-            value = fix_value(value=value)
+        value = fix_value(value=value, index_type=index_infos.get("type", ""))
         params["fq"].append("{index}:{value}".format(index=index, value=value))
     return params
 

@@ -29,7 +29,9 @@ class TestSearch(unittest.TestCase):
         self.request = self.layer["request"]
         setRoles(self.portal, TEST_USER_ID, ["Manager"])
         set_registry_record(
-            "enabled_types", ["Document", "News Item"], interface=IRerSolrpushSettings
+            "enabled_types",
+            ["Document", "News Item"],
+            interface=IRerSolrpushSettings,
         )
         init_solr_push()
         # set_registry_record("active", True, interface=IRerSolrpushSettings)
@@ -77,7 +79,9 @@ class TestSearch(unittest.TestCase):
         self.assertNotEqual(solr_results.docs[0]["id"], "odd")
 
         set_registry_record(
-            "qf", u"id^1000.0 SearchableText^1.0", interface=IRerSolrpushSettings
+            "qf",
+            u"id^1000.0 SearchableText^1.0",
+            interface=IRerSolrpushSettings,
         )
         commit()
         solr_results = search(query={"": "odd"}, fl=["UID", "id", "Title"])
@@ -114,4 +118,6 @@ class TestSearch(unittest.TestCase):
 
     def test_escape_chars(self):
         self.assertEqual(escape_special_characters("*:*", False), "\\*\\:\\*")
-        self.assertEqual(escape_special_characters("* : *", True), '"\\* \\: \\*"')
+        self.assertEqual(
+            escape_special_characters("* : *", True), '"\\* \\: \\*"'
+        )
