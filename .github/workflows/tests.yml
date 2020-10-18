@@ -13,13 +13,6 @@ jobs:
         exclude:
           - python: '3.7'
             plone: '51'
-    services:
-      solr:
-        image: solr:7.7.3
-        ports:
-          - '8983:8983'
-        volumes:
-          - /home/runner/work/rer.solrpush/rer.solrpush/config:/opt/solr/server/solr/plone
     steps:
       - uses: actions/checkout@v1
       - name: Cache eggs
@@ -40,8 +33,6 @@ jobs:
         run: |
           buildout -N -t 3 code-analysis:return-status-codes=True annotate
           buildout -N -t 3 code-analysis:return-status-codes=True
-      - name: Setup tmate session
-        uses: mxschmitt/action-tmate@v3
       - name: Run tests
         run: |
           bin/code-analysis
