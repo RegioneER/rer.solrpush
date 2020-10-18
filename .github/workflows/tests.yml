@@ -40,6 +40,8 @@ jobs:
         run: |
           buildout -N -t 3 code-analysis:return-status-codes=True annotate
           buildout -N -t 3 code-analysis:return-status-codes=True
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3
       - name: Run tests
         run: |
           bin/code-analysis
