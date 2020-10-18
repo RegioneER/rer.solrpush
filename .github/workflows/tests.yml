@@ -13,10 +13,15 @@ jobs:
         exclude:
           - python: '3.7'
             plone: '51'
+    services:
+      solr:
+        image: solr:7.7.3
+        ports:
+          - '8983:8983'
+        volumes:
+          - ./config:/opt/solr/server/solr/plone
     steps:
       - uses: actions/checkout@v1
-      - name: Docker compose
-        run: docker-compose up -d
       - name: Cache eggs
         uses: actions/cache@v1
         with:
