@@ -8,6 +8,10 @@
 # dirs
 bin/
 buildout-cache/
+config/dev/conf/
+config/test/conf/
+config/dev/data/
+config/test/data/
 develop-eggs/
 eggs/
 htmlcov/
