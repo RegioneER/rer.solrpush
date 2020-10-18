@@ -19,7 +19,7 @@ jobs:
         ports:
           - '8983:8983'
         volumes:
-          - ${{ github.workspace }}/config:/opt/solr/server/solr/plone
+          - /home/runner/work/rer.solrpush/rer.solrpush/config:/opt/solr/server/solr/plone
     steps:
       - uses: actions/checkout@v1
       - name: Cache eggs
