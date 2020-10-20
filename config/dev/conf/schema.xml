@@ -164,12 +164,12 @@
 <!-- catchall field per spellcheck, containing all other searchable text fields (implemented via copyField further on in this schema -->
    <field name="SearchableText_no_stem" type="text_no_stem_it" indexed="true" stored="false" required="false" multiValued="true" termVectors="false" termPositions="false" termOffsets="false"/>
 <!-- bandi -->
-   <field name="getChiusura_procedimento_bando" type="date" indexed="true" stored="true" required="false" multiValued="false" termVectors="false" termPositions="false" termOffsets="false"/>
-   <field name="getScadenza_bando" type="date" indexed="true" stored="true" required="false" multiValued="false" termVectors="false" termPositions="false" termOffsets="false"/>
-   <field name="getTipologia_bando" type="string" indexed="true" stored="true" required="false" multiValued="false" termVectors="false" termPositions="false" termOffsets="false"/>
-   <field name="getDestinatariBando" type="string" indexed="true" stored="true" required="false" multiValued="true" termVectors="false" termPositions="false" termOffsets="false"/>
-   <field name="getFinanziatori_bando" type="string" indexed="true" stored="true" required="false" multiValued="true" termVectors="false" termPositions="false" termOffsets="false"/>
-   <field name="getMaterie_bando" type="string" indexed="true" stored="true" required="false" multiValued="true" termVectors="false" termPositions="false" termOffsets="false"/>
+   <field name="chiusura_procedimento_bando" type="date" indexed="true" stored="true" required="false" multiValued="false" termVectors="false" termPositions="false" termOffsets="false"/>
+   <field name="scadenza_bando" type="date" indexed="true" stored="true" required="false" multiValued="false" termVectors="false" termPositions="false" termOffsets="false"/>
+   <field name="tipologia_bando" type="string" indexed="true" stored="true" required="false" multiValued="false" termVectors="false" termPositions="false" termOffsets="false"/>
+   <field name="destinatari" type="string" indexed="true" stored="true" required="false" multiValued="true" termVectors="false" termPositions="false" termOffsets="false"/>
+   <field name="finanziatori" type="string" indexed="true" stored="true" required="false" multiValued="true" termVectors="false" termPositions="false" termOffsets="false"/>
+   <field name="materie" type="string" indexed="true" stored="true" required="false" multiValued="true" termVectors="false" termPositions="false" termOffsets="false"/>
 
 <!-- campi aggiunti -->
    <field name="site_name" type="string" indexed="true" stored="true" required="false" multiValued="false" termVectors="false" termPositions="false" termOffsets="false"/>

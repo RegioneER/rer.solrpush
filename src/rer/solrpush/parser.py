@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime
 from DateTime import DateTime
+from plone import api
 from rer.solrpush.solr import get_index_fields
 from rer.solrpush.solr import get_site_title
 from OFS.Traversable import path2url
@@ -39,6 +40,10 @@ class Brain(dict):
         self.update(context)  # copy data
 
     @property
+    def is_current_site(self):
+        return self.get("site_name", "") == get_site_title()
+
+    @property
     def id(self):
         """ convenience alias """
         return self.get("id", self.get("getId"))
@@ -56,7 +61,9 @@ class Brain(dict):
         return self.get("path", "")
 
     def getObject(self, REQUEST=None, restricted=True):
-        raise NotImplementedError
+        if self.is_current_site:
+            return api.content.get(self.getPath().encode("utf-8"))
+        return self
 
     def _unrestrictedGetObject(self):
         raise NotImplementedError
@@ -66,9 +73,8 @@ class Brain(dict):
         If site_name is the current site, convert the physical path into a url, if it was stored.
         Else return url attribute stored in SOLR
         """
-        if self.get("site_name", "") != get_site_title():
+        if not self.is_current_site:
             return self.get("url", "")
-
         path = self.getPath()
         path = path
         try:
@@ -89,6 +95,9 @@ class Brain(dict):
 
     def PortalType(self):
         return self.get("portal_type", "")
+
+    def EffectiveDate(self):
+        return self.get("effective", None)
 
 
 class SolrResults(list):
