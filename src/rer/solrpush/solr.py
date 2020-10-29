@@ -202,6 +202,11 @@ def extract_fields(nodes):
 def attachment_to_index(item):
     """
     If item has a provider to extract text, return the file to be indexed
+
+    file could be:
+    * data
+    * stream
+    * filepath
     """
     try:
         provider = IExtractFileFromTika(item)
@@ -276,10 +281,7 @@ def create_index_dict(item):
         )
     else:
         index_me["url"] = item.absolute_url()
-
-    attachment = attachment_to_index(item)
-    if attachment:
-        index_me["attachment"] = attachment
+    index_me["attachment"] = attachment_to_index(item)
     return index_me
 
 
@@ -426,7 +428,6 @@ def push_to_solr(item_or_obj):
     if not solr:
         logger.error("Unable to push to solr. Configuration is incomplete.")
         return
-    attachment = None
     if not isinstance(item_or_obj, dict):
         if can_index(item_or_obj):
             item_or_obj = create_index_dict(item_or_obj)
@@ -434,9 +435,8 @@ def push_to_solr(item_or_obj):
             item_or_obj = None
     if not item_or_obj:
         return False
-    if "attachment" in item_or_obj:
-        attachment = item_or_obj["attachment"]
-        del item_or_obj["attachment"]
+    attachment = item_or_obj.pop("attachment", None)
+    if attachment:
         add_with_attachment(
             solr=solr, attachment=attachment, fields=item_or_obj
         )
