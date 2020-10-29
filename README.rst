@@ -2,8 +2,9 @@
 rer.solrpush
 ============
 
-.. image:: https://github.com/RegioneER/rer.solrpush/workflows/Tests/badge.svg
-
+.. image:: https://github.com/RegioneER/rer.solrpush/workflows/Tests/badge.svg 
+.. image:: https://travis-ci.org/RegioneER/rer.solrpush.svg?branch=master
+    :target: https://travis-ci.org/RegioneER/rer.solrpush
 
 Product that allows SOLR indexing/searching of a Plone website.
 
