@@ -202,11 +202,6 @@ def extract_fields(nodes):
 def attachment_to_index(item):
     """
     If item has a provider to extract text, return the file to be indexed
-
-    file could be:
-    * data
-    * stream
-    * filepath
     """
     try:
         provider = IExtractFileFromTika(item)
