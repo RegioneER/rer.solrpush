@@ -48,6 +48,8 @@ def fix_value(value, index_type="", wrap=True):
     if isinstance(value, dict):
         query = value.get("query", "")
         range = value.get("range", "")
+        if not query:
+            return ""
         if range:
             if range == "min":
                 value = "[{} TO *]".format(parse_date_str(query))
@@ -62,7 +64,7 @@ def fix_value(value, index_type="", wrap=True):
             value = query
     if isinstance(value, six.string_types):
         if index_type == "date":
-            return value
+            return "[{} TO *]".format(parse_date_str(value))
         return escape_special_characters(value, wrap)
     elif isinstance(value, list):
         return "({})".format(
@@ -429,7 +431,10 @@ def extract_from_query(query):
             continue
         # other indexes will be added in fq
         value = fix_value(value=value, index_type=index_infos.get("type", ""))
-        params["fq"].append("{index}:{value}".format(index=index, value=value))
+        if value:
+            params["fq"].append(
+                "{index}:{value}".format(index=index, value=value)
+            )
     return params
 
 

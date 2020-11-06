@@ -99,6 +99,9 @@ class Brain(dict):
     def EffectiveDate(self):
         return self.get("effective", None)
 
+    def location(self):
+        return self.get("location", "")
+
 
 class SolrResults(list):
     """ a list of results returned from solr, i.e. sol(a)r flares """
