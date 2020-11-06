@@ -8,7 +8,8 @@ from pysolr import SolrError
 from rer.solrpush import _
 from rer.solrpush.interfaces.adapter import IExtractFileFromTika
 from rer.solrpush.interfaces.settings import IRerSolrpushSettings
-from rer.solrpush.restapi.services.solr_search.batch import DEFAULT_BATCH_SIZE
+
+# from rer.solrpush.restapi.services.solr_search.batch import DEFAULT_BATCH_SIZE
 from zope.component import getUtility
 from zope.component import queryMultiAdapter
 from zope.i18n import translate
