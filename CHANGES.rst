@@ -2,10 +2,15 @@ Changelog
 =========
 
 
-0.1.3 (unreleased)
+0.2.0 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Refactor indexer logic.
+  [mamico]
+- Add support for *bq* and *qf* in search.
+  [mamico]
+- Index files with tika.
+  [cekk]
 
 
 0.1.2 (2019-12-12)
