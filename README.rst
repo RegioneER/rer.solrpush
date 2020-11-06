@@ -2,8 +2,9 @@
 rer.solrpush
 ============
 
-.. image:: https://github.com/RegioneER/rer.solrpush/workflows/Tests/badge.svg
-
+.. image:: https://github.com/RegioneER/rer.solrpush/workflows/Tests/badge.svg 
+.. image:: https://travis-ci.org/RegioneER/rer.solrpush.svg?branch=master
+    :target: https://travis-ci.org/RegioneER/rer.solrpush
 
 Product that allows SOLR indexing/searching of a Plone website.
 
@@ -35,6 +36,72 @@ SOLR fields are directly read from `schema.xml` file exposed by SOLR.
 This schema is stored in Plone registry for performance reasons
 and is always synced when you save `solr-controlpanel` form
 or click on `Reload schema.xml` button.
+
+File indexing
+'''''''''''''
+
+If Tika is configured on SOLR, you can send attachments to it and they will be indexed as SearchableText in the content.
+
+To allow attachments indexing, you need to register an adapter for each content-type that you need to index.
+
+`File` content-type is already registered, so you can copy from that::
+
+    <adapter
+      for="plone.app.contenttypes.interfaces.IFile"
+      provides="rer.solrpush.interfaces.adapter.IExtractFileFromTika"
+      factory=".file.FileExtractor"
+      />
+
+::
+
+    from rer.solrpush.interfaces.adapter import IExtractFileFromTika
+    from zope.interface import implementer
+
+
+    @implementer(IExtractFileFromTika)
+    class FileExtractor(object):
+        def __init__(self, context):
+            self.context = context
+
+        def get_file_to_index(self):
+            """
+            """
+            here you need to return the file that need to be indexed
+
+N.B.: `SearchableText` index should be **multivalued**.
+
+
+Search configuration
+''''''''''''''''''''
+
+In solr controlpanel (*/@@solrpush-conf*) there are some field that allows admins to setup some query parameters.
+
+'qf' specifies a list of fields, each of which is assigned a boost factor to increase
+or decrease that particular field’s relevance in the query.
+
+For example if you want to give more relevance to results that contains searched
+text into their title than in the text, you could set something like this::
+
+    title^1000.0 SearchableText^1.0 description^500.0
+
+You can also elevate by *searchwords*.
+
+`bq` specifies an additional, optional, query clause that will be added to the user’s main query to influence the score.
+For example if we want to boost results that have a specific `searchwords` term::
+
+    searchwords:something^1000
+  
+Solr will improve ranking for results that have "*something*" in their searchwords field.
+
+`bf` specifies functions (with optional boosts) that will be used to construct FunctionQueries
+which will be added to the user’s main query as optional clauses that will influence the score.
+Any `function supported natively <https://lucene.apache.org/solr/guide/6_6/function-queries.html>`_ by Solr can be used, along with a boost value.
+For example if we want to give less relevance to items deeper in the tree we can set something like this::
+
+    recip(path_depth,10,100,1)
+
+*path_depth* is an index that counts tree level of an object.
+
 
 Development buildout
 --------------------

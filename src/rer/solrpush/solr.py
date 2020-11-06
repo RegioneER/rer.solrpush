@@ -6,6 +6,7 @@ from plone.indexer.interfaces import IIndexableObject
 from plone.registry.interfaces import IRegistry
 from pysolr import SolrError
 from rer.solrpush import _
+from rer.solrpush.interfaces.adapter import IExtractFileFromTika
 from rer.solrpush.interfaces.settings import IRerSolrpushSettings
 from rer.solrpush.restapi.services.solr_search.batch import DEFAULT_BATCH_SIZE
 from zope.component import getUtility
@@ -37,8 +38,8 @@ except ImportError:
 logger = logging.getLogger(__name__)
 
 ADDITIONAL_FIELDS = ["searchwords"]
-
 LUCENE_SPECIAL_CHARACTERS = '+-&|!(){}^"~?:\t\v\\/'
+TRIM = re.compile(r"\s+")
 
 
 def fix_value(value, wrap=True):
@@ -49,7 +50,9 @@ def fix_value(value, wrap=True):
             " OR ".join([escape_special_characters(x, wrap) for x in value])
         )
         # return list(map(escape_special_characters, value))
-    logger.warning("[fix_value]: unable to escape value: {}. skipping".format(value))
+    logger.warning(
+        "[fix_value]: unable to escape value: {}. skipping".format(value)
+    )
     return
 
 
@@ -58,7 +61,7 @@ ESCAPE_CHARS_RE = re.compile(r'(?<!\\)(?P<char>[&|+\-!(){}[\]^"~*?:])')
 
 def escape_special_characters(value, wrap):
     new_value = ESCAPE_CHARS_RE.sub(r"\\\g<char>", value)
-    # if ('OR' not in new_value or 'AND' not in new_value) and ' ' in new_value:
+    # if ('OR' not in new_value or 'AND' not in new_value) and ' ' in new_value:  # noqa
     #     new_value = '"{}"'.format(new_value)
     if wrap:
         return '"{}"'.format(new_value)
@@ -86,7 +89,9 @@ def get_index_fields(field):
 
 def get_site_title():
     registry = getUtility(IRegistry)
-    site_settings = registry.forInterface(ISiteSchema, prefix="plone", check=False)
+    site_settings = registry.forInterface(
+        ISiteSchema, prefix="plone", check=False
+    )
     site_title = getattr(site_settings, "site_title") or ""
     if RER_THEME:
         fields_value = getUtility(ICustomFields)
@@ -170,7 +175,9 @@ def init_solr_push():
             return ErrorMessage
 
         root = etree.fromstring(respo.content)
-        chosen_fields = json.dumps(extract_fields(nodes=root.findall(".//field")))
+        chosen_fields = json.dumps(
+            extract_fields(nodes=root.findall(".//field"))
+        )
         if six.PY2:
             chosen_fields = chosen_fields.decode("utf-8")
         set_setting(field="index_fields", value=chosen_fields)
@@ -191,6 +198,17 @@ def extract_fields(nodes):
             field_type = six.text_type(field_type)
         fields[field_name] = {"type": field_type}
     return fields
+
+
+def attachment_to_index(item):
+    """
+    If item has a provider to extract text, return the file to be indexed
+    """
+    try:
+        provider = IExtractFileFromTika(item)
+        return provider.get_file_to_index()
+    except TypeError:
+        return None
 
 
 def is_solr_active():
@@ -219,7 +237,6 @@ def create_index_dict(item):
     """Restituisce un dizionario pronto per essere 'mandato' a SOLR per
     l'indicizzazione.
     """
-
     index_fields = get_index_fields(field="index_fields")
     frontend_url = get_setting(field="frontend_url")
 
@@ -255,9 +272,12 @@ def create_index_dict(item):
     index_me["path"] = "/".join(item.getPhysicalPath())
     index_me["path_depth"] = len(item.getPhysicalPath()) - 2
     if frontend_url:
-        index_me["url"] = item.absolute_url().replace(portal.portal_url(), frontend_url)
+        index_me["url"] = item.absolute_url().replace(
+            portal.portal_url(), frontend_url
+        )
     else:
         index_me["url"] = item.absolute_url()
+    index_me["attachment"] = attachment_to_index(item)
     return index_me
 
 
@@ -279,7 +299,9 @@ def set_sort_parameter(query):
     sort_order = query.get("sort_order", "asc")
     if sort_order in ["reverse"]:
         return "{sort_on} desc".format(sort_on=sort_on)
-    return "{sort_on} {sort_order}".format(sort_on=sort_on, sort_order=sort_order)
+    return "{sort_on} {sort_order}".format(
+        sort_on=sort_on, sort_order=sort_order
+    )
 
 
 def generate_query(
@@ -288,39 +310,17 @@ def generate_query(
     facets=False,
     facet_fields=["Subject", "portal_type"],
     filtered_sites=[],
-    **kwargs
 ):
-    index_fields = get_index_fields(field="index_fields")
-    # index_ids = [x['id'] for x in index_fields]
-    solr_query = kwargs
-    solr_query.update(
-        {
-            "q": "",
-            "fq": [],
-            "facet": facets and "true" or "false",
-            "start": query.get("b_start", 0),
-            "rows": query.get("b_size", DEFAULT_BATCH_SIZE),
-            "json.nl": "arrmap",
-        }
-    )
-    for index, value in query.items():
-        if index == "*":
-            solr_query["q"] = "*:*"
-            continue
-        if index == "":
-            solr_query["q"] = fix_value(value, wrap=False)
-            continue
-        index_infos = index_fields.get(index, {})
-        if not index_infos:
-            continue
-        if index == "SearchableText":
-            solr_query["q"] = u"SearchableText:{}".format(
-                fix_value(value=value, wrap=False)
-            )
-        else:
-            if index_infos.get("type") not in ["date"]:
-                value = fix_value(value=value)
-            solr_query["fq"].append("{index}:{value}".format(index=index, value=value))
+    solr_query = {
+        "q": "",
+        "fq": [],
+        "facet": facets and "true" or "false",
+        "start": query.get("b_start", 0),
+        "rows": query.get("b_size", 20),
+        "json.nl": "arrmap",
+    }
+    solr_query.update(extract_from_query(query=query))
+
     if not solr_query["q"]:
         solr_query["q"] = "*:*"
     if filtered_sites:
@@ -335,7 +335,85 @@ def generate_query(
         solr_query["facet.field"] = facet_fields
     if fl:
         solr_query["fl"] = fl
+
+    solr_query.update(add_query_tweaks())
+    # elevate
+    solr_query.update(manage_elevate(query))
     return solr_query
+
+
+def manage_elevate(query):
+    params = {}
+    params["enableElevation"] = "false"
+    searchableText = query.get("SearchableText", "")
+    if not searchableText:
+        return params
+    if not searchableText.replace(" ", ""):
+        return params
+    elevate_map = json.loads(get_setting("elevate_schema"))
+    if not elevate_map:
+        return params
+    try:
+        if six.PY2:
+            text = (
+                TRIM.sub(" ", searchableText).strip().decode("utf-8").lower()
+            )
+        else:
+            text = TRIM.sub(" ", searchableText).strip().lower()
+    except Exception:
+        logger.exception("error parsing %r", searchableText)
+        text = None
+    if text:
+        for config in elevate_map:
+            # exact match
+            # if text == s:
+
+            # contains
+            # if s in text:
+
+            # contains regexp
+            if re.search(
+                "(^|\s+)" + config.get("text", "") + "(\s+|$)", text  # noqa
+            ):
+                params["enableElevation"] = "true"
+                params["elevateIds"] = ",".join(config.get("ids", []))
+                break
+    return params
+
+
+def extract_from_query(query):
+    index_fields = get_index_fields(field="index_fields")
+    params = {"q": "", "fq": []}
+    for index, value in query.items():
+        if index == "*":
+            params["q"] = "*:*"
+            continue
+        if index in ["", "SearchableText"]:
+            params["q"] = fix_value(value, wrap=False)
+
+            continue
+        index_infos = index_fields.get(index, {})
+        if not index_infos:
+            continue
+        # other indexes will be added in fq
+        if index_infos.get("type") not in ["date"]:
+            value = fix_value(value=value)
+        params["fq"].append("{index}:{value}".format(index=index, value=value))
+    return params
+
+
+def add_query_tweaks():
+    """
+    Add query tweaks set in control panel
+    """
+    params = {}
+    for id in ["qf", "bq", "bf"]:
+        value = get_setting(field=id)
+        if value:
+            params[id] = value
+    if params:
+        params["defType"] = "edismax"
+    return params
 
 
 def push_to_solr(item_or_obj):
@@ -351,11 +429,41 @@ def push_to_solr(item_or_obj):
             item_or_obj = create_index_dict(item_or_obj)
         else:
             item_or_obj = None
-    if item_or_obj:
-        solr.add([item_or_obj])
-        return True
-    else:
+    if not item_or_obj:
         return False
+    attachment = item_or_obj.pop("attachment", None)
+    if attachment:
+        add_with_attachment(
+            solr=solr, attachment=attachment, fields=item_or_obj
+        )
+    else:
+        solr.add([item_or_obj])
+    return True
+
+
+def add_with_attachment(solr, attachment, fields):
+    params = {
+        "extractOnly": "false",
+        "lowernames": "false",
+        "fmap.content": "SearchableText",
+        "fmap.title": "SearchableText",
+        "fmap.created": "ignore_created",
+        "fmap.modified": "ignore_modified",
+        "literalsOverride": "false",
+        "commit": "true",
+    }
+    params.update(
+        {
+            "literal.{key}".format(key=key): value
+            for (key, value) in fields.items()
+        }
+    )
+    return solr._send_request(
+        "post",
+        "update/extract",
+        body=params,
+        files={"file": ("extracted", attachment)},
+    )
 
 
 def remove_from_solr(uid):
@@ -378,7 +486,9 @@ def remove_from_solr(uid):
             default=u"There was a problem removing this content from SOLR. "
             " Please contact site administrator.",
         )
-        api.portal.show_message(message=message, request=portal.REQUEST, type="error")
+        api.portal.show_message(
+            message=message, request=portal.REQUEST, type="error"
+        )
 
 
 def reset_solr():
@@ -426,7 +536,6 @@ def search(
         facets=facets,
         facet_fields=facet_fields,
         filtered_sites=filtered_sites,
-        **kwargs
     )
     try:
         res = solr.search(**solr_query)
