@@ -74,13 +74,16 @@ class IRerSolrpushConf(model.Schema):
         required=False,
         default=[],
         missing_value=[],
-        value_type=schema.Choice(vocabulary="plone.app.vocabularies.PortalTypes"),
+        value_type=schema.Choice(
+            vocabulary="plone.app.vocabularies.PortalTypes"
+        ),
     )
 
     elevate_schema = schema.SourceText(
         title=u"Elevate configuration",
-        description=u"Insert a list of values for elevate. Each elevate item should"
-        u' have the following structure: {"text": "some text", "ids": ["12345677"]}.',
+        description=u"Insert a list of values for elevate. Each elevate item "
+        u"should have the following structure: "
+        u'{"text": "some text", "ids": ["12345677"]}.',
         required=False,
         constraint=validate_cfg_json,
         default=u"[]",
@@ -89,7 +92,8 @@ class IRerSolrpushConf(model.Schema):
     index_fields = schema.SourceText(
         title=_(
             "index_fields_label",
-            default=u"List of fields loaded from SOLR that we use for indexing.",
+            default=u"List of fields loaded from SOLR that we use for "
+            u"indexing.",
         ),
         description=_(
             u"index_fields_help",
@@ -99,7 +103,13 @@ class IRerSolrpushConf(model.Schema):
         ),
         required=False,
     )
-
+    search_with_solr = schema.Bool(
+        title=u"Enable search with SOLR",
+        description=u"If selected, the search will be performed through SOLR "
+        u"instead of Plone.",
+        default=False,
+        required=False,
+    )
     # NASCOSTO DAL PANNELLO DI CONTROLLO (vedi: browser/controlpanel.py)
     ready = schema.Bool(
         title=_(u"Ready"),

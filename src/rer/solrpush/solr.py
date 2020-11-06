@@ -8,6 +8,8 @@ from pysolr import SolrError
 from rer.solrpush import _
 from rer.solrpush.interfaces.adapter import IExtractFileFromTika
 from rer.solrpush.interfaces.settings import IRerSolrpushSettings
+
+# from rer.solrpush.restapi.services.solr_search.batch import DEFAULT_BATCH_SIZE
 from zope.component import getUtility
 from zope.component import queryMultiAdapter
 from zope.i18n import translate
@@ -60,7 +62,7 @@ ESCAPE_CHARS_RE = re.compile(r'(?<!\\)(?P<char>[&|+\-!(){}[\]^"~*?:])')
 
 def escape_special_characters(value, wrap):
     new_value = ESCAPE_CHARS_RE.sub(r"\\\g<char>", value)
-    # if ('OR' not in new_value or 'AND' not in new_value) and ' ' in new_value:
+    # if ('OR' not in new_value or 'AND' not in new_value) and ' ' in new_value:  # noqa
     #     new_value = '"{}"'.format(new_value)
     if wrap:
         return '"{}"'.format(new_value)
