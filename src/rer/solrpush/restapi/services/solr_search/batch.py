@@ -11,14 +11,14 @@ class SolrHypermediaBatch(object):
     def __init__(self, request, results):
         self.request = request
 
-        self.b_start = int(json_body(self.request).get("b_start", False)) or int(
-            self.request.form.get("b_start", 0)
-        )
+        self.b_start = int(
+            json_body(self.request).get("b_start", False)
+        ) or int(self.request.form.get("b_start", 0))
         self.b_size = int(json_body(self.request).get("b_size", False)) or int(
             self.request.form.get("b_size", DEFAULT_BATCH_SIZE)
         )
 
-        self.hits = results.hits
+        self.hits = getattr(results, "hits", 0)
 
     @property
     def canonical_url(self):
@@ -32,7 +32,13 @@ class SolrHypermediaBatch(object):
         # Remove any batching / sorting related parameters.
         # Also take care to preserve list-like query string params.
         for key, value in qs_params[:]:
-            if key in ("b_size", "b_start", "sort_on", "sort_order", "sort_limit"):
+            if key in (
+                "b_size",
+                "b_start",
+                "sort_on",
+                "sort_order",
+                "sort_limit",
+            ):
                 qs_params.remove((key, value))
 
         qs = urlencode(qs_params)
@@ -104,7 +110,9 @@ class SolrHypermediaBatch(object):
         and add or update some query string parameters in it.
         """
         url = self.request["ACTUAL_URL"]
-        qs_params = parse_qsl(self.request["QUERY_STRING"], keep_blank_values=1)
+        qs_params = parse_qsl(
+            self.request["QUERY_STRING"], keep_blank_values=1
+        )
 
         # Take care to preserve list-like query string arguments (same QS
         # param repeated multiple times). In other words, don't turn the

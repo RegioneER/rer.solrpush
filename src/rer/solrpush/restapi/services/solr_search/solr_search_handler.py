@@ -5,7 +5,9 @@ from rer.solrpush.solr import search as solr_search
 from rer.solrpush.restapi.services.solr_search.batch import SolrHypermediaBatch
 from plone.restapi.deserializer import boolean_value
 
-DEFAULT_METADATA_FIELDS = set(["@id", "@type", "description", "review_state", "title"])
+DEFAULT_METADATA_FIELDS = set(
+    ["@id", "@type", "description", "review_state", "title"]
+)
 FIELD_ACCESSORS = {
     "@id": "getURL",
     "@type": "PortalType",
