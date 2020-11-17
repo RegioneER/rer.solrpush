@@ -5,7 +5,8 @@ Changelog
 0.1.3 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Add styles for elevate widget
+  [nzambello]
 
 
 0.1.2 (2019-12-12)
