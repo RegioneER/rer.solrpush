@@ -11,5 +11,14 @@
     handler=".upgrades.to_1100"
     />
 
+  <genericsetup:upgradeStep
+    source="1100"
+    destination="1200"
+    title="Added css resource and bundle"
+    description="Styles for controlpanel"
+    profile="rer.solrpush:default"
+    handler=".upgrades.to_1200"
+    />
+
 
 </configure>
