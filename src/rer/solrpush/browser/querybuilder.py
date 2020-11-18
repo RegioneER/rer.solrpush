@@ -43,7 +43,6 @@ class QueryBuilder(BaseView):
         parsedquery = queryparser.parseFormquery(
             self.context, query, sort_on, sort_order
         )
-
         index_modifiers = getUtilitiesFor(IParsedQueryIndexModifier)
         for name, modifier in index_modifiers:
             if name in parsedquery:
@@ -97,8 +96,13 @@ class QueryBuilder(BaseView):
             if parsedquery["searchWithSolr"]["query"]:
                 search_with_solr = True
             del parsedquery["searchWithSolr"]
+
         if not empty_query:
             if search_with_solr:
+                if "SearchableText" in parsedquery:
+                    parsedquery["SearchableText"] = parsedquery[
+                        "SearchableText"
+                    ].rstrip("*")
                 results = SolrResponse(
                     data=solr_search(
                         **self.clean_query_for_solr(query=parsedquery)

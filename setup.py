@@ -56,7 +56,6 @@ setup(
         "pysolr",
         'ftfy==4.4.3;python_version<="2.7"',
         "plone.restapi",
-        
     ],
     extras_require={
         "test": [
