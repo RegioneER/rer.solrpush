@@ -87,7 +87,11 @@ class IRerSolrpushConf(model.Schema):
     )
 
     index_fields = schema.SourceText(
-        title=_("index_fields_label", default=u"SOLR Indexes."),
+        title=_(
+            "index_fields_label",
+            default=u"List of fields loaded from SOLR that we use for "
+            u"indexing.",
+        ),
         description=_(
             u"index_fields_help",
             default=u"We store this list for performance"
@@ -96,7 +100,13 @@ class IRerSolrpushConf(model.Schema):
         ),
         required=False,
     )
-
+    search_with_solr = schema.Bool(
+        title=u"Enable search with SOLR",
+        description=u"If selected, the search will be performed through SOLR "
+        u"instead of Plone.",
+        default=False,
+        required=False,
+    )
     # NASCOSTO DAL PANNELLO DI CONTROLLO (vedi: browser/controlpanel.py)
     ready = schema.Bool(
         title=_(u"Ready"),

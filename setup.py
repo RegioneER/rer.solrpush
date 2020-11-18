@@ -56,6 +56,8 @@ setup(
         "plone.api>=1.8.4",
         "pysolr",
         'ftfy==4.4.3;python_version<="2.7"',
+        "plone.restapi",
+        
     ],
     extras_require={
         "test": [
@@ -66,6 +68,7 @@ setup(
             "plone.testing>=5.0.0",
             "plone.app.contenttypes",
             "plone.app.robotframework[debug]",
+            "collective.MockMailHost",
         ]
     },
     entry_points="""

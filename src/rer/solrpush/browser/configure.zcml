@@ -64,4 +64,5 @@
           class=".maintenance.ResetSolr"
           layer="rer.solrpush.interfaces.IRerSolrpushLayer"
           />
+    
 </configure>

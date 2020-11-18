@@ -159,28 +159,29 @@ class ReindexBaseView(BrowserView):
         skipped = 0
         indexed = 0
         for brain in brains_to_reindex:
-            status["counter"] = status["counter"] + 1
             commit()
             obj = brain.getObject()
             try:
-                if push_to_solr(obj):
-                    indexed += 1
-                else:
-                    skipped += 1
-                logger.info(
-                    "[{indexed}+{skipped}/{total}] {path} ({type})".format(
-                        indexed=indexed,
-                        skipped=skipped,
-                        total=brains_to_reindex.actual_result_count,
-                        path=brain.getPath(),
-                        type=brain.portal_type,
-                    )
-                )
+                res = push_to_solr(obj)
             except SolrError:
                 status["in_progress"] = False
                 status["error"] = True
                 status["message"] = self.solr_error_message
                 return
+            if res:
+                indexed += 1
+            else:
+                skipped += 1
+            logger.info(
+                "[{indexed}/{total}] {path} ({type})".format(
+                    indexed=indexed + skipped,
+                    total=brains_to_reindex.actual_result_count,
+                    path=brain.getPath(),
+                    type=brain.portal_type,
+                )
+            )
+            status["counter"] = indexed + skipped
+
         status["in_progress"] = False
         elapsed_time = next(elapsed)
         logger.info("SOLR Reindex completed in {}".format(elapsed_time))

@@ -4,7 +4,6 @@ rer.solrpush
 
 .. image:: https://github.com/RegioneER/rer.solrpush/workflows/Tests/badge.svg
 
-
 Product that allows SOLR indexing/searching of a Plone website.
 
 
@@ -35,6 +34,40 @@ SOLR fields are directly read from `schema.xml` file exposed by SOLR.
 This schema is stored in Plone registry for performance reasons
 and is always synced when you save `solr-controlpanel` form
 or click on `Reload schema.xml` button.
+
+File indexing
+'''''''''''''
+
+If Tika is configured on SOLR, you can send attachments to it and they will be indexed as SearchableText in the content.
+
+To allow attachments indexing, you need to register an adapter for each content-type that you need to index.
+
+`File` content-type is already registered, so you can copy from that::
+
+    <adapter
+      for="plone.app.contenttypes.interfaces.IFile"
+      provides="rer.solrpush.interfaces.adapter.IExtractFileFromTika"
+      factory=".file.FileExtractor"
+      />
+
+::
+
+    from rer.solrpush.interfaces.adapter import IExtractFileFromTika
+    from zope.interface import implementer
+
+
+    @implementer(IExtractFileFromTika)
+    class FileExtractor(object):
+        def __init__(self, context):
+            self.context = context
+
+        def get_file_to_index(self):
+            """
+            """
+            here you need to return the file that need to be indexed
+
+N.B.: `SearchableText` index should be **multivalued**.
+
 
 Search configuration
 ''''''''''''''''''''
