@@ -5,6 +5,8 @@ Changelog
 0.2.0 (unreleased)
 ------------------
 
+- Add styles for elevate widget
+  [nzambello]
 - Refactor indexer logic.
   [mamico]
 - Add support for *bq* and *qf* in search.
