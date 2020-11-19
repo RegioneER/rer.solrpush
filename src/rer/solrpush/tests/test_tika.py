@@ -9,7 +9,7 @@ from rer.solrpush.interfaces.settings import IRerSolrpushSettings
 from rer.solrpush.solr import init_solr_push
 from rer.solrpush.solr import reset_solr
 from rer.solrpush.solr import search
-from rer.solrpush.testing import RER_SOLRPUSH_FUNCTIONAL_TESTING
+from rer.solrpush.testing import RER_SOLRPUSH_API_FUNCTIONAL_TESTING
 from transaction import commit
 
 import unittest
@@ -19,14 +19,16 @@ import os
 class TestTika(unittest.TestCase):
     """Test solr indexing for files"""
 
-    layer = RER_SOLRPUSH_FUNCTIONAL_TESTING
+    layer = RER_SOLRPUSH_API_FUNCTIONAL_TESTING
 
     def setUp(self):
         """Custom shared utility setup for tests."""
         self.portal = self.layer["portal"]
         self.request = self.layer["request"]
         setRoles(self.portal, TEST_USER_ID, ["Manager"])
-        set_registry_record("enabled_types", ["File"], interface=IRerSolrpushSettings)
+        set_registry_record(
+            "enabled_types", ["File"], interface=IRerSolrpushSettings
+        )
         init_solr_push()
         commit()
 
@@ -37,7 +39,9 @@ class TestTika(unittest.TestCase):
 
     def create_file_item(self, filename):
         item_file = None
-        with open(os.path.join(os.path.dirname(__file__), "docs", filename), "rb") as f:
+        with open(
+            os.path.join(os.path.dirname(__file__), "docs", filename), "rb"
+        ) as f:
             item_file = NamedFile(data=f.read(), filename=filename)
 
         file_item = api.content.create(

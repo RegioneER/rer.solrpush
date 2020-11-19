@@ -1,20 +1,20 @@
-body.template-solrpush-conf .datagridwidget-table-view .header {
+body.template-elevate-settings .datagridwidget-table-view .header {
   vertical-align: top;
 }
-body.template-solrpush-conf .datagridwidget-cell {
+body.template-elevate-settings .datagridwidget-cell {
   vertical-align: middle;
   padding: 0.5rem;
 }
-body.template-solrpush-conf .datagridwidget-cell.cell-2 {
+body.template-elevate-settings .datagridwidget-cell.cell-2 {
   width: 40%;
 }
-body.template-solrpush-conf .datagridwidget-cell .select2-container {
+body.template-elevate-settings .datagridwidget-cell .select2-container {
   margin-bottom: 0.5rem;
 }
-body.template-solrpush-conf .datagridwidget-cell input[type=text] {
+body.template-elevate-settings .datagridwidget-cell input[type=text] {
   padding: 6px 12px;
 }
-body.template-solrpush-conf .datagridwidget-manipulator {
+body.template-elevate-settings .datagridwidget-manipulator {
   padding: 1rem 0.5rem;
   vertical-align: middle;
 }

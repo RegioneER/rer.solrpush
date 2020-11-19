@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from collective.z3cform.datagridfield.registry import DictRow
 from plone.app.vocabularies.catalog import CatalogSource as CatalogSourceBase
 from plone.app.z3cform.widget import RelatedItemsFieldWidget
 from plone.autoform import directives as form
@@ -74,16 +73,6 @@ class IRerSolrpushConf(model.Schema):
         value_type=schema.Choice(
             vocabulary="plone.app.vocabularies.PortalTypes"
         ),
-    )
-
-    elevate_schema = schema.List(
-        title=_(u"elevate_schema_label", default=u"Elevate configuration"),
-        description=_(
-            u"elevate_schema_help",
-            default=u"Insert a list of values for elevate.",
-        ),
-        required=False,
-        value_type=DictRow(title=u"elevate row", schema=IElevateRowSchema),
     )
 
     index_fields = schema.SourceText(

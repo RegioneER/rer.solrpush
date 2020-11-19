@@ -10,7 +10,7 @@ from rer.solrpush.solr import reset_solr
 from rer.solrpush.solr import search
 from rer.solrpush.solr import push_to_solr
 from rer.solrpush.solr import remove_from_solr
-from rer.solrpush.testing import RER_SOLRPUSH_FUNCTIONAL_TESTING
+from rer.solrpush.testing import RER_SOLRPUSH_API_FUNCTIONAL_TESTING
 import time
 from transaction import commit
 
@@ -20,7 +20,7 @@ import unittest
 class TestSolrIndexActions(unittest.TestCase):
     """Test that rer.solrpush is properly installed."""
 
-    layer = RER_SOLRPUSH_FUNCTIONAL_TESTING
+    layer = RER_SOLRPUSH_API_FUNCTIONAL_TESTING
 
     def setUp(self):
         """"""
@@ -144,7 +144,7 @@ class TestSolrIndexActions(unittest.TestCase):
 class TestSolrSearch(unittest.TestCase):
     """"""
 
-    layer = RER_SOLRPUSH_FUNCTIONAL_TESTING
+    layer = RER_SOLRPUSH_API_FUNCTIONAL_TESTING
 
     def setUp(self):
         """"""

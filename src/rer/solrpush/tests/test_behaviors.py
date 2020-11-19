@@ -8,7 +8,9 @@ from rer.solrpush.interfaces.settings import IRerSolrpushSettings
 from rer.solrpush.solr import init_solr_push
 from rer.solrpush.solr import reset_solr
 from rer.solrpush.solr import search
-from rer.solrpush.testing import RER_SOLRPUSH_FUNCTIONAL_TESTING  # noqa: E501
+from rer.solrpush.testing import (
+    RER_SOLRPUSH_API_FUNCTIONAL_TESTING,
+)  # noqa: E501
 from transaction import commit
 
 import unittest
@@ -17,7 +19,7 @@ import unittest
 class TestShowInSearch(unittest.TestCase):
     """Test show in search field behavior."""
 
-    layer = RER_SOLRPUSH_FUNCTIONAL_TESTING
+    layer = RER_SOLRPUSH_API_FUNCTIONAL_TESTING
 
     def setUp(self):
         """

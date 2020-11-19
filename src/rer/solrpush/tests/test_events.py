@@ -7,7 +7,9 @@ from plone.app.testing import setRoles
 from plone.app.testing import TEST_USER_ID
 from rer.solrpush.interfaces.settings import IRerSolrpushSettings
 from rer.solrpush.solr import init_solr_push
-from rer.solrpush.testing import RER_SOLRPUSH_FUNCTIONAL_TESTING  # noqa: E501
+from rer.solrpush.testing import (
+    RER_SOLRPUSH_API_FUNCTIONAL_TESTING,
+)  # noqa: E501
 from transaction import commit
 from zope.event import notify
 from zope.lifecycleevent import ObjectModifiedEvent
@@ -25,7 +27,7 @@ except ImportError:
 class TestSOLRPush(unittest.TestCase):
     """Test that rer.solrpush is properly installed."""
 
-    layer = RER_SOLRPUSH_FUNCTIONAL_TESTING
+    layer = RER_SOLRPUSH_API_FUNCTIONAL_TESTING
 
     def setUp(self):
         """Custom shared utility setup for tests."""
@@ -70,7 +72,7 @@ class TestSOLRPush(unittest.TestCase):
 class TestEvents(unittest.TestCase):
     """Test that rer.solrpush is properly installed."""
 
-    layer = RER_SOLRPUSH_FUNCTIONAL_TESTING
+    layer = RER_SOLRPUSH_API_FUNCTIONAL_TESTING
 
     def setUp(self):
         """Custom shared utility setup for tests."""

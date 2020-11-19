@@ -3,5 +3,6 @@
   <version>1200</version>
   <dependencies>
     <dependency>profile-collective.z3cform.datagridfield:default</dependency>
+    <dependency>profile-plone.restapi:default</dependency>
   </dependencies>
 </metadata>

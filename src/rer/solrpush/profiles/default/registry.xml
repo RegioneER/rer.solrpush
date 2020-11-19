@@ -2,7 +2,7 @@
 <registry>
   <!-- -*- extra stuff goes here -*- -->
   <records interface="rer.solrpush.interfaces.settings.IRerSolrpushSettings" />
-
+  <records interface="rer.solrpush.interfaces.IElevateSettings" />
 
   <!-- RESOURCE -->
   <records prefix="plone.resources/rer-solrpush-css"

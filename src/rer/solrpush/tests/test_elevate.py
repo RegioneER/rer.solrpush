@@ -4,11 +4,12 @@ from plone import api
 from plone.api.portal import set_registry_record
 from plone.app.testing import setRoles
 from plone.app.testing import TEST_USER_ID
+from rer.solrpush.interfaces import IElevateSettings
 from rer.solrpush.interfaces.settings import IRerSolrpushSettings
 from rer.solrpush.solr import init_solr_push
 from rer.solrpush.solr import reset_solr
 from rer.solrpush.solr import search
-from rer.solrpush.testing import RER_SOLRPUSH_FUNCTIONAL_TESTING
+from rer.solrpush.testing import RER_SOLRPUSH_API_FUNCTIONAL_TESTING
 from transaction import commit
 
 import unittest
@@ -18,7 +19,7 @@ class TestSolrSearch(unittest.TestCase):
     """
     """
 
-    layer = RER_SOLRPUSH_FUNCTIONAL_TESTING
+    layer = RER_SOLRPUSH_API_FUNCTIONAL_TESTING
 
     def setUp(self):
         """
@@ -75,9 +76,7 @@ class TestSolrSearch(unittest.TestCase):
     def tearDown(self):
         set_registry_record("active", True, interface=IRerSolrpushSettings)
         #  reset elevate
-        set_registry_record(
-            "elevate_schema", [], interface=IRerSolrpushSettings
-        )
+        set_registry_record("elevate_schema", [], interface=IElevateSettings)
         reset_solr()
         commit()
 
@@ -100,8 +99,8 @@ class TestSolrSearch(unittest.TestCase):
         # now let's set an elevate for fourth document
         set_registry_record(
             "elevate_schema",
-            [{"text": u"page", "uid": [doc4.UID()]}],
-            interface=IRerSolrpushSettings,
+            [{"text": [u"page"], "uid": [doc4.UID()]}],
+            interface=IElevateSettings,
         )
         commit()
 

@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<registry>
+  <!-- -*- extra stuff goes here -*- -->
+  <records interface="rer.solrpush.interfaces.settings.IRerSolrpushSettings" remove="True"/>
+  <records interface="rer.solrpush.interfaces.IElevateSettings" remove="True"/>
+
+  <!-- RESOURCE -->
+  <records prefix="plone.resources/rer-solrpush-css"
+           interface='Products.CMFPlone.interfaces.IResourceRegistry' remove="True">
+  </records>
+
+  <!-- BUNDLE -->
+  <records prefix="plone.bundles/rer-solrpush-css-bundle"
+           interface='Products.CMFPlone.interfaces.IBundleRegistry' remove="True">
+  </records>
+
+</registry>

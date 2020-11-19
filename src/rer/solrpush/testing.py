@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 from plone.api.portal import set_registry_record
 from plone.app.contenttypes.testing import PLONE_APP_CONTENTTYPES_FIXTURE
-from plone.app.robotframework.testing import REMOTE_LIBRARY_BUNDLE_FIXTURE
 from plone.app.testing import applyProfile
 from plone.app.testing import FunctionalTesting
 from plone.app.testing import IntegrationTesting
@@ -10,10 +9,12 @@ from plone.restapi.testing import PloneRestApiDXLayer
 from plone.testing import Layer
 from plone.testing import z2
 from rer.solrpush.interfaces.settings import IRerSolrpushSettings
+from rer.solrpush.solr import init_solr_push
 from six.moves import range
 from time import sleep
 from ZPublisher.HTTPRequest import HTTPRequest
 
+import collective.z3cform.datagridfield
 import os
 import plone.restapi
 import rer.solrpush
@@ -45,7 +46,9 @@ class SolrLayer(Layer):
         self.solr_host = solr_host
         self.solr_port = solr_port
         self.solr_base = solr_base
-        self.solr_url = u"http://{0}:{1}{2}".format(solr_host, solr_port, solr_base)
+        self.solr_url = u"http://{0}:{1}{2}".format(
+            solr_host, solr_port, solr_base
+        )
 
     def setUp(self):
         """Start Solr and poll until it is up and running."""
@@ -64,7 +67,9 @@ class SolrLayer(Layer):
                 sleep(3)
                 sys.stdout.write(".")
             if i == 9:
-                subprocess.call("./solr-stop", shell=True, close_fds=True, cwd=BIN_DIR)
+                subprocess.call(
+                    "./solr-stop", shell=True, close_fds=True, cwd=BIN_DIR
+                )
                 sys.stdout.write("Solr Instance could not be started !!!")
 
     def tearDown(self):
@@ -73,80 +78,12 @@ class SolrLayer(Layer):
             self.solr_url
         )
         six.moves.urllib.request.urlopen(solr_clean_url)
-        subprocess.check_call("./solr-stop", shell=True, close_fds=True, cwd=BIN_DIR)
+        subprocess.check_call(
+            "./solr-stop", shell=True, close_fds=True, cwd=BIN_DIR
+        )
 
 
 SOLR_FIXTURE = SolrLayer()
-
-
-class RerSolrpushLayer(PloneSandboxLayer):
-
-    defaultBases = (PLONE_APP_CONTENTTYPES_FIXTURE,)
-
-    def __init__(
-        self,
-        bases=None,
-        name="SolrPush Layer",
-        module=None,
-        solr_host=u"localhost",
-        solr_port=8983,
-        solr_base=u"/solr/solrpush_test",
-    ):
-        super(PloneSandboxLayer, self).__init__(bases, name, module)
-        self.solr_host = solr_host
-        self.solr_port = solr_port
-        self.solr_base = solr_base
-        # SolrLayer should use the same settings as CollectiveSolrLayer
-        self.solr_layer = SolrLayer(
-            bases,
-            name,
-            module,
-            solr_host=solr_host,
-            solr_port=solr_port,
-            solr_base=solr_base,
-        )
-
-    def setUpZope(self, app, configurationContext):
-        # Load any other ZCML that is required for your tests.
-        # The z3c.autoinclude feature is disabled in the Plone fixture base
-        # layer.
-        self._orig_retry_max_count = HTTPRequest.retry_max_count
-        HTTPRequest.retry_max_count = 3
-
-        self.loadZCML(package=rer.solrpush)
-        self.loadZCML(package=plone.restapi)
-
-    def tearDownZope(self, app):
-        HTTPRequest.retry_max_count = self._orig_retry_max_count
-
-    def setUpPloneSite(self, portal):
-        self.solr_layer.setUp()
-        applyProfile(portal, "rer.solrpush:default")
-        set_registry_record(
-            "solr_url", self.solr_layer.solr_url, interface=IRerSolrpushSettings
-        )
-
-    def tearDownPloneSite(self, portal):
-        self.solr_layer.tearDown()
-
-
-RER_SOLRPUSH_FIXTURE = RerSolrpushLayer()
-
-
-RER_SOLRPUSH_INTEGRATION_TESTING = IntegrationTesting(
-    bases=(RER_SOLRPUSH_FIXTURE,), name="RerSolrpushLayer:IntegrationTesting"
-)
-
-
-RER_SOLRPUSH_FUNCTIONAL_TESTING = FunctionalTesting(
-    bases=(RER_SOLRPUSH_FIXTURE,), name="RerSolrpushLayer:FunctionalTesting"
-)
-
-
-RER_SOLRPUSH_ACCEPTANCE_TESTING = FunctionalTesting(
-    bases=(RER_SOLRPUSH_FIXTURE, REMOTE_LIBRARY_BUNDLE_FIXTURE, z2.ZSERVER_FIXTURE),
-    name="RerSolrpushLayer:AcceptanceTesting",
-)
 
 
 class RerSolrpushRestApiLayer(PloneRestApiDXLayer):
@@ -186,6 +123,7 @@ class RerSolrpushRestApiLayer(PloneRestApiDXLayer):
 
         self.loadZCML(package=rer.solrpush)
         self.loadZCML(package=plone.restapi)
+        self.loadZCML(package=collective.z3cform.datagridfield)
 
     def tearDownZope(self, app):
         HTTPRequest.retry_max_count = self._orig_retry_max_count
@@ -195,20 +133,26 @@ class RerSolrpushRestApiLayer(PloneRestApiDXLayer):
         applyProfile(portal, "rer.solrpush:default")
         set_registry_record("active", True, interface=IRerSolrpushSettings)
         set_registry_record(
-            "solr_url", self.solr_layer.solr_url, interface=IRerSolrpushSettings
+            "solr_url",
+            self.solr_layer.solr_url,
+            interface=IRerSolrpushSettings,
         )
+        init_solr_push()
 
     def tearDownPloneSite(self, portal):
         set_registry_record("active", True, interface=IRerSolrpushSettings)
         set_registry_record(
-            "solr_url", self.solr_layer.solr_url, interface=IRerSolrpushSettings
+            "solr_url",
+            self.solr_layer.solr_url,
+            interface=IRerSolrpushSettings,
         )
         self.solr_layer.tearDown()
 
 
 RER_SOLRPUSH_API_FIXTURE = RerSolrpushRestApiLayer()
 RER_SOLRPUSH_API_INTEGRATION_TESTING = IntegrationTesting(
-    bases=(RER_SOLRPUSH_API_FIXTURE,), name="RerSolrpushRestApiLayer:Integration"
+    bases=(RER_SOLRPUSH_API_FIXTURE,),
+    name="RerSolrpushRestApiLayer:Integration",
 )
 
 RER_SOLRPUSH_API_FUNCTIONAL_TESTING = FunctionalTesting(

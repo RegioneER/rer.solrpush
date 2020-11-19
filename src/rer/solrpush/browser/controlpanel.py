@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from collective.z3cform.datagridfield import DataGridFieldFactory
 from plone import api
 from plone.app.registry.browser.controlpanel import ControlPanelFormWrapper
 from plone.app.registry.browser.controlpanel import RegistryEditForm
@@ -23,8 +22,6 @@ logger = logging.getLogger(__name__)
 class FormDefault(group.Group):
     label = _("settings_default_label", default=u"Settings")
     fields = field.Fields(IRerSolrpushConf)
-
-    fields["elevate_schema"].widgetFactory = DataGridFieldFactory
 
 
 class FormSearch(group.Group):
@@ -95,6 +92,6 @@ class RerSolrpushEditForm(RegistryEditForm):
         self.request.response.redirect(self.request.getURL())
 
 
-class RerSolrpushView(ControlPanelFormWrapper):
+class RerSolrpushSettingsView(ControlPanelFormWrapper):
     form = RerSolrpushEditForm
     index = ViewPageTemplateFile("templates/controlpanel_layout.pt")

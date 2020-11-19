@@ -8,10 +8,12 @@ from pysolr import SolrError
 from rer.solrpush import _
 from rer.solrpush.interfaces.adapter import IExtractFileFromTika
 from rer.solrpush.interfaces.settings import IRerSolrpushSettings
+from rer.solrpush.interfaces import IElevateSettings
 from six.moves import map
 from zope.component import getUtility
 from zope.component import queryMultiAdapter
 from zope.i18n import translate
+
 # from rer.solrpush.restapi.services.solr_search.batch import DEFAULT_BATCH_SIZE
 
 import json
@@ -69,15 +71,15 @@ def escape_special_characters(value, wrap):
     return new_value
 
 
-def get_setting(field):
+def get_setting(field, interface=IRerSolrpushSettings):
     return api.portal.get_registry_record(
-        field, interface=IRerSolrpushSettings, default=False
+        field, interface=interface, default=False
     )
 
 
-def set_setting(field, value):
+def set_setting(field, value, interface=IRerSolrpushSettings):
     return api.portal.set_registry_record(
-        field, interface=IRerSolrpushSettings, value=value
+        field, interface=interface, value=value
     )
 
 
@@ -351,7 +353,9 @@ def manage_elevate(query):
         return params
     if not searchableText.replace(" ", ""):
         return params
-    elevate_map = get_setting("elevate_schema")
+    elevate_map = get_setting(
+        field="elevate_schema", interface=IElevateSettings
+    )
     if not elevate_map:
         return params
     try:
@@ -373,12 +377,11 @@ def manage_elevate(query):
             # if s in text:
 
             # contains regexp
-            if re.search(
-                "(^|\s+)" + config.get("text", "") + "(\s+|$)", text  # noqa
-            ):
-                params["enableElevation"] = "true"
-                params["elevateIds"] = ",".join(config.get("uid", []))
-                break
+            for word in config.get("text", []):
+                if re.search("(^|\s+)" + word + "(\s+|$)", text):  # noqa
+                    params["enableElevation"] = "true"
+                    params["elevateIds"] = ",".join(config.get("uid", []))
+                    break
     return params
 
 
