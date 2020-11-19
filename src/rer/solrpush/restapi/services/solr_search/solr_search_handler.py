@@ -35,9 +35,12 @@ class SolrSearchHandler(BaseHandler):
             query = {}
         fl = self.get_fields_list(query)
         facets = boolean_value(query.get("facets", False))
+        facet_fields = query.get("facet_fields", [])
         query_params = {"fl": fl}
         if facets:
             query_params["facets"] = facets
+            if facet_fields:
+                query_params["facet_fields"] = facet_fields
             if "facets" in query:
                 del query["facets"]
         query_params["query"] = query
