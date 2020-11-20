@@ -271,16 +271,22 @@ def create_index_dict(item):
         if value is not None:
             index_me[field] = value
     portal = api.portal.get()
+
+    # extra-catalog schema
     index_me["site_name"] = get_site_title()
     index_me["path"] = "/".join(item.getPhysicalPath())
     index_me["path_depth"] = len(item.getPhysicalPath()) - 2
+    index_me["attachment"] = attachment_to_index(item)
+    if "view_name" in index_fields.keys():
+        index_me["view_name"] = item.getLayout()
+
+    # convert url to frontend one
     if frontend_url:
         index_me["url"] = item.absolute_url().replace(
             portal.portal_url(), frontend_url
         )
     else:
         index_me["url"] = item.absolute_url()
-    index_me["attachment"] = attachment_to_index(item)
     return index_me
 
 
