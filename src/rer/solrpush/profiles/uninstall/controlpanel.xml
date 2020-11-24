@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<object
+    name="portal_controlpanel"
+    xmlns:i18n="http://xml.zope.org/namespaces/i18n"
+    i18n:domain="rer.solrpush">
+
+    <configlet
+        title="Configurazione RER SolrPush"
+        action_id="solrpush.configuration"
+        appId="solrpush"
+        category="SOLR"
+        remove="True">
+    </configlet>
+    <configlet
+        title="Configurazione Elevate"
+        action_id="solrpush.elevate"
+        appId="solrpush-elevate"
+        category="SOLR"
+        remove="True">
+    </configlet>
+</object>

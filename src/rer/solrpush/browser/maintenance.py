@@ -9,11 +9,11 @@ from Products.CMFCore.interfaces import IIndexQueueProcessor
 from Products.Five import BrowserView
 from pysolr import SolrError
 from rer.solrpush import _
-from rer.solrpush.solr import is_solr_active
-from rer.solrpush.solr import push_to_solr
-from rer.solrpush.solr import remove_from_solr
-from rer.solrpush.solr import reset_solr
-from rer.solrpush.solr import search
+from rer.solrpush.utils.solr_common import is_solr_active
+from rer.solrpush.utils import push_to_solr
+from rer.solrpush.utils import remove_from_solr
+from rer.solrpush.utils import reset_solr
+from rer.solrpush.utils import search
 from time import strftime
 from time import time
 from transaction import commit
@@ -71,7 +71,7 @@ class SolrMaintenanceBaseForm(form.Form):
         msg_label = _("maintenance_cancel_action", default="Action cancelled")
         api.portal.show_message(message=msg_label, request=self.request)
         return self.request.response.redirect(
-            "{}/@@solrpush-conf".format(api.portal.get().absolute_url())
+            "{}/@@solrpush-settings".format(api.portal.get().absolute_url())
         )
 
 
@@ -94,7 +94,7 @@ class ResetSolr(SolrMaintenanceBaseForm):
         logger.info("##### SOLR Index dropped #####")
         api.portal.show_message(message=msg_label, request=self.request)
         return self.request.response.redirect(
-            "{}/@@solrpush-conf".format(api.portal.get().absolute_url())
+            "{}/@@solrpush-settings".format(api.portal.get().absolute_url())
         )
 
 

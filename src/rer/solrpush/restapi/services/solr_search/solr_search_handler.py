@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from Products.CMFCore.utils import getToolByName
 from plone.restapi.search.handler import SearchHandler as BaseHandler
-from rer.solrpush.solr import search as solr_search
+from rer.solrpush.utils import search as solr_search
 from rer.solrpush.restapi.services.solr_search.batch import SolrHypermediaBatch
 from plone.restapi.deserializer import boolean_value
 
@@ -35,9 +35,12 @@ class SolrSearchHandler(BaseHandler):
             query = {}
         fl = self.get_fields_list(query)
         facets = boolean_value(query.get("facets", False))
+        facet_fields = query.get("facet_fields", [])
         query_params = {"fl": fl}
         if facets:
             query_params["facets"] = facets
+            if facet_fields:
+                query_params["facet_fields"] = facet_fields
             if "facets" in query:
                 del query["facets"]
         query_params["query"] = query

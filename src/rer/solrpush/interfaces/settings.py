@@ -1,45 +1,41 @@
 # -*- coding: utf-8 -*-
-from jsonschema import validate
-from jsonschema import ValidationError
+from plone.app.vocabularies.catalog import CatalogSource as CatalogSourceBase
+from plone.app.z3cform.widget import RelatedItemsFieldWidget
+from plone.autoform import directives as form
 from plone.supermodel import model
 from rer.solrpush import _
 from zope import schema
-from zope.interface import Invalid
-
-import json
-
-ELEVATE_SCHEMA = {
-    "type": "object",
-    "properties": {
-        "text": {"type": "string"},
-        "id": {"type": "array", "items": {"type": "string"}},
-    },
-}
 
 
-def validate_cfg_json(value):
-    """check that we have at least valid json and its a dict
+class CatalogSource(CatalogSourceBase):
     """
-    try:
-        jv = json.loads(value)
-        if not isinstance(jv, list):
-            raise Invalid(
-                _(
-                    "invalid_json_format",
-                    "JSON is not valid. It should be a list of values.",
-                )
-            )
-        for item in jv:
-            validate(instance=item, schema=ELEVATE_SCHEMA)
-    except (ValueError, ValidationError) as e:
-        raise Invalid(
-            _(
-                "invalid_json",
-                "JSON is not valid, parser complained: ${message}",
-                mapping={"message": e.message},
-            )
-        )
-    return True
+    Collection tile specific catalog source to allow targeted widget.
+    Without this hack, validation doesn't pass
+    """
+
+    def __contains__(self, value):
+        return True  # Always contains to allow lazy handling of removed objs
+
+
+class IElevateRowSchema(model.Schema):
+    text = schema.TextLine(
+        title=_("elevate_row_schema_text_label", default=u"Text"),
+        description=_(
+            "elevate_row_schema_text_help",
+            default=u"The word that should match in the search.",
+        ),
+        required=True,
+    )
+    uid = schema.List(
+        title=_("elevate_row_schema_uid_label", u"Elements"),
+        description=_(
+            "elevate_row_schema_uid_help",
+            u"Select a list of elements to elevate for that search word.",
+        ),
+        value_type=schema.Choice(source=CatalogSource()),
+        required=True,
+    )
+    form.widget("uid", RelatedItemsFieldWidget)
 
 
 class IRerSolrpushConf(model.Schema):
@@ -79,16 +75,6 @@ class IRerSolrpushConf(model.Schema):
         ),
     )
 
-    elevate_schema = schema.SourceText(
-        title=u"Elevate configuration",
-        description=u"Insert a list of values for elevate. Each elevate item "
-        u"should have the following structure: "
-        u'{"text": "some text", "ids": ["12345677"]}.',
-        required=False,
-        constraint=validate_cfg_json,
-        default=u"[]",
-    )
-
     index_fields = schema.SourceText(
         title=_(
             "index_fields_label",
@@ -103,13 +89,6 @@ class IRerSolrpushConf(model.Schema):
         ),
         required=False,
     )
-    search_with_solr = schema.Bool(
-        title=u"Enable search with SOLR",
-        description=u"If selected, the search will be performed through SOLR "
-        u"instead of Plone.",
-        default=False,
-        required=False,
-    )
     # NASCOSTO DAL PANNELLO DI CONTROLLO (vedi: browser/controlpanel.py)
     ready = schema.Bool(
         title=_(u"Ready"),
@@ -121,13 +100,40 @@ class IRerSolrpushConf(model.Schema):
 
 class IRerSolrpushSearchConf(model.Schema):
 
+    enabled_solr_sites = schema.List(
+        title=_(u"enabled_solr_sites_label", default=u"Sites to search"),
+        description=_(
+            u"enabled_solr_sites_help",
+            default=u"Select in which sites you want to search contents. "
+            u"If not set, search will be performed on all sites.",
+        ),
+        required=False,
+        default=[],
+        missing_value=[],
+        value_type=schema.Choice(
+            vocabulary="rer.solrpush.vocabularies.AvailableSites"
+        ),
+    )
+    remote_elevate_schema = schema.TextLine(
+        title=_(u"remote_elevate_label", default=u"Remote elevate"),
+        description=_(
+            u"remote_elevate_help",
+            default=u'If this field is set and "remote_elevate=true" is '
+            u"passed in query, elevate schema is taken from an external "
+            u"source. This is useful if you index several sites and handle "
+            u"elevate configuration in one single site.",
+        ),
+        default=u"",
+        required=False,
+    )
     qf = schema.TextLine(
         title=_("qf_label", default=u"qf (query fields)"),
         description=_(
             "qf_help",
-            default=u"Set a list of fields, each of which is assigned a boost factor "
-            u"to increase or decrease that particular field’s importance in the query."
-            u" For example: fieldOne^1000.0 fieldTwo fieldThree^10.0",
+            default=u"Set a list of fields, each of which is assigned a boost "
+            u"factor to increase or decrease that particular field’s "
+            u"importance in the query. "
+            u"For example: fieldOne^1000.0 fieldTwo fieldThree^10.0",
         ),
         required=False,
         default=u"",
@@ -136,9 +142,10 @@ class IRerSolrpushSearchConf(model.Schema):
         title=_("bq_label", default=u"bq (boost query)"),
         description=_(
             "bq_help",
-            default=u"Set a list query clauses that will be added to the main query "
-            u"to influence the score. For example if we want to boost results that"
-            u' have a specific "searchwords" term: searchwords:something^1000',
+            default=u"Set a list query clauses that will be added to the main "
+            u"query to influence the score. For example if we want to boost "
+            u'results that have a specific "searchwords" term: '
+            u"searchwords:something^1000",
         ),
         required=False,
         default=u"",
@@ -148,12 +155,14 @@ class IRerSolrpushSearchConf(model.Schema):
         title=_("bf_label", default=u"bf (boost functions)"),
         description=_(
             "bf_help",
-            default=u"Set a list of functions (with optional boosts) that will be "
-            u"used to construct FunctionQueries which will be added to the main query "
-            u"as optional clauses that will influence the score. Any function "
-            u"supported natively by Solr can be used, along with a boost value. "
-            u"For example if we want to give less relevance to items deeper in the "
-            u"tree we can set something like this: recip(path_depth,10,100,1)",
+            default=u"Set a list of functions (with optional boosts) that "
+            u"will be used to construct FunctionQueries which will be added "
+            u"to the main query as optional clauses that will influence the "
+            u"score. Any function supported natively by Solr can be used, "
+            u"along with a boost value. "
+            u"For example if we want to give less relevance to "
+            u"items deeper in the tree we can set something like this: "
+            u"recip(path_depth,10,100,1)",
         ),
         required=False,
         default=u"",

@@ -10,13 +10,15 @@
     profile="rer.solrpush:default"
     handler=".upgrades.to_1100"
     />
+
   <genericsetup:upgradeStep
     source="1100"
     destination="1200"
-    title="Add new collections criteria"
-    description=""
+    title="Added css resource and bundle"
+    description="Styles for controlpanel"
     profile="rer.solrpush:default"
-    handler=".upgrades.update_registry"
+    handler=".upgrades.to_1200"
     />
+
 
 </configure>

@@ -1,0 +1,13 @@
+{
+    "name": "rer-solrpush",
+    "version": "1.0.0",
+    "main": "index.js",
+    "license": "MIT",
+    "scripts": {
+        "build": "sass styles.scss styles.css"
+    },
+    "dependencies": {
+        "node-sass": "^5.0.0",
+        "sass": "^1.29.0"
+    }
+}

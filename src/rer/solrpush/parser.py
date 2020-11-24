@@ -2,8 +2,8 @@
 from datetime import datetime
 from DateTime import DateTime
 from plone import api
-from rer.solrpush.solr import get_index_fields
-from rer.solrpush.solr import get_site_title
+from rer.solrpush.utils.solr_common import get_index_fields
+from rer.solrpush.utils.solr_indexer import get_site_title
 from OFS.Traversable import path2url
 
 try:

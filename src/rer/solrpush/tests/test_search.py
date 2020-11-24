@@ -5,11 +5,13 @@ from plone.api.portal import set_registry_record
 from plone.app.testing import setRoles
 from plone.app.testing import TEST_USER_ID
 from rer.solrpush.interfaces.settings import IRerSolrpushSettings
-from rer.solrpush.solr import init_solr_push
-from rer.solrpush.solr import reset_solr
-from rer.solrpush.solr import search
-from rer.solrpush.solr import escape_special_characters
-from rer.solrpush.testing import RER_SOLRPUSH_FUNCTIONAL_TESTING  # noqa: E501
+from rer.solrpush.utils import init_solr_push
+from rer.solrpush.utils import reset_solr
+from rer.solrpush.utils import search
+from rer.solrpush.utils.solr_search import escape_special_characters
+from rer.solrpush.testing import (
+    RER_SOLRPUSH_API_FUNCTIONAL_TESTING,
+)  # noqa: E501
 from transaction import commit
 
 import unittest
@@ -18,7 +20,7 @@ import unittest
 class TestSearch(unittest.TestCase):
     """Test show in search field behavior."""
 
-    layer = RER_SOLRPUSH_FUNCTIONAL_TESTING
+    layer = RER_SOLRPUSH_API_FUNCTIONAL_TESTING
 
     def setUp(self):
         """

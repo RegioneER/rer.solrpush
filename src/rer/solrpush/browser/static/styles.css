@@ -1,0 +1,22 @@
+body.template-elevate-settings .datagridwidget-table-view .header {
+  vertical-align: top;
+}
+body.template-elevate-settings .datagridwidget-cell {
+  vertical-align: middle;
+  padding: 0.5rem;
+}
+body.template-elevate-settings .datagridwidget-cell.cell-2 {
+  width: 40%;
+}
+body.template-elevate-settings .datagridwidget-cell .select2-container {
+  margin-bottom: 0.5rem;
+}
+body.template-elevate-settings .datagridwidget-cell input[type=text] {
+  padding: 6px 12px;
+}
+body.template-elevate-settings .datagridwidget-manipulator {
+  padding: 1rem 0.5rem;
+  vertical-align: middle;
+}
+
+/*# sourceMappingURL=styles.css.map */

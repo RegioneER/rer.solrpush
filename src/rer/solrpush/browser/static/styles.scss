@@ -1,0 +1,27 @@
+body.template-elevate-settings {
+  .datagridwidget-table-view .header {
+    vertical-align: top;
+  }
+
+  .datagridwidget-cell {
+    vertical-align: middle;
+    padding: 0.5rem;
+
+    &.cell-2 {
+      width: 40%;
+    }
+
+    .select2-container {
+      margin-bottom: 0.5rem;
+    }
+
+    input[type='text'] {
+      padding: 6px 12px;
+    }
+  }
+
+  .datagridwidget-manipulator {
+    padding: 1rem 0.5rem;
+    vertical-align: middle;
+  }
+}

@@ -10,11 +10,22 @@
         appId="solrpush"
         category="Products"
         condition_expr=""
-        url_expr="string:${portal_url}/@@solrpush-conf"
+        url_expr="string:${portal_url}/@@solrpush-settings"
         icon_expr=""
         visible="True"
         i18n:attributes="title">
-            <permission>Manage portal</permission>
+            <permission>rer.solrpush: Edit Settings</permission>
     </configlet>
-
+    <configlet
+        title="Configurazione Elevate"
+        action_id="solrpush.elevate"
+        appId="solrpush-elevate"
+        category="Products"
+        condition_expr=""
+        url_expr="string:${portal_url}/@@elevate-settings"
+        icon_expr=""
+        visible="True"
+        i18n:attributes="title">
+            <permission>rer.solrpush: Edit Elevate</permission>
+    </configlet>
 </object>
