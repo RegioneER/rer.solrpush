@@ -9,8 +9,8 @@ from plone.app.querystring.querybuilder import QueryBuilder as BaseView
 from plone.batching import Batch
 from Products.CMFCore.utils import getToolByName
 from rer.solrpush.parser import SolrResponse
-from rer.solrpush.solr import get_site_title
-from rer.solrpush.solr import search as solr_search
+from rer.solrpush.utils.solr_indexer import get_site_title
+from rer.solrpush.utils import search as solr_search
 from zope.component import getUtilitiesFor
 
 
@@ -129,7 +129,6 @@ class QueryBuilder(BaseView):
         for k, v in query.items():
             if k == "sort_on":
                 v = SORT_ON_MAPPING.get(v, v)
-
             if k == "path":
                 portal = api.portal.get()
                 portal_path = "/".join(portal.getPhysicalPath())
@@ -146,7 +145,7 @@ class QueryBuilder(BaseView):
                 if sites != "null":
                     filtered_sites = sites
             else:
-                fixed_query[k] = v
+                fixed_query[k] = self.extract_value(v)
 
         return {"query": fixed_query, "filtered_sites": filtered_sites}
 
