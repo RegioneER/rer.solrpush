@@ -9,8 +9,8 @@ from plone.restapi.testing import RelativeSession
 from Products.CMFCore.utils import getToolByName
 from rer.solrpush.interfaces.settings import IRerSolrpushSettings
 from rer.solrpush.testing import RER_SOLRPUSH_API_FUNCTIONAL_TESTING
-from rer.solrpush.solr import init_solr_push
-from rer.solrpush.solr import reset_solr
+from rer.solrpush.utils import init_solr_push
+from rer.solrpush.utils import reset_solr
 
 from transaction import commit
 import unittest
@@ -36,7 +36,9 @@ class SearchBandiTest(unittest.TestCase):
         setRoles(self.portal, TEST_USER_ID, ["Manager"])
 
         set_registry_record(
-            "enabled_types", ["Document", "News Item"], interface=IRerSolrpushSettings
+            "enabled_types",
+            ["Document", "News Item"],
+            interface=IRerSolrpushSettings,
         )
 
         init_solr_push()

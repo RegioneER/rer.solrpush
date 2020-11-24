@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from Products.CMFCore.utils import getToolByName
 from plone.restapi.search.handler import SearchHandler as BaseHandler
-from rer.solrpush.solr import search as solr_search
+from rer.solrpush.utils import search as solr_search
 from rer.solrpush.restapi.services.solr_search.batch import SolrHypermediaBatch
 from plone.restapi.deserializer import boolean_value
 

@@ -5,11 +5,11 @@ from plone.api.portal import set_registry_record
 from plone.app.testing import setRoles
 from plone.app.testing import TEST_USER_ID
 from rer.solrpush.interfaces.settings import IRerSolrpushSettings
-from rer.solrpush.solr import init_solr_push
-from rer.solrpush.solr import reset_solr
-from rer.solrpush.solr import search
-from rer.solrpush.solr import push_to_solr
-from rer.solrpush.solr import remove_from_solr
+from rer.solrpush.utils import init_solr_push
+from rer.solrpush.utils import reset_solr
+from rer.solrpush.utils import search
+from rer.solrpush.utils import push_to_solr
+from rer.solrpush.utils import remove_from_solr
 from rer.solrpush.testing import RER_SOLRPUSH_API_FUNCTIONAL_TESTING
 import time
 from transaction import commit

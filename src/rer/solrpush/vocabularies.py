@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from rer.solrpush.solr import search
+from rer.solrpush.utils import search
 from zope.interface import implementer
 from zope.schema.interfaces import IVocabularyFactory
 from zope.schema.vocabulary import SimpleVocabulary, SimpleTerm

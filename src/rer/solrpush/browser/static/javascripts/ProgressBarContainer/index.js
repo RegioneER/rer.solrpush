@@ -21,7 +21,7 @@ const ProgressBarContainer = ({ authenticator, action }) => {
     : '';
 
   const doCancel = () => {
-    window.location.href = `${portalUrl}/@@solrpush-conf`;
+    window.location.href = `${portalUrl}/@@solrpush-settings`;
   };
 
   const doReindex = () => {
@@ -30,8 +30,8 @@ const ProgressBarContainer = ({ authenticator, action }) => {
     axios(`${portalUrl}/${action}`, {
       params: { _authenticator: authenticator },
     });
-    const intervalId = setInterval(function() {
-      axios(`${portalUrl}/reindex-progress`).then(result =>
+    const intervalId = setInterval(function () {
+      axios(`${portalUrl}/reindex-progress`).then((result) =>
         setData(result.data),
       );
     }, 5000);

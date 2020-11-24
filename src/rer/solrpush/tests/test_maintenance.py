@@ -8,9 +8,9 @@ from plone.app.testing import setRoles
 from plone.app.testing import TEST_USER_ID
 from plone.protect.authenticator import createToken
 from rer.solrpush.interfaces.settings import IRerSolrpushSettings
-from rer.solrpush.solr import init_solr_push
-from rer.solrpush.solr import reset_solr
-from rer.solrpush.solr import search
+from rer.solrpush.utils import init_solr_push
+from rer.solrpush.utils import reset_solr
+from rer.solrpush.utils import search
 from rer.solrpush.testing import (
     RER_SOLRPUSH_API_FUNCTIONAL_TESTING,
 )  # noqa: E501

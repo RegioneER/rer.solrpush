@@ -9,7 +9,7 @@ from plone.restapi.testing import PloneRestApiDXLayer
 from plone.testing import Layer
 from plone.testing import z2
 from rer.solrpush.interfaces.settings import IRerSolrpushSettings
-from rer.solrpush.solr import init_solr_push
+from rer.solrpush.utils import init_solr_push
 from six.moves import range
 from time import sleep
 from ZPublisher.HTTPRequest import HTTPRequest

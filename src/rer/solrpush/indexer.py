@@ -9,10 +9,10 @@ from rer.solrpush import _
 from rer.solrpush.interfaces import IRerSolrpushLayer
 from rer.solrpush.interfaces import ISolrIndexQueueProcessor
 from rer.solrpush.interfaces.settings import IRerSolrpushSettings
-from rer.solrpush.solr import can_index
-from rer.solrpush.solr import create_index_dict
-from rer.solrpush.solr import push_to_solr
-from rer.solrpush.solr import remove_from_solr
+from rer.solrpush.utils.solr_indexer import can_index
+from rer.solrpush.utils.solr_indexer import create_index_dict
+from rer.solrpush.utils import push_to_solr
+from rer.solrpush.utils import remove_from_solr
 from zope.globalrequest import getRequest
 from zope.interface import implementer
 
@@ -47,7 +47,11 @@ class SolrIndexProcessor(object):
         )
 
     def index(self, obj, attributes=None):
-        if self.active and getattr(obj, "showinsearch", True) and can_index(obj):
+        if (
+            self.active
+            and getattr(obj, "showinsearch", True)  # noqa
+            and can_index(obj)  # noqa
+        ):
             uid = obj.UID()
             data = create_index_dict(obj)
             self.queue = [item for item in self.queue if item[0] != uid] + [

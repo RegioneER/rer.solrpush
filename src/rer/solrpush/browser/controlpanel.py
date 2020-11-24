@@ -7,7 +7,7 @@ from rer.solrpush import _
 from rer.solrpush.interfaces.settings import IRerSolrpushConf
 from rer.solrpush.interfaces.settings import IRerSolrpushSearchConf
 from rer.solrpush.interfaces.settings import IRerSolrpushSettings
-from rer.solrpush.solr import init_solr_push
+from rer.solrpush.utils import init_solr_push
 from z3c.form import button
 from z3c.form import field
 from z3c.form import group
