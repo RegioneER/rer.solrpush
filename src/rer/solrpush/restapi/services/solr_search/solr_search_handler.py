@@ -49,13 +49,13 @@ class SolrSearchHandler(BaseHandler):
     def get_fields_list(self, query):
         if "fullobjects" in query:
             del query["fullobjects"]
-            return ""
+            return []
         fields = []
         for field in self.metadata_fields(query):
             if field.startswith("_") or field in BLACKLISTED_ATTRIBUTES:
                 continue
             fields.append(field)
-        return " ".join(fields)
+        return fields
 
     def metadata_fields(self, query):
 

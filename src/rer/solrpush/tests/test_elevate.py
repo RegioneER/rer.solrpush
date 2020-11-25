@@ -96,7 +96,10 @@ class TestSolrSearch(unittest.TestCase):
             query={"SearchableText": "page"}, fl=["UID", "Title", "[elevated]"]
         ).docs
         self.assertEqual(len(solr_results), 4)
-        self.assertEqual(solr_results[0], {'UID': doc4.UID(), 'Title': doc4.Title(), '[elevated]': False})
+        self.assertEqual(
+            solr_results[0],
+            {"UID": doc4.UID(), "Title": doc4.Title(), "[elevated]": False},
+        )
 
         # now let's set an elevate for third document
         set_registry_record(
@@ -108,5 +111,11 @@ class TestSolrSearch(unittest.TestCase):
             query={"SearchableText": "page"}, fl=["UID", "Title", "[elevated]"]
         ).docs
         self.assertEqual(len(solr_results), 4)
-        self.assertEqual(solr_results[0], {'UID': doc3.UID(), 'Title': doc3.Title(), '[elevated]': True})
-        self.assertEqual(solr_results[1], {'UID': doc4.UID(), 'Title': doc4.Title(), '[elevated]': False})
+        self.assertEqual(
+            solr_results[0],
+            {"UID": doc3.UID(), "Title": doc3.Title(), "[elevated]": True},
+        )
+        self.assertEqual(
+            solr_results[1],
+            {"UID": doc4.UID(), "Title": doc4.Title(), "[elevated]": False},
+        )
