@@ -173,7 +173,7 @@ def extract_elevate_schema(query):
 
 
 def extract_from_query(query):
-    index_fields = get_index_fields(field="index_fields")
+    index_fields = get_index_fields()
     params = {"q": "", "fq": []}
     for index, value in query.items():
         if index == "*":
