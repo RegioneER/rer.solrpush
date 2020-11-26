@@ -118,7 +118,7 @@ class IRerSolrpushSearchConf(model.Schema):
         title=_(u"remote_elevate_label", default=u"Remote elevate"),
         description=_(
             u"remote_elevate_help",
-            default=u'If this field is set and "remote_elevate=true" is '
+            default=u'If this field is set and no "site_name" is '
             u"passed in query, elevate schema is taken from an external "
             u"source. This is useful if you index several sites and handle "
             u"elevate configuration in one single site.",

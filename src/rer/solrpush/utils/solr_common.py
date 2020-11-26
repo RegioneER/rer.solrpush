@@ -27,10 +27,8 @@ def is_solr_active():
     return get_setting(field="active")
 
 
-def get_index_fields(field):
-    json_str = api.portal.get_registry_record(
-        field, interface=IRerSolrpushSettings, default=""
-    )
+def get_index_fields():
+    json_str = get_setting(field="index_fields")
     return json.loads(json_str)
 
 

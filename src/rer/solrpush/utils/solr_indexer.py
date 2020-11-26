@@ -97,7 +97,7 @@ def create_index_dict(item):
     """Restituisce un dizionario pronto per essere 'mandato' a SOLR per
     l'indicizzazione.
     """
-    index_fields = get_index_fields(field="index_fields")
+    index_fields = get_index_fields()
     frontend_url = get_setting(field="frontend_url")
 
     catalog = api.portal.get_tool(name="portal_catalog")

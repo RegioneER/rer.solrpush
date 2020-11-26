@@ -7,9 +7,11 @@ from zope.i18n import translate
 from rer.solrpush.utils.solr_common import get_solr_connection
 from rer.solrpush.utils.solr_common import get_setting
 from rer.solrpush.utils.solr_common import get_index_fields
+from rer.solrpush.interfaces.settings import IRerSolrpushSettings
 
 import logging
 import re
+import requests
 import six
 
 
@@ -28,7 +30,6 @@ def fix_value(value, wrap=True):
         return "({})".format(
             " OR ".join([escape_special_characters(x, wrap) for x in value])
         )
-        # return list(map(escape_special_characters, value))
     logger.warning(
         "[fix_value]: unable to escape value: {}. skipping".format(value)
     )
@@ -55,11 +56,7 @@ def set_sort_parameter(query):
 
 
 def generate_query(
-    query,
-    fl="",
-    facets=False,
-    facet_fields=["Subject", "portal_type"],
-    filtered_sites=[],
+    query, fl=None, facets=False, facet_fields=["Subject", "portal_type"],
 ):
     solr_query = {
         "q": "",
@@ -73,22 +70,33 @@ def generate_query(
 
     if not solr_query["q"]:
         solr_query["q"] = "*:*"
-    if filtered_sites:
-        if six.PY2:
-            sites = [u'"{}"'.format(x) for x in filtered_sites]
-        else:
-            sites = ['"{}"'.format(x) for x in filtered_sites]
-        solr_query["fq"].append(u"site_name:({})".format(" OR ".join(sites)))
     if "sort_on" in query:
         solr_query["sort"] = set_sort_parameter(query)
     if facets:
         solr_query["facet.field"] = facet_fields
     if fl:
+        if "UID" not in fl:
+            # we need it because if we ask for [elevated] value, solr returns
+            # error if we don't ask also the primary key
+            if isinstance(fl, six.text_type):
+                fl = "{} UID".format(fl)
+            elif isinstance(fl, list):
+                fl.append("UID")
         solr_query["fl"] = fl
 
     solr_query.update(add_query_tweaks())
     # elevate
-    solr_query.update(manage_elevate(query))
+    elevate = manage_elevate(query=query)
+    if elevate.get("enableElevation", False):
+        solr_query.update(manage_elevate(query=query))
+        if "fl" not in solr_query:
+            solr_query["fl"] = "* [elevated]"
+        else:
+            if "[elevated]" not in solr_query["fl"]:
+                if isinstance(solr_query["fl"], six.text_type):
+                    solr_query["fl"] = "{} [elevated]".format(solr_query["fl"])
+                elif isinstance(solr_query["fl"], list):
+                    solr_query["fl"].append("[elevated]")
     return solr_query
 
 
@@ -100,10 +108,8 @@ def manage_elevate(query):
         return params
     if not searchableText.replace(" ", ""):
         return params
-    elevate_map = get_setting(
-        field="elevate_schema", interface=IElevateSettings
-    )
-    if not elevate_map:
+    elevate_schema = extract_elevate_schema(query=query)
+    if not elevate_schema:
         return params
     try:
         if six.PY2:
@@ -116,7 +122,7 @@ def manage_elevate(query):
         logger.exception("error parsing %r", searchableText)
         text = None
     if text:
-        for config in elevate_map:
+        for config in elevate_schema:
             # exact match
             # if text == s:
 
@@ -132,8 +138,42 @@ def manage_elevate(query):
     return params
 
 
+def extract_elevate_schema(query):
+    """
+    If no site_name is passed in query and remote_elevate_schema is set,
+    return the schema from remote site.
+    """
+    local_schema = get_setting(
+        field="elevate_schema", interface=IElevateSettings
+    )
+    if query.get("site_name", []):
+        return local_schema
+    if query.get("remote_elevate", "false").lower() != "true":
+        return local_schema
+    remote_schema = get_setting(
+        field="remote_elevate_schema", interface=IRerSolrpushSettings
+    )
+    if not remote_schema:
+        return local_schema
+    try:
+        resp = requests.get(
+            remote_schema, headers={"Accept": "application/json"}
+        )
+    except requests.exceptions.RequestException as err:
+        logger.error("Connection problem:\n{0}".format(err))
+        return []
+    if resp.status_code != 200:
+        logger.error(
+            "Problems fetching schema:\n{0}\n{1}".format(
+                resp.status_code, resp.reason
+            )
+        )
+        return []
+    return resp.json()
+
+
 def extract_from_query(query):
-    index_fields = get_index_fields(field="index_fields")
+    index_fields = get_index_fields()
     params = {"q": "", "fq": []}
     for index, value in query.items():
         if index == "*":
@@ -172,10 +212,9 @@ def add_query_tweaks():
 # LIBRARY METHODS
 def search(
     query,
-    fl="",
+    fl=None,
     facets=False,
     facet_fields=["Subject", "portal_type"],
-    filtered_sites=[],
     **kwargs
 ):
     """[summary] TODO
@@ -186,7 +225,6 @@ def search(
         facets (bool, optional): [description]. Defaults to False.
         facet_fields (list, optional): [description].
         Defaults to ["Subject", "portal_type"].
-        filtered_sites (list, optional): [description]. Defaults to [].
 
     Returns:
         [type]: [description]
@@ -203,11 +241,7 @@ def search(
             ),
         }
     solr_query = generate_query(
-        query,
-        fl=fl,
-        facets=facets,
-        facet_fields=facet_fields,
-        filtered_sites=filtered_sites,
+        query, fl=fl, facets=facets, facet_fields=facet_fields,
     )
     try:
         res = solr.search(**solr_query)

@@ -84,28 +84,38 @@ class TestSolrSearch(unittest.TestCase):
         doc3 = api.content.create(
             container=self.portal, type="Document", title="Third page"
         )
+        # page with the shortest title containing keyword has the better score
         doc4 = api.content.create(
-            container=self.portal, type="Document", title="Fourth page"
+            container=self.portal, type="Document", title="page"
         )
         api.content.transition(obj=doc3, transition="publish")
         api.content.transition(obj=doc4, transition="publish")
         commit()
 
         solr_results = search(
-            query={"SearchableText": "page"}, fl="UID Title"
+            query={"SearchableText": "page"}, fl=["UID", "Title", "[elevated]"]
         ).docs
-        self.assertNotEqual(solr_results[0]["UID"], doc4.UID())
+        self.assertEqual(len(solr_results), 4)
+        self.assertEqual(
+            solr_results[0],
+            {"UID": doc4.UID(), "Title": doc4.Title(), "[elevated]": False},
+        )
 
-        # now let's set an elevate for fourth document
+        # now let's set an elevate for third document
         set_registry_record(
             "elevate_schema",
-            [{"text": [u"page"], "uid": [doc4.UID()]}],
+            [{"text": [u"page"], "uid": [doc3.UID()]}],
             interface=IElevateSettings,
         )
-        commit()
-
         solr_results = search(
-            query={"SearchableText": "page"}, fl="UID Title"
+            query={"SearchableText": "page"}, fl=["UID", "Title", "[elevated]"]
         ).docs
-
-        self.assertEqual(solr_results[0]["UID"], doc4.UID())
+        self.assertEqual(len(solr_results), 4)
+        self.assertEqual(
+            solr_results[0],
+            {"UID": doc3.UID(), "Title": doc3.Title(), "[elevated]": True},
+        )
+        self.assertEqual(
+            solr_results[1],
+            {"UID": doc4.UID(), "Title": doc4.Title(), "[elevated]": False},
+        )
