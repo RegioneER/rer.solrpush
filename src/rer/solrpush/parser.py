@@ -49,8 +49,8 @@ class Brain(dict):
         return self.get("id", self.get("getId"))
 
     @property
-    def Description(self):
-        return self.get("description", "")
+    def description(self):
+        return self.get("Description", "")
 
     def getId(self):
         return self.id

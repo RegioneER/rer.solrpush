@@ -104,8 +104,7 @@ def create_index_dict(item):
     adapter = queryMultiAdapter((item, catalog), IIndexableObject)
     index_me = {}
 
-    for field in index_fields.keys():
-        field_infos = index_fields[field]
+    for field, field_infos in index_fields.items():
         field_type = field_infos.get("type")
         if six.PY2:
             field = field.encode("ascii")
@@ -151,7 +150,7 @@ def fix_py2_strings(value):
     """ REMOVE ON PYTHON 3 """
     if isinstance(value, six.string_types):
         if not isinstance(value, six.text_type):
-            value = value.decode("utf-8")
+            value = value.replace("\xc0?", "").decode("utf-8")
         return fix_text(value)
     if isinstance(value, list):
         return list(map(fix_py2_strings, value))
@@ -206,6 +205,7 @@ def push_to_solr(item_or_obj):
     if not item_or_obj:
         return False
     attachment = item_or_obj.pop("attachment", None)
+
     if attachment:
         add_with_attachment(
             solr=solr, attachment=attachment, fields=item_or_obj

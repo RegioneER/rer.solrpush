@@ -7,7 +7,6 @@ from plone.memoize.view import memoize
 from plone.protect.authenticator import createToken
 from Products.CMFCore.interfaces import IIndexQueueProcessor
 from Products.Five import BrowserView
-from pysolr import SolrError
 from rer.solrpush import _
 from rer.solrpush.utils.solr_common import is_solr_active
 from rer.solrpush.utils import push_to_solr
@@ -163,7 +162,8 @@ class ReindexBaseView(BrowserView):
             obj = brain.getObject()
             try:
                 res = push_to_solr(obj)
-            except SolrError:
+            except Exception as e:
+                logger.exception(e)
                 status["in_progress"] = False
                 status["error"] = True
                 status["message"] = self.solr_error_message
