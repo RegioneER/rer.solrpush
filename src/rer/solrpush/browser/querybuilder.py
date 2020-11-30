@@ -146,8 +146,9 @@ class QueryBuilder(BaseView):
                     filtered_sites = sites
             else:
                 fixed_query[k] = self.extract_value(v)
-
-        return {"query": fixed_query, "filtered_sites": filtered_sites}
+            if filtered_sites:
+                fixed_query["site_name"] = filtered_sites
+        return {"query": fixed_query}
 
     def extract_value(self, value):
         if isinstance(value, dict) and "query" in value:
