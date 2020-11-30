@@ -9,6 +9,7 @@ from rer.solrpush.utils.solr_common import get_setting
 from rer.solrpush.utils.solr_common import get_index_fields
 from rer.solrpush.interfaces.settings import IRerSolrpushSettings
 from rer.solrpush.utils.solr_indexer import parse_date_str
+from DateTime import DateTime
 
 import logging
 import re
@@ -42,6 +43,8 @@ def fix_value(value, index_type="", wrap=True):
             return value
         else:
             value = query
+    if isinstance(value, DateTime):
+        return "[{} TO *]".format(parse_date_str(value))
     if isinstance(value, six.string_types):
         if index_type == "date":
             return "[{} TO *]".format(parse_date_str(value))

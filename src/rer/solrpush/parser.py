@@ -23,6 +23,7 @@ class Brain(dict):
     def __getattr__(self, name):
         """ look up attributes in dict """
         marker = []
+
         value = self.get(name, marker)
         schema = get_index_fields()
         if value is not marker:
@@ -102,6 +103,12 @@ class Brain(dict):
 
     def location(self):
         return self.get("location", "")
+
+    def ModificationDate(self):
+        value = self.get("ModificationDate", None)
+        if not value:
+            return None
+        return DateTime(value).toZone(timezone)
 
 
 class SolrResults(list):
