@@ -23,8 +23,9 @@ from zope.component import getMultiAdapter
 from zope.component import getSiteManager
 from zope.i18n import translate
 
-import logging
 import json
+import logging
+import os
 import pkg_resources
 
 
@@ -158,6 +159,7 @@ class ReindexBaseView(BrowserView):
         skipped = 0
         indexed = 0
         for brain in brains_to_reindex:
+            tot_indexed = indexed + skipped
             commit()
             obj = brain.getObject()
             try:
@@ -172,15 +174,21 @@ class ReindexBaseView(BrowserView):
                 indexed += 1
             else:
                 skipped += 1
-            logger.info(
+            logger.debug(
                 "[{indexed}/{total}] {path} ({type})".format(
-                    indexed=indexed + skipped,
+                    indexed=tot_indexed,
                     total=brains_to_reindex.actual_result_count,
                     path=brain.getPath(),
                     type=brain.portal_type,
                 )
             )
-            status["counter"] = indexed + skipped
+            if tot_indexed > 0 and tot_indexed % 200 == 0:
+                logger.info(
+                    "[PROGRESS]: {}/{}".format(
+                        tot_indexed, brains_to_reindex.actual_result_count
+                    )
+                )
+            status["counter"] = tot_indexed
 
         status["in_progress"] = False
         elapsed_time = next(elapsed)
@@ -203,15 +211,14 @@ class ReindexBaseView(BrowserView):
             brains_to_sync = pc()
         good_uids = [x.UID for x in brains_to_sync]
         solr_results = search(query={"*": "*", "b_size": 100000}, fl="UID")
-        uids_to_cleanup = [
+        uids_to_remove = [
             x["UID"] for x in solr_results.docs if x["UID"] not in good_uids
         ]
         status = self.setupAnnotations(
-            items_len=len(uids_to_cleanup), message="Cleanup items on SOLR"
+            items_len=len(uids_to_remove), message="Cleanup items on SOLR"
         )
         logger.info("##### SOLR CLEANUP STARTED #####")
-        logger.info(" - First of all, cleanup items on SOLR")
-        for uid in uids_to_cleanup:
+        for uid in uids_to_remove:
             remove_from_solr(uid)
             status["counter"] = status["counter"] + 1
             commit()
@@ -230,7 +237,17 @@ class DoReindexView(ReindexBaseView):
         )
         if not authenticator.verify():
             raise Unauthorized
+        # disable noisy logging from pysolr
+        if os.environ.get("DEBUG_SOLR", "").lower() not in ("true", "1"):
+            pysolr_logger = logging.getLogger("pysolr")
+            pt_logger = logging.getLogger("PortalTransforms")
+            pysolr_logger.setLevel(logging.WARNING)
+            pt_logger.setLevel(logging.WARNING)
+
         self.reindexPloneToSolr()
+
+        pysolr_logger.setLevel(logging.INFO)
+        pt_logger.setLevel(logging.INFO)
 
 
 class DoSyncView(ReindexBaseView):
@@ -240,8 +257,19 @@ class DoSyncView(ReindexBaseView):
         )
         if not authenticator.verify():
             raise Unauthorized
+
+        # disable noisy logging from pysolr
+        if os.environ.get("DEBUG_SOLR", "").lower() not in ("true", "1"):
+            pysolr_logger = logging.getLogger("pysolr")
+            pt_logger = logging.getLogger("PortalTransforms")
+            pysolr_logger.setLevel(logging.WARNING)
+            pt_logger.setLevel(logging.WARNING)
+
         self.cleanupSolrIndex()
         self.reindexPloneToSolr()
+
+        pysolr_logger.setLevel(logging.INFO)
+        pt_logger.setLevel(logging.INFO)
 
 
 class ReindexProgressView(BrowserView):

@@ -15,6 +15,8 @@ Changelog
   [cekk]
 - Add support for collections.
   [cekk]
+- Mute noisy solr logs in maintenance.
+  [cekk]
 
 0.1.2 (2019-12-12)
 ------------------

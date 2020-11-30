@@ -8,6 +8,7 @@ from rer.solrpush.utils.solr_common import get_solr_connection
 from rer.solrpush.utils.solr_common import get_setting
 from rer.solrpush.utils.solr_common import get_index_fields
 from rer.solrpush.interfaces.settings import IRerSolrpushSettings
+from rer.solrpush.utils.solr_indexer import parse_date_str
 
 import logging
 import re
@@ -23,13 +24,33 @@ ESCAPE_CHARS_RE = re.compile(r'(?<!\\)(?P<char>[&|+\-!(){}[\]^"~*?:])')
 # HELPER METHODS
 
 
-def fix_value(value, wrap=True):
+def fix_value(value, index_type="", wrap=True):
+    if isinstance(value, dict):
+        query = value.get("query", "")
+        range = value.get("range", "")
+        if not query:
+            return ""
+        if range:
+            if range == "min":
+                value = "[{} TO *]".format(parse_date_str(query))
+            if range == "max":
+                value = "[* TO {}]".format(parse_date_str(query))
+            if range == "minmax":
+                value = "[{} TO {}]".format(
+                    parse_date_str(query[0]), parse_date_str(query[1])
+                )
+            return value
+        else:
+            value = query
     if isinstance(value, six.string_types):
+        if index_type == "date":
+            return "[{} TO *]".format(parse_date_str(value))
         return escape_special_characters(value, wrap)
     elif isinstance(value, list):
         return "({})".format(
             " OR ".join([escape_special_characters(x, wrap) for x in value])
         )
+        # return list(map(escape_special_characters, value))
     logger.warning(
         "[fix_value]: unable to escape value: {}. skipping".format(value)
     )
@@ -187,9 +208,11 @@ def extract_from_query(query):
         if not index_infos:
             continue
         # other indexes will be added in fq
-        if index_infos.get("type") not in ["date"]:
-            value = fix_value(value=value)
-        params["fq"].append("{index}:{value}".format(index=index, value=value))
+        value = fix_value(value=value, index_type=index_infos.get("type", ""))
+        if value:
+            params["fq"].append(
+                "{index}:{value}".format(index=index, value=value)
+            )
     return params
 
 

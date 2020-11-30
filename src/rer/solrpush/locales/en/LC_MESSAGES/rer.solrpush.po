@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2020-11-24 10:04+0000\n"
+"POT-Creation-Date: 2020-11-30 13:41+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI +ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -58,7 +58,7 @@ msgstr ""
 msgid "Loaded schema.xml from SOLR"
 msgstr ""
 
-#: rer/solrpush/utils/solr_common.py:86
+#: rer/solrpush/utils/solr_common.py:84
 msgid "No SOLR url provided"
 msgstr ""
 
@@ -147,11 +147,11 @@ msgid "bq_label"
 msgstr ""
 
 #. Default: "Cancel"
-#: rer/solrpush/browser/maintenance.py:69
+#: rer/solrpush/browser/maintenance.py:68
 msgid "cancel_label"
 msgstr ""
 
-#. Default: "There was a problem indexing this content. Please contact site administrator."
+#. Default: "There was a problem indexing or unindexing this content. Please take note of this address and contact site administrator."
 #: rer/solrpush/indexer.py:92
 msgid "content_indexed_error"
 msgstr ""
@@ -250,7 +250,7 @@ msgid "label_showinsearch"
 msgstr ""
 
 #. Default: "Action cancelled"
-#: rer/solrpush/browser/maintenance.py:71
+#: rer/solrpush/browser/maintenance.py:70
 msgid "maintenance_cancel_action"
 msgstr ""
 
@@ -265,17 +265,17 @@ msgid "maintenance_reindex_label"
 msgstr ""
 
 #. Default: "Drop all items in SOLR index."
-#: rer/solrpush/browser/maintenance.py:84
+#: rer/solrpush/browser/maintenance.py:83
 msgid "maintenance_reset_solr_description"
 msgstr ""
 
 #. Default: "Reset SOLR index"
-#: rer/solrpush/browser/maintenance.py:83
+#: rer/solrpush/browser/maintenance.py:82
 msgid "maintenance_reset_solr_label"
 msgstr ""
 
 #. Default: "SOLR index dropped"
-#: rer/solrpush/browser/maintenance.py:91
+#: rer/solrpush/browser/maintenance.py:90
 msgid "maintenance_reset_success"
 msgstr ""
 
@@ -304,7 +304,7 @@ msgstr ""
 msgid "reindex_solr_not_active"
 msgstr ""
 
-#. Default: "If this field is set and \"remote_elevate=true\" is passed in query, elevate schema is taken from an external source. This is useful if you index several sites and handle elevate configuration in one single site."
+#. Default: "If this field is set and no \"site_name\" is passed in query, elevate schema is taken from an external source. This is useful if you index several sites and handle elevate configuration in one single site."
 #: rer/solrpush/interfaces/settings.py:119
 msgid "remote_elevate_help"
 msgstr ""
@@ -315,7 +315,7 @@ msgid "remote_elevate_label"
 msgstr ""
 
 #. Default: "Unable to perform a search with SOLR. Please contact the site administrator or wait some minutes."
-#: rer/solrpush/utils/solr_search.py:220
+#: rer/solrpush/utils/solr_search.py:254
 msgid "search_error_label"
 msgstr ""
 
@@ -339,7 +339,7 @@ msgstr ""
 msgid "settings_search_label"
 msgstr ""
 
-#: rer/solrpush/utils/solr_search.py:201
+#: rer/solrpush/utils/solr_search.py:239
 msgid "solr_configuration_error_label"
 msgstr ""
 
@@ -349,11 +349,11 @@ msgid "solr_elevate_configuration_label"
 msgstr ""
 
 #. Default: "There have been problems connecting to SOLR. Contact site administrator."
-#: rer/solrpush/browser/maintenance.py:105
+#: rer/solrpush/browser/maintenance.py:104
 msgid "solr_error_connection"
 msgstr ""
 
 #. Default: "Start"
-#: rer/solrpush/browser/maintenance.py:61
+#: rer/solrpush/browser/maintenance.py:60
 msgid "start_label"
 msgstr ""

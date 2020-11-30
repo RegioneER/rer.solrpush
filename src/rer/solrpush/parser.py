@@ -2,7 +2,7 @@
 from datetime import datetime
 from DateTime import DateTime
 from plone import api
-from rer.solrpush.utils.solr_common import get_index_fields
+from rer.solrpush.utils.solr_indexer import get_index_fields
 from rer.solrpush.utils.solr_indexer import get_site_title
 from OFS.Traversable import path2url
 
@@ -34,7 +34,6 @@ class Brain(dict):
         else:
             if name not in schema:
                 raise AttributeError(name)
-        return value
 
     def __init__(self, context, request=None):
         self.context = context
@@ -51,8 +50,8 @@ class Brain(dict):
         return self.get("id", self.get("getId"))
 
     @property
-    def description(self):
-        return self.get("Description", "")
+    def Description(self):
+        return self.get("description", "")
 
     def getId(self):
         return self.id

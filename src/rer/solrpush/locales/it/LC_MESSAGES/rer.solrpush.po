@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2020-11-24 10:04+0000\n"
+"POT-Creation-Date: 2020-11-30 13:41+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI +ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -58,7 +58,7 @@ msgstr "Installa l'add-on rer.solrpush."
 msgid "Loaded schema.xml from SOLR"
 msgstr "schema.xml caricato correttamente da SOLR"
 
-#: rer/solrpush/utils/solr_common.py:86
+#: rer/solrpush/utils/solr_common.py:84
 msgid "No SOLR url provided"
 msgstr "Nessun url di connessione a SOLR fornito"
 
@@ -147,14 +147,14 @@ msgid "bq_label"
 msgstr "bq (boost query)"
 
 #. Default: "Cancel"
-#: rer/solrpush/browser/maintenance.py:69
+#: rer/solrpush/browser/maintenance.py:68
 msgid "cancel_label"
 msgstr "Annulla"
 
-#. Default: "There was a problem indexing this content. Please contact site administrator."
+#. Default: "There was a problem indexing or unindexing this content. Please take note of this address and contact site administrator."
 #: rer/solrpush/indexer.py:92
 msgid "content_indexed_error"
-msgstr "Si è verificato un problema indicizzando questo contenuto su SOLR. Contatta l'amministratore per maggiori informazioni."
+msgstr "Si è verificato un problema: questo contenuto non può essere indicizzato o rimosso da SOLR e quindi non verrà mostrato nelle ricerche e nelle collezioni fatte con SOLR. Avvisa subito gli amministratori del sito indicando l'URL di questo contenuto."
 
 #. Default: "There was a problem removing this content from SOLR.  Please contact site administrator."
 #: rer/solrpush/utils/solr_indexer.py:233
@@ -198,12 +198,12 @@ msgstr "Configurazione Elevate"
 #. Default: "Select in which sites you want to search contents. If not set, search will be performed on all sites."
 #: rer/solrpush/interfaces/settings.py:105
 msgid "enabled_solr_sites_help"
-msgstr ""
+msgstr "Seleziona in quali siti eseguire la ricerca. Se nessuno è impostato, la ricerca verrà eseguita su tutti i siti."
 
 #. Default: "Sites to search"
 #: rer/solrpush/interfaces/settings.py:104
 msgid "enabled_solr_sites_label"
-msgstr ""
+msgstr "Siti in cui cercare"
 
 #. Default: "Select a list of portal types to index in solr. Empty list means that all portal types will be indexed."
 #: rer/solrpush/interfaces/settings.py:65
@@ -231,15 +231,13 @@ msgstr ""
 
 #. Default: "We store this list for performance reasons. If the configuration changes, you need to click on Reload button"
 #: rer/solrpush/interfaces/settings.py:84
-#, fuzzy
 msgid "index_fields_help"
 msgstr "Ci salviamo questa lista per motivi di performance. Se la configurazione cambia, bisogna cliccare sul bottone di Aggiornamento."
 
 #. Default: "List of fields loaded from SOLR that we use for indexing."
 #: rer/solrpush/interfaces/settings.py:79
-#, fuzzy
 msgid "index_fields_label"
-msgstr "Indici solr."
+msgstr "Lista di indici di SOLR che utilizziamo per fare l'inidicizzazione."
 
 #. Default: "Search words"
 #: rer/solrpush/behaviors/solr_fields.py:30
@@ -252,7 +250,7 @@ msgid "label_showinsearch"
 msgstr "Mostra nella ricerca"
 
 #. Default: "Action cancelled"
-#: rer/solrpush/browser/maintenance.py:71
+#: rer/solrpush/browser/maintenance.py:70
 msgid "maintenance_cancel_action"
 msgstr "Azione annullata"
 
@@ -267,17 +265,17 @@ msgid "maintenance_reindex_label"
 msgstr "Reindicizza SOLR"
 
 #. Default: "Drop all items in SOLR index."
-#: rer/solrpush/browser/maintenance.py:84
+#: rer/solrpush/browser/maintenance.py:83
 msgid "maintenance_reset_solr_description"
 msgstr "Rmuovi tutti gli elementi dall'indice SOLR."
 
 #. Default: "Reset SOLR index"
-#: rer/solrpush/browser/maintenance.py:83
+#: rer/solrpush/browser/maintenance.py:82
 msgid "maintenance_reset_solr_label"
 msgstr "Azzera l'indice SOLR"
 
 #. Default: "SOLR index dropped"
-#: rer/solrpush/browser/maintenance.py:91
+#: rer/solrpush/browser/maintenance.py:90
 msgid "maintenance_reset_success"
 msgstr "Indice SOLR azzerato"
 
@@ -306,18 +304,18 @@ msgstr "qf (query fields)"
 msgid "reindex_solr_not_active"
 msgstr "SOLR push non è attivo. Impossibile sincronizzarsi."
 
-#. Default: "If this field is set and \"remote_elevate=true\" is passed in query, elevate schema is taken from an external source. This is useful if you index several sites and handle elevate configuration in one single site."
+#. Default: "If this field is set and no \"site_name\" is passed in query, elevate schema is taken from an external source. This is useful if you index several sites and handle elevate configuration in one single site."
 #: rer/solrpush/interfaces/settings.py:119
 msgid "remote_elevate_help"
-msgstr ""
+msgstr "Se questo campo è compilato e non è stato passato nessun valore per \"site_name\" nella query, allora lo schema per l'elevate verrà letto dall'url impostato. Questo è utile quando vengono indicizzati più siti, ma si vuole mantenere un elevate centrale."
 
 #. Default: "Remote elevate"
 #: rer/solrpush/interfaces/settings.py:118
 msgid "remote_elevate_label"
-msgstr ""
+msgstr "Elevate remoto"
 
 #. Default: "Unable to perform a search with SOLR. Please contact the site administrator or wait some minutes."
-#: rer/solrpush/utils/solr_search.py:220
+#: rer/solrpush/utils/solr_search.py:254
 msgid "search_error_label"
 msgstr "Impossibile eseguire la ricerca su SOLR. Contatta l'amministratore del sito o riprova tra qualche minuto."
 
@@ -341,21 +339,21 @@ msgstr "Utilizza questi campi per alterare i risultati delle ricerche."
 msgid "settings_search_label"
 msgstr "Ricerca"
 
-#: rer/solrpush/utils/solr_search.py:201
+#: rer/solrpush/utils/solr_search.py:239
 msgid "solr_configuration_error_label"
 msgstr "Impossibile cercare usando SOLR. Configurazione incompleta o errata."
 
 #. Default: "Solr Push Elevate Configuration"
 #: rer/solrpush/browser/elevate_settings.py:13
 msgid "solr_elevate_configuration_label"
-msgstr ""
+msgstr "Configurazione Elevate per Solr Push"
 
 #. Default: "There have been problems connecting to SOLR. Contact site administrator."
-#: rer/solrpush/browser/maintenance.py:105
+#: rer/solrpush/browser/maintenance.py:104
 msgid "solr_error_connection"
 msgstr "Si è verificato un problema di connessione verso SOLR. Contatta l'amministratore per maggiori informazioni."
 
 #. Default: "Start"
-#: rer/solrpush/browser/maintenance.py:61
+#: rer/solrpush/browser/maintenance.py:60
 msgid "start_label"
 msgstr "Avvia"
