@@ -8,7 +8,7 @@ Product that allows SOLR indexing/searching of a Plone website.
 
 
 Control Panel
--------------
+=============
 
 - Active: flag to enable/disable SOLR integration
 - Solr URL: SOLR core url
@@ -17,7 +17,7 @@ Control Panel
 
 
 Hidden registry fields
-''''''''''''''''''''''
+----------------------
 
 There are some "service" registry fields hidden to disallow users to edit them.
 
@@ -27,7 +27,7 @@ There are some "service" registry fields hidden to disallow users to edit them.
 
 
 schema.xml load
-'''''''''''''''
+---------------
 
 SOLR fields are directly read from `schema.xml` file exposed by SOLR.
 
@@ -36,7 +36,7 @@ and is always synced when you save `solr-controlpanel` form
 or click on `Reload schema.xml` button.
 
 File indexing
-'''''''''''''
+-------------
 
 If Tika is configured on SOLR, you can send attachments to it and they will be indexed as SearchableText in the content.
 
@@ -70,9 +70,9 @@ N.B.: `SearchableText` index should be **multivalued**.
 
 
 Search configuration
-''''''''''''''''''''
+--------------------
 
-In solr controlpanel (*/@@solrpush-conf*) there are some field that allows admins to setup some query parameters.
+In solr controlpanel (*/@@solrpush-settings*) there are some field that allows admins to setup some query parameters.
 
 'qf' specifies a list of fields, each of which is assigned a boost factor to increase
 or decrease that particular field’s relevance in the query.
@@ -100,9 +100,18 @@ For example if we want to give less relevance to items deeper in the tree we can
 
 *path_depth* is an index that counts tree level of an object.
 
+Collections
+===========
+
+There are two new Collection's criteria that allows to search on SOLR also in Collections:
+
+- *Search with SOLR*: if checked, searches will be redirected to SOLR (the default is always on local Plone Site).
+- *Sites*: a list of indexes plone sites on SOLR. The user can select on which sites perform the query.
+  If no sites are set (or this criteria not selected), the default search will be made only in the current site.
+
 
 Development buildout
---------------------
+====================
 
 In the buildout there is a solr configuration (in `conf` folder) and a recipe that builds a solr instance locally.
 
@@ -111,19 +120,8 @@ To use it, simply run::
     > ./bin/solr-foreground
 
 
-
-Search
-------
-
-Date fields:
-
-from DateTime import DateTime
-timezone = DateTime().timezone()
-DateTime(value).toZone(timezone).ISO8601()
-
-
 Installation
-------------
+============
 
 Add rer.solrpush to buildout::
 
@@ -139,19 +137,19 @@ and run ``bin/buildout`` command.
 
 
 Contribute
-----------
+==========
 
 - Issue Tracker: https://github.com/RegioneER/rer.solrpush/issues
 - Source Code: https://github.com/RegioneER/rer.solrpush
 
 Compatibility
--------------
+=============
 
 This product has been tested on Plone 5.1 and 5.2
 
 
 Credits
--------
+=======
 
 Developed with the support of `Regione Emilia Romagna`__;
 
@@ -161,7 +159,7 @@ __ http://www.regione.emilia-romagna.it/
 __ http://www.plonegov.it/
 
 Authors
--------
+=======
 
 This product was developed by RedTurtle Technology team.
 

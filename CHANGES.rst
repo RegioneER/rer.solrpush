@@ -13,7 +13,8 @@ Changelog
   [mamico]
 - Index files with tika.
   [cekk]
-
+- Add support for collections.
+  [cekk]
 
 0.1.2 (2019-12-12)
 ------------------
