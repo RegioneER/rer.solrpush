@@ -34,6 +34,7 @@ class Brain(dict):
         else:
             if name not in schema:
                 raise AttributeError(name)
+        return value
 
     def __init__(self, context, request=None):
         self.context = context
