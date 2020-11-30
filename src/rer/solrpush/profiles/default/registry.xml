@@ -1,5 +1,6 @@
 <?xml version="1.0"?>
-<registry>
+<registry xmlns:i18n="http://xml.zope.org/namespaces/i18n"
+          i18n:domain="rer.solrpush">
   <!-- -*- extra stuff goes here -*- -->
   <records interface="rer.solrpush.interfaces.settings.IRerSolrpushSettings" />
   <records interface="rer.solrpush.interfaces.IElevateSettings" />
@@ -25,4 +26,30 @@
     <value key="depends">plone</value>
   </records>
 
+  <records interface="plone.app.querystring.interfaces.IQueryField"
+            prefix="plone.app.querystring.field.searchWithSolr">
+    <value key="title" i18n:translate="">Search with Solr</value>
+    <value key="description"
+           i18n:translate="Select if perform search with SOLR or with Plone (local) catalog.">
+    </value>
+    <value key="enabled">True</value>
+    <value key="sortable">False</value>
+    <value key="operations">
+        <element>plone.app.querystring.operation.boolean.isTrue</element>
+        <element>plone.app.querystring.operation.boolean.isFalse</element>
+    </value>
+    <value key="group" i18n:translate="">SOLR</value>
+  </records>
+  <records interface="plone.app.querystring.interfaces.IQueryField"
+             prefix="plone.app.querystring.field.solr_sites">
+        <value key="title" i18n:translate="">Sites</value>
+        <value key="description" i18n:translate="">A list of (SOLR indexed) sites where search items.</value>
+        <value key="enabled">True</value>
+        <value key="sortable">False</value>
+        <value key="operations">
+            <element>plone.app.querystring.operation.selection.any</element>
+        </value>
+        <value key="vocabulary">rer.solrpush.vocabularies.AvailableSites</value>
+       <value key="group" i18n:translate="">SOLR</value>
+  </records>
 </registry>
