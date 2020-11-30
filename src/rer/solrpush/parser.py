@@ -32,7 +32,8 @@ class Brain(dict):
                 value = DateTime(value).toZone(timezone)
             return value
         else:
-            raise AttributeError(name)
+            if name not in schema:
+                raise AttributeError(name)
 
     def __init__(self, context, request=None):
         self.context = context
