@@ -216,6 +216,15 @@ def extract_from_query(query):
             params["fq"].append(
                 "{index}:{value}".format(index=index, value=value)
             )
+    can_access_inactive = api.user.has_permission(
+        "Access inactive portal content"
+    )
+    if not can_access_inactive:
+        # do not show expired or not yet published items
+        if "expires" not in query:
+            params["fq"].append("expires:[NOW TO *]")
+        if "effective" not in query:
+            params["fq"].append("effective:[* TO NOW]")
     return params
 
 
