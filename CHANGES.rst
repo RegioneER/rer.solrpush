@@ -2,7 +2,7 @@ Changelog
 =========
 
 
-0.2.1 (unreleased)
+0.2.1 (2020-12-03)
 ------------------
 
 - Fix date indexes in query when they already are in "solr syntax".
