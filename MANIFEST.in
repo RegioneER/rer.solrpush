@@ -2,6 +2,7 @@ graft src/rer
 graft docs
 include *.rst
 include LICENSE.GPL
+include *.yml
 global-exclude *.pyc
 prune config
 prune .github
