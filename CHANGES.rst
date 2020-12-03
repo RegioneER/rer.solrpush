@@ -5,7 +5,8 @@ Changelog
 0.2.1 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Fix date indexes in query when they already are in "solr syntax".
+  [cekk]
 
 
 0.2.0 (2020-12-03)

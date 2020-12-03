@@ -47,7 +47,10 @@ def fix_value(value, index_type="", wrap=True):
         return "[{} TO *]".format(parse_date_str(value))
     if isinstance(value, six.string_types):
         if index_type == "date":
-            return "[{} TO *]".format(parse_date_str(value))
+            if "TO" not in value:
+                return "[{} TO *]".format(parse_date_str(value))
+            else:
+                return value
         return escape_special_characters(value, wrap)
     elif isinstance(value, list):
         return "({})".format(
