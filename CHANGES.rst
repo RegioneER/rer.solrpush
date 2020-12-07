@@ -5,7 +5,8 @@ Changelog
 0.2.2 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Fix encoding problems in `escape_special_characters` method for python2.
+  [cekk]
 
 
 0.2.1 (2020-12-03)

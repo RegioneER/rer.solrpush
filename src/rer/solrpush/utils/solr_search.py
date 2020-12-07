@@ -65,8 +65,8 @@ def fix_value(value, index_type="", wrap=True):
 
 def escape_special_characters(value, wrap):
     new_value = ESCAPE_CHARS_RE.sub(r"\\\g<char>", value)
-    # if ('OR' not in new_value or 'AND' not in new_value) and ' ' in new_value:  # noqa
-    #     new_value = '"{}"'.format(new_value)
+    if six.PY2 and isinstance(new_value, unicode):
+        new_value = new_value.encode("utf-8")
     if wrap:
         return '"{}"'.format(new_value)
     return new_value
