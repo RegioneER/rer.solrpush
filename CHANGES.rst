@@ -2,7 +2,7 @@ Changelog
 =========
 
 
-0.2.2 (unreleased)
+0.2.2 (2020-12-14)
 ------------------
 
 - Fix encoding problems in `escape_special_characters` method for python2.
