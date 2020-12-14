@@ -42,6 +42,14 @@
       provides="Products.GenericSetup.interfaces.EXTENSION"
       />
 
+  <genericsetup:registerProfile
+      name="to_1300"
+      title="RER: Solr push remove unused control panel"
+      directory="profiles/to_1300"
+      description=""
+      provides="Products.GenericSetup.interfaces.EXTENSION"
+      />
+      
   <utility
       factory=".setuphandlers.HiddenProfiles"
       name="rer.solrpush-hiddenprofiles"

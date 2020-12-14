@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
+from collective.z3cform.jsonwidget.browser.widget import JSONFieldWidget
 from plone.app.registry.browser.controlpanel import ControlPanelFormWrapper
 from plone.app.registry.browser.controlpanel import RegistryEditForm
+from Products.CMFPlone.resources import add_bundle_on_request
 from rer.solrpush import _
 from rer.solrpush.interfaces import IElevateSettings
-from z3c.form import field
-from collective.z3cform.jsonwidget.browser.widget import JSONFieldWidget
 from rer.solrpush.interfaces.elevate import IElevateRowSchema
-from Products.CMFPlone.resources import add_bundle_on_request
+from z3c.form import field
 
 
 class ElevateSettingsEditForm(RegistryEditForm):
