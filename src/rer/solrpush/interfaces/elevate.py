@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
-from collective.z3cform.datagridfield.registry import DictRow
 from plone.app.vocabularies.catalog import CatalogSource as CatalogSourceBase
 from plone.app.z3cform.widget import RelatedItemsFieldWidget
 from plone.autoform import directives as form
 from plone.supermodel import model
 from rer.solrpush import _
+from z3c.relationfield.schema import RelationChoice
+from z3c.relationfield.schema import RelationList
 from zope import schema
 
 
@@ -27,28 +28,31 @@ class IElevateRowSchema(model.Schema):
         required=True,
         value_type=schema.TextLine(),
     )
-    uid = schema.List(
+    uid = RelationList(
         title=_("elevate_row_schema_uid_label", u"Elements"),
         description=_(
             "elevate_row_schema_uid_help",
             u"Select a list of elements to elevate for that search word.",
         ),
-        value_type=schema.Choice(source=CatalogSource()),
+        value_type=RelationChoice(vocabulary="plone.app.vocabularies.Catalog"),
         required=True,
     )
-    form.widget("uid", RelatedItemsFieldWidget)
+    form.widget(
+        "uid",
+        RelatedItemsFieldWidget,
+        vocabulary="plone.app.vocabularies.Catalog",
+    )
 
 
 class IElevateSettings(model.Schema):
     """
     """
 
-    elevate_schema = schema.List(
+    elevate_schema = schema.SourceText(
         title=_(u"elevate_schema_label", default=u"Elevate configuration"),
         description=_(
             u"elevate_schema_help",
             default=u"Insert a list of values for elevate.",
         ),
         required=False,
-        value_type=DictRow(title=u"elevate row", schema=IElevateRowSchema),
     )

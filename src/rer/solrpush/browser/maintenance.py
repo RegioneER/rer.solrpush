@@ -159,7 +159,7 @@ class ReindexBaseView(BrowserView):
         skipped = 0
         indexed = 0
         for brain in brains_to_reindex:
-            tot_indexed = indexed + skipped
+            tot_indexed = indexed + skipped + 1
             commit()
             obj = brain.getObject()
             try:

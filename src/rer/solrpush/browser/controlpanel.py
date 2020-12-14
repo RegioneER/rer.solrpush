@@ -13,7 +13,6 @@ from z3c.form import field
 from z3c.form import group
 from z3c.form.interfaces import HIDDEN_MODE
 
-
 import logging
 
 logger = logging.getLogger(__name__)

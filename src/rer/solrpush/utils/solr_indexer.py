@@ -103,7 +103,6 @@ def create_index_dict(item):
     catalog = api.portal.get_tool(name="portal_catalog")
     adapter = queryMultiAdapter((item, catalog), IIndexableObject)
     index_me = {}
-
     for field, field_infos in index_fields.items():
         field_type = field_infos.get("type")
         if six.PY2:
