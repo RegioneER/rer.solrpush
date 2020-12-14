@@ -7,7 +7,8 @@ Changelog
 
 - Fix encoding problems in `escape_special_characters` method for python2.
   [cekk]
-
+- Remove collective.z3cform.datagrifield dependency and temporary disable elevate control panel.
+  [cekk]
 
 0.2.1 (2020-12-03)
 ------------------

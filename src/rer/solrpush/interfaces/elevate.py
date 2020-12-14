@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from collective.z3cform.datagridfield.registry import DictRow
 from plone.app.vocabularies.catalog import CatalogSource as CatalogSourceBase
 from plone.app.z3cform.widget import RelatedItemsFieldWidget
 from plone.autoform import directives as form
@@ -50,5 +49,5 @@ class IElevateSettings(model.Schema):
             default=u"Insert a list of values for elevate.",
         ),
         required=False,
-        value_type=DictRow(title=u"elevate row", schema=IElevateRowSchema),
+        value_type=schema.TextLine(title=u"elevate row"),
     )
