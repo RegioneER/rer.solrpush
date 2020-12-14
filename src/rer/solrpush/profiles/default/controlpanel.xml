@@ -16,7 +16,7 @@
         i18n:attributes="title">
             <permission>rer.solrpush: Edit Settings</permission>
     </configlet>
-    <configlet
+    <!-- <configlet
         title="Configurazione Elevate"
         action_id="solrpush.elevate"
         appId="solrpush-elevate"
@@ -27,5 +27,5 @@
         visible="True"
         i18n:attributes="title">
             <permission>rer.solrpush: Edit Elevate</permission>
-    </configlet>
+    </configlet> -->
 </object>
