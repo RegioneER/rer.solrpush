@@ -16,7 +16,7 @@ long_description = "\n\n".join(
 
 setup(
     name="rer.solrpush",
-    version="0.2.2",
+    version="0.2.3.dev0",
     description="Prodotto per Regione Emilia-Romagna relativo all'indicizzazione dei contenuti con solr",
     long_description=long_description,
     # Get more from https://pypi.python.org/pypi?%3Aaction=list_classifiers
