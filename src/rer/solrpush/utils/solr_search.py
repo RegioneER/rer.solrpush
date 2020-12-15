@@ -27,9 +27,11 @@ ESCAPE_CHARS_RE = re.compile(r'(?<!\\)(?P<char>[&|+\-!(){}[\]^"~*?:])')
 
 
 def fix_value(value, index_type="", wrap=True):
+    operator = "or"
     if isinstance(value, dict):
         query = value.get("query", "")
         range = value.get("range", "")
+        operator = value.get("operator", "or")
         if not query:
             return ""
         if range:
@@ -54,10 +56,10 @@ def fix_value(value, index_type="", wrap=True):
                 return value
         return escape_special_characters(value, wrap)
     elif isinstance(value, list):
+        join_str = " {} ".format(operator.upper())
         return "({})".format(
-            " OR ".join([escape_special_characters(x, wrap) for x in value])
+            join_str.join([escape_special_characters(x, wrap) for x in value])
         )
-        # return list(map(escape_special_characters, value))
     logger.warning(
         "[fix_value]: unable to escape value: {}. skipping".format(value)
     )
