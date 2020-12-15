@@ -229,6 +229,8 @@ def extract_from_query(query):
         # other indexes will be added in fq
         value = fix_value(value=value, index_type=index_infos.get("type", ""))
         if value:
+            if index == "path":
+                index = "path_parents"
             params["fq"].append(
                 "{index}:{value}".format(index=index, value=value)
             )
