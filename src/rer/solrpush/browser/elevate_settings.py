@@ -22,7 +22,6 @@ class ElevateSettingsEditForm(RegistryEditForm):
 
     def updateWidgets(self):
         """
-        Hide some fields
         """
         super(ElevateSettingsEditForm, self).updateWidgets()
         self.widgets["elevate_schema"].schema = IElevateRowSchema
