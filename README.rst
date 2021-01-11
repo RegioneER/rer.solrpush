@@ -6,6 +6,37 @@ rer.solrpush
 
 Product that allows SOLR indexing/searching of a Plone website.
 
+SOLR schema configuration
+=========================
+
+This product works with some assumptions and SOLR schema need to have some particular configuration.
+
+You can see an example in config folder of this product.
+
+By default we mapped all base Plone indexes/metadata into SOLR, plus some additional fields::
+
+    <field name="searchwords" type="string" indexed="true" stored="true" required="false" multiValued="true" termVectors="false" termPositions="false" termOffsets="false"/>
+    <field name="showinsearch" type="boolean" indexed="true" stored="false" required="false" multiValued="false" termVectors="false" termPositions="false" termOffsets="false"/>
+    <field name="url" type="string" indexed="false" stored="true" required="false" multiValued="false" termVectors="false" termPositions="false" termOffsets="false"/>
+    <field name="site_name" type="string" indexed="true" stored="true" required="false" multiValued="false" termVectors="false" termPositions="false" termOffsets="false"/>
+    <field name="path_depth" type="pint" indexed="false" stored="true" required="false" multiValued="false" termVectors="false" termPositions="false" termOffsets="false"/>
+    <field name="path_parents" type="string" indexed="true" stored="true" multiValued="true"/>
+    <field name="view_name" type="string" indexed="true" stored="true" required="false" multiValued="false" termVectors="false" termPositions="false" termOffsets="false"/>
+    <field name="@id" type="string" indexed="false" stored="true" required="false" multiValued="false" termVectors="false" termPositions="false" termOffsets="false"/>
+    <field name="@type" type="string" indexed="false" stored="true" required="false" multiValued="false" termVectors="false" termPositions="false" termOffsets="false"/>
+    <field name="title" type="text_it" indexed="false" stored="true" required="false" multiValued="false" termVectors="false" termPositions="false" termOffsets="false"/>
+
+- `searchwords`, `view_name`, `path_parents`, `path_depth`, `site_name` are needed for query filter and boost (see below)
+- `showinsearch` is needed to allow/disallow single content indexing
+- `url` is an index where we store frontend url
+- `@id`, `@type` and `title` are needed for plone.restapi-like responses
+
+plone.restapi related metadata are not indexed from Plone, but they are copied in SOLR::
+
+    <copyField source="Title" dest="title"/>
+    <copyField source="portal_type" dest="@type"/>
+    <copyField source="url" dest="@id"/>
+
 
 Control Panel
 =============
