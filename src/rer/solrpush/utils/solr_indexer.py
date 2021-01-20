@@ -48,13 +48,15 @@ def get_site_title():
     )
     site_title = getattr(site_settings, "site_title") or ""
     if RER_THEME:
+        site_subtitle_style = (
+            getattr(site_settings, "site_subtitle_style") or ""
+        )
         fields_value = getUtility(ICustomFields)
         site_title = fields_value.titleLang(site_title)
         site_subtitle = fields_value.subtitleLang(
             getattr(site_settings, "site_subtitle") or "{}"
         )
-
-        if site_subtitle:
+        if site_subtitle and site_subtitle_style == "subtitle-normal":
             site_title += " {}".format(site_subtitle)
 
     if six.PY2:
