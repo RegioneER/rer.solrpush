@@ -8,11 +8,13 @@ from plone.protect.authenticator import createToken
 from Products.CMFCore.interfaces import IIndexQueueProcessor
 from Products.Five import BrowserView
 from rer.solrpush import _
-from rer.solrpush.utils.solr_common import is_solr_active
 from rer.solrpush.utils import push_to_solr
 from rer.solrpush.utils import remove_from_solr
 from rer.solrpush.utils import reset_solr
 from rer.solrpush.utils import search
+from rer.solrpush.utils.solr_common import is_solr_active
+from rer.solrpush.utils.solr_indexer import get_site_title
+from rer.solrpush.utils.solr_indexer import parse_date_as_datetime
 from time import strftime
 from time import time
 from transaction import commit
@@ -22,7 +24,6 @@ from zope.annotation.interfaces import IAnnotations
 from zope.component import getMultiAdapter
 from zope.component import getSiteManager
 from zope.i18n import translate
-
 import json
 import logging
 import os
@@ -194,7 +195,11 @@ class ReindexBaseView(BrowserView):
         elapsed_time = next(elapsed)
         logger.info("SOLR Reindex completed in {}".format(elapsed_time))
 
-    def cleanupSolrIndex(self):
+    def removeZombiesFromSolr(self):
+        """
+        remove items stored in solr that are no longer present in Plone or
+        they are not indexeable anymore.
+        """
         if not self.solr_utility:
             return
         if not is_solr_active():
@@ -210,14 +215,17 @@ class ReindexBaseView(BrowserView):
             pc = api.portal.get_tool(name="portal_catalog")
             brains_to_sync = pc()
         good_uids = [x.UID for x in brains_to_sync]
-        solr_results = search(query={"*": "*", "b_size": 100000}, fl="UID")
+        solr_results = search(
+            query={"site_name": get_site_title(), "b_size": 100000000},
+            fl="UID",
+        )
         uids_to_remove = [
             x["UID"] for x in solr_results.docs if x["UID"] not in good_uids
         ]
         status = self.setupAnnotations(
             items_len=len(uids_to_remove), message="Cleanup items on SOLR"
         )
-        logger.info("##### SOLR CLEANUP STARTED #####")
+        logger.info("##### CLEANUP CONTENTS FROM SOLR #####")
         for uid in uids_to_remove:
             remove_from_solr(uid)
             status["counter"] = status["counter"] + 1
@@ -226,8 +234,83 @@ class ReindexBaseView(BrowserView):
         status["in_progress"] = False
         elapsed_time = next(elapsed)
         logger.info(
-            "SOLR indexes cleanup completed in {}".format(elapsed_time)
+            "Completed in {}. Removed {} items from SOLR".format(
+                elapsed_time, len(uids_to_remove)
+            )
         )
+
+    def syncPloneWithSolr(self):
+        if not self.solr_utility:
+            return
+        if not is_solr_active():
+            logger.warning("Trying to cleanup but solr is not set as active")
+            return
+        elapsed = timer()
+        logger.info("##### SYNC CONTENTS TO SOLR #####")
+        pc = api.portal.get_tool(name="portal_catalog")
+        solr_docs = search(
+            query={"site_name": get_site_title(), "b_size": 100000000},
+            fl="UID modified",
+        ).docs
+        solr_items = {item["UID"]: item["modified"] for item in solr_docs}
+        if self.solr_utility.enabled_types:
+            brains_to_sync = api.content.find(
+                portal_type=self.solr_utility.enabled_types
+            )
+        else:
+            pc = api.portal.get_tool(name="portal_catalog")
+            brains_to_sync = pc()
+        results = self.sync_contents(
+            brains_to_sync=brains_to_sync, solr_items=solr_items
+        )
+        elapsed_time = next(elapsed)
+        logger.info("Completed in {}.".format(elapsed_time))
+        if len(results["synced"]):
+            logger.info(
+                "Synced {} items (new or modified):".format(
+                    len(results["synced"])
+                )
+            )
+            for path in results["synced"]:
+                logger.info("- {}".format(path))
+        if len(results["not_synced"]):
+            logger.warning("NOT synced {} items:")
+            for path in results["not_synced"]:
+                logger.info("- {}".format(path))
+
+    def sync_contents(self, brains_to_sync, solr_items):
+        synced = []
+        not_synced = []
+        status = self.setupAnnotations(
+            items_len=len(brains_to_sync), message="Sync contents to SOLR"
+        )
+        for brain in brains_to_sync:
+            status["counter"] = status["counter"] + 1
+            commit()
+            if brain.UID not in solr_items:
+                # missing from solr: try to index it
+                try:
+                    res = push_to_solr(brain.getObject())
+                    if res:
+                        synced.append(brain.getPath())
+                except Exception as e:
+                    logger.exception(e)
+                    not_synced.append(brain.getPath())
+            else:
+                if (
+                    parse_date_as_datetime(brain.modified)
+                    != solr_items[brain.UID]  # noqa
+                ):
+                    # item has been modified and not synced in solr
+                    try:
+                        res = push_to_solr(brain.getObject())
+                        if res:
+                            synced.append(brain.getPath())
+                    except Exception as e:
+                        logger.exception(e)
+                        not_synced.append(brain.getPath())
+        status["in_progress"] = False
+        return {"synced": synced, "not_synced": not_synced}
 
 
 class DoReindexView(ReindexBaseView):
@@ -251,13 +334,13 @@ class DoReindexView(ReindexBaseView):
 
 
 class DoSyncView(ReindexBaseView):
-    def __call__(self):
-        authenticator = getMultiAdapter(
-            (self.context, self.request), name=u"authenticator"
-        )
-        if not authenticator.verify():
-            raise Unauthorized
-
+    def __call__(self, cron_view=False):
+        if not cron_view:
+            authenticator = getMultiAdapter(
+                (self.context, self.request), name=u"authenticator"
+            )
+            if not authenticator.verify():
+                raise Unauthorized
         # disable noisy logging from pysolr
         if os.environ.get("DEBUG_SOLR", "").lower() not in ("true", "1"):
             pysolr_logger = logging.getLogger("pysolr")
@@ -265,8 +348,8 @@ class DoSyncView(ReindexBaseView):
             pysolr_logger.setLevel(logging.WARNING)
             pt_logger.setLevel(logging.WARNING)
 
-        self.cleanupSolrIndex()
-        self.reindexPloneToSolr()
+        self.removeZombiesFromSolr()
+        self.syncPloneWithSolr()
 
         pysolr_logger.setLevel(logging.INFO)
         pt_logger.setLevel(logging.INFO)
