@@ -14,6 +14,7 @@ config/dev/data/
 config/test/data/
 develop-eggs/
 eggs/
+extras/
 htmlcov/
 include/
 lib/
