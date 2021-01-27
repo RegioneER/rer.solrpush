@@ -2,7 +2,7 @@ Changelog
 =========
 
 
-0.2.3 (unreleased)
+0.2.3 (2021-01-27)
 ------------------
 
 - Fix maintenance sync view.
