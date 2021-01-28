@@ -5,7 +5,8 @@ Changelog
 0.2.4 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Fix logic in maintenance view.
+  [cekk]
 
 
 0.2.3 (2021-01-27)
