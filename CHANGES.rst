@@ -2,7 +2,7 @@ Changelog
 =========
 
 
-0.2.4 (unreleased)
+0.2.4 (2021-01-28)
 ------------------
 
 - Fix logic in maintenance view.
