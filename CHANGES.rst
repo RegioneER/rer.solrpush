@@ -2,7 +2,20 @@ Changelog
 =========
 
 
-0.2.3 (unreleased)
+0.2.5 (unreleased)
+------------------
+
+- Nothing changed yet.
+
+
+0.2.4 (2021-01-28)
+------------------
+
+- Fix logic in maintenance view.
+  [cekk]
+
+
+0.2.3 (2021-01-27)
 ------------------
 
 - Fix maintenance sync view.

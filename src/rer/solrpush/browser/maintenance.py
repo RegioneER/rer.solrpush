@@ -12,6 +12,7 @@ from rer.solrpush.utils import push_to_solr
 from rer.solrpush.utils import remove_from_solr
 from rer.solrpush.utils import reset_solr
 from rer.solrpush.utils import search
+from rer.solrpush.utils.solr_indexer import can_index
 from rer.solrpush.utils.solr_common import is_solr_active
 from rer.solrpush.utils.solr_indexer import get_site_title
 from rer.solrpush.utils.solr_indexer import parse_date_as_datetime
@@ -195,7 +196,7 @@ class ReindexBaseView(BrowserView):
         elapsed_time = next(elapsed)
         logger.info("SOLR Reindex completed in {}".format(elapsed_time))
 
-    def removeZombiesFromSolr(self):
+    def removeZombiesFromSolr(self, disable_progress=False):
         """
         remove items stored in solr that are no longer present in Plone or
         they are not indexeable anymore.
@@ -222,24 +223,29 @@ class ReindexBaseView(BrowserView):
         uids_to_remove = [
             x["UID"] for x in solr_results.docs if x["UID"] not in good_uids
         ]
-        status = self.setupAnnotations(
-            items_len=len(uids_to_remove), message="Cleanup items on SOLR"
-        )
+        if not disable_progress:
+            status = self.setupAnnotations(
+                items_len=len(uids_to_remove), message="Cleanup items on SOLR"
+            )
         logger.info("##### CLEANUP CONTENTS FROM SOLR #####")
         for uid in uids_to_remove:
             remove_from_solr(uid)
-            status["counter"] = status["counter"] + 1
-            commit()
+            if not disable_progress:
+                status["counter"] = status["counter"] + 1
+                commit()
 
-        status["in_progress"] = False
+        if not disable_progress:
+            status["in_progress"] = False
         elapsed_time = next(elapsed)
-        logger.info(
-            "Completed in {}. Removed {} items from SOLR".format(
-                elapsed_time, len(uids_to_remove)
+        logger.info("Completed in {}.".format(elapsed_time))
+        if len(uids_to_remove):
+            logger.info(
+                "Removed {} items from SOLR that are no longer in Plone".format(
+                    len(uids_to_remove)
+                )
             )
-        )
 
-    def syncPloneWithSolr(self):
+    def syncPloneWithSolr(self, disable_progress=False):
         if not self.solr_utility:
             return
         if not is_solr_active():
@@ -261,56 +267,81 @@ class ReindexBaseView(BrowserView):
             pc = api.portal.get_tool(name="portal_catalog")
             brains_to_sync = pc()
         results = self.sync_contents(
-            brains_to_sync=brains_to_sync, solr_items=solr_items
+            brains_to_sync=brains_to_sync,
+            solr_items=solr_items,
+            disable_progress=disable_progress,
         )
         elapsed_time = next(elapsed)
         logger.info("Completed in {}.".format(elapsed_time))
-        if len(results["synced"]):
+        if len(results["indexed"]):
             logger.info(
-                "Synced {} items (new or modified):".format(
-                    len(results["synced"])
+                "Indexed {} items (new or modified):".format(
+                    len(results["indexed"])
                 )
             )
             for path in results["synced"]:
                 logger.info("- {}".format(path))
-        if len(results["not_synced"]):
-            logger.warning("NOT synced {} items:")
-            for path in results["not_synced"]:
+        if len(results["removed"]):
+            logger.info(
+                "Removed {} items (no more indexeable):".format(
+                    len(results["removed"])
+                )
+            )
+            for path in results["removed"]:
+                logger.info("- {}".format(path))
+        if len(results["not_indexed"]):
+            logger.warning("NOT indexed {} items (errors):")
+            for path in results["not_indexed"]:
                 logger.info("- {}".format(path))
 
-    def sync_contents(self, brains_to_sync, solr_items):
-        synced = []
-        not_synced = []
-        status = self.setupAnnotations(
-            items_len=len(brains_to_sync), message="Sync contents to SOLR"
-        )
+    def sync_contents(
+        self, brains_to_sync, solr_items, disable_progress=False
+    ):
+        indexed = []
+        not_indexed = []
+        removed = []
+        if not disable_progress:
+            status = self.setupAnnotations(
+                items_len=len(brains_to_sync), message="Sync contents to SOLR"
+            )
         for brain in brains_to_sync:
-            status["counter"] = status["counter"] + 1
-            commit()
+            if not disable_progress:
+                status["counter"] = status["counter"] + 1
+                commit()
             if brain.UID not in solr_items:
                 # missing from solr: try to index it
                 try:
                     res = push_to_solr(brain.getObject())
                     if res:
-                        synced.append(brain.getPath())
+                        indexed.append(brain.getPath())
                 except Exception as e:
                     logger.exception(e)
-                    not_synced.append(brain.getPath())
+                    not_indexed.append(brain.getPath())
             else:
+                item = brain.getObject()
+                if not can_index(item):
+                    remove_from_solr(brain.UID)
+                    removed.append(brain.getPath())
+                    continue
                 if (
                     parse_date_as_datetime(brain.modified)
                     != solr_items[brain.UID]  # noqa
                 ):
                     # item has been modified and not synced in solr
                     try:
-                        res = push_to_solr(brain.getObject())
+                        res = push_to_solr(item)
                         if res:
-                            synced.append(brain.getPath())
+                            indexed.append(brain.getPath())
                     except Exception as e:
                         logger.exception(e)
-                        not_synced.append(brain.getPath())
-        status["in_progress"] = False
-        return {"synced": synced, "not_synced": not_synced}
+                        not_indexed.append(brain.getPath())
+        if not disable_progress:
+            status["in_progress"] = False
+        return {
+            "indexed": indexed,
+            "not_indexed": not_indexed,
+            "removed": removed,
+        }
 
 
 class DoReindexView(ReindexBaseView):
@@ -348,8 +379,8 @@ class DoSyncView(ReindexBaseView):
             pysolr_logger.setLevel(logging.WARNING)
             pt_logger.setLevel(logging.WARNING)
 
-        self.removeZombiesFromSolr()
-        self.syncPloneWithSolr()
+        self.removeZombiesFromSolr(disable_progress=cron_view)
+        self.syncPloneWithSolr(disable_progress=cron_view)
 
         pysolr_logger.setLevel(logging.INFO)
         pt_logger.setLevel(logging.INFO)
