@@ -2,7 +2,7 @@ Changelog
 =========
 
 
-0.2.5 (unreleased)
+0.3.0 (2021-02-09)
 ------------------
 
 - Refactor elevate control panel and use collective.z3cform.jsonwidget.
