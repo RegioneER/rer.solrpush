@@ -14,6 +14,7 @@ from transaction import commit
 
 import unittest
 import json
+import six
 
 
 class TestSolrSearch(unittest.TestCase):
@@ -103,12 +104,11 @@ class TestSolrSearch(unittest.TestCase):
         )
 
         # now let's set an elevate for third document
+        value = json.dumps([{"text": [u"page"], "uid": [{"UID": doc3.UID()}]}])
+        if six.PY2:
+            value = value.decode("utf-8")
         set_registry_record(
-            "elevate_schema",
-            json.dumps(
-                [{"text": [u"page"], "uid": [{"UID": doc3.UID()}]}]
-            ).decode("utf-8"),
-            interface=IElevateSettings,
+            "elevate_schema", value, interface=IElevateSettings,
         )
         solr_results = search(
             query={"SearchableText": "page"}, fl=["UID", "Title", "[elevated]"]
