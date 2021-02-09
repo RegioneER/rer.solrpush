@@ -5,7 +5,10 @@ Changelog
 0.2.5 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Refactor elevate control panel and use collective.z3cform.jsonwidget.
+  [cekk]
+- Some improvements in indexing.
+  [cekk]
 
 
 0.2.4 (2021-01-28)
