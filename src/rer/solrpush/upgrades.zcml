@@ -27,5 +27,12 @@
     profile="rer.solrpush:default"
     handler=".upgrades.to_1300"
     />
-
+  <genericsetup:upgradeStep
+    source="1300"
+    destination="1400"
+    title="Remove unused control panel"
+    description=""
+    profile="rer.solrpush:default"
+    handler=".upgrades.to_1400"
+    />
 </configure>

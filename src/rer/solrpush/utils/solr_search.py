@@ -12,6 +12,7 @@ from rer.solrpush.utils.solr_indexer import parse_date_str
 from DateTime import DateTime
 
 import logging
+import json
 import re
 import requests
 import six
@@ -26,9 +27,11 @@ ESCAPE_CHARS_RE = re.compile(r'(?<!\\)(?P<char>[&|+\-!(){}[\]^"~*?:])')
 
 
 def fix_value(value, index_type="", wrap=True):
+    operator = "or"
     if isinstance(value, dict):
         query = value.get("query", "")
         range = value.get("range", "")
+        operator = value.get("operator", "or")
         if not query:
             return ""
         if range:
@@ -53,10 +56,10 @@ def fix_value(value, index_type="", wrap=True):
                 return value
         return escape_special_characters(value, wrap)
     elif isinstance(value, list):
+        join_str = " {} ".format(operator.upper())
         return "({})".format(
-            " OR ".join([escape_special_characters(x, wrap) for x in value])
+            join_str.join([escape_special_characters(x, wrap) for x in value])
         )
-        # return list(map(escape_special_characters, value))
     logger.warning(
         "[fix_value]: unable to escape value: {}. skipping".format(value)
     )
@@ -65,7 +68,7 @@ def fix_value(value, index_type="", wrap=True):
 
 def escape_special_characters(value, wrap):
     new_value = ESCAPE_CHARS_RE.sub(r"\\\g<char>", value)
-    if six.PY2 and isinstance(new_value, unicode):
+    if six.PY2 and isinstance(new_value, six.string_types):
         new_value = new_value.encode("utf-8")
     if wrap:
         return '"{}"'.format(new_value)
@@ -74,9 +77,13 @@ def escape_special_characters(value, wrap):
 
 def set_sort_parameter(query):
     sort_on = query.get("sort_on")
+    if sort_on == "sortable_title":
+        sort_on = "Title"
     sort_order = query.get("sort_order", "asc")
-    if sort_order in ["reverse"]:
-        return "{sort_on} desc".format(sort_on=sort_on)
+    if sort_order in ["reverse", "descending"]:
+        sort_order = "desc"
+    if sort_order in ["ascending"]:
+        sort_order = "asc"
     return "{sort_on} {sort_order}".format(
         sort_on=sort_on, sort_order=sort_order
     )
@@ -130,7 +137,7 @@ def generate_query(
 def manage_elevate(query):
     params = {}
     params["enableElevation"] = "false"
-    searchableText = query.get("SearchableText", "")
+    searchableText = query.get("SearchableText", "").rstrip("*")
     if not searchableText:
         return params
     if not searchableText.replace(" ", ""):
@@ -159,8 +166,9 @@ def manage_elevate(query):
             # contains regexp
             for word in config.get("text", []):
                 if re.search("(^|\s+)" + word + "(\s+|$)", text):  # noqa
+                    uids = [x.get("UID", "") for x in config.get("uid", [])]
                     params["enableElevation"] = "true"
-                    params["elevateIds"] = ",".join(config.get("uid", []))
+                    params["elevateIds"] = ",".join(uids)
                     break
     return params
 
@@ -173,6 +181,9 @@ def extract_elevate_schema(query):
     local_schema = get_setting(
         field="elevate_schema", interface=IElevateSettings
     )
+    if not local_schema:
+        return []
+    local_schema = json.loads(local_schema)
     if query.get("site_name", []):
         return local_schema
     if query.get("remote_elevate", "false").lower() != "true":
@@ -203,6 +214,8 @@ def extract_from_query(query):
     index_fields = get_index_fields()
     params = {"q": "", "fq": []}
     for index, value in query.items():
+        if not value:
+            continue
         if index == "*":
             params["q"] = "*:*"
             continue
@@ -216,6 +229,8 @@ def extract_from_query(query):
         # other indexes will be added in fq
         value = fix_value(value=value, index_type=index_infos.get("type", ""))
         if value:
+            if index == "path":
+                index = "path_parents"
             params["fq"].append(
                 "{index}:{value}".format(index=index, value=value)
             )

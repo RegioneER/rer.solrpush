@@ -52,6 +52,7 @@ setup(
     python_requires="==2.7",
     install_requires=[
         "setuptools",
+        "collective.z3cform.jsonwidget",
         "plone.api>=1.8.4",
         "pysolr",
         'ftfy==4.4.3;python_version<="2.7"',

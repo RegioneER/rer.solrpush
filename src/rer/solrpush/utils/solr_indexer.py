@@ -36,6 +36,8 @@ logger = logging.getLogger(__name__)
 
 ADDITIONAL_FIELDS = ["searchwords"]
 
+RESTAPI_METADATA_FIELDS = ["@id", "@type", "description", "title"]
+
 # HELPER METHODS
 
 
@@ -46,8 +48,17 @@ def get_site_title():
     )
     site_title = getattr(site_settings, "site_title") or ""
     if RER_THEME:
+        site_subtitle_style = (
+            getattr(site_settings, "site_subtitle_style") or ""
+        )
         fields_value = getUtility(ICustomFields)
         site_title = fields_value.titleLang(site_title)
+        site_subtitle = fields_value.subtitleLang(
+            getattr(site_settings, "site_subtitle") or "{}"
+        )
+        if site_subtitle and site_subtitle_style == "subtitle-normal":
+            site_title += " {}".format(site_subtitle)
+
     if six.PY2:
         site_title = site_title.decode("utf-8")
     return site_title
@@ -103,8 +114,11 @@ def create_index_dict(item):
     catalog = api.portal.get_tool(name="portal_catalog")
     adapter = queryMultiAdapter((item, catalog), IIndexableObject)
     index_me = {}
-
     for field, field_infos in index_fields.items():
+        if field in RESTAPI_METADATA_FIELDS:
+            # skip. These fields are only metadata fields needed in restap-like
+            # repsonses and can be copied in solr configuration.
+            continue
         field_type = field_infos.get("type")
         if six.PY2:
             field = field.encode("ascii")
@@ -205,7 +219,6 @@ def push_to_solr(item_or_obj):
     if not item_or_obj:
         return False
     attachment = item_or_obj.pop("attachment", None)
-
     if attachment:
         add_with_attachment(
             solr=solr, attachment=attachment, fields=item_or_obj

@@ -13,6 +13,8 @@ from rer.solrpush.testing import RER_SOLRPUSH_API_FUNCTIONAL_TESTING
 from transaction import commit
 
 import unittest
+import json
+import six
 
 
 class TestSolrSearch(unittest.TestCase):
@@ -76,7 +78,7 @@ class TestSolrSearch(unittest.TestCase):
     def tearDown(self):
         set_registry_record("active", True, interface=IRerSolrpushSettings)
         #  reset elevate
-        set_registry_record("elevate_schema", [], interface=IElevateSettings)
+        set_registry_record("elevate_schema", u"", interface=IElevateSettings)
         reset_solr()
         commit()
 
@@ -102,10 +104,11 @@ class TestSolrSearch(unittest.TestCase):
         )
 
         # now let's set an elevate for third document
+        value = json.dumps([{"text": [u"page"], "uid": [{"UID": doc3.UID()}]}])
+        if six.PY2:
+            value = value.decode("utf-8")
         set_registry_record(
-            "elevate_schema",
-            [{"text": [u"page"], "uid": [doc3.UID()]}],
-            interface=IElevateSettings,
+            "elevate_schema", value, interface=IElevateSettings,
         )
         solr_results = search(
             query={"SearchableText": "page"}, fl=["UID", "Title", "[elevated]"]

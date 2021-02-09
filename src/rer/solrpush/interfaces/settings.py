@@ -100,20 +100,6 @@ class IRerSolrpushConf(model.Schema):
 
 class IRerSolrpushSearchConf(model.Schema):
 
-    enabled_solr_sites = schema.List(
-        title=_(u"enabled_solr_sites_label", default=u"Sites to search"),
-        description=_(
-            u"enabled_solr_sites_help",
-            default=u"Select in which sites you want to search contents. "
-            u"If not set, search will be performed on all sites.",
-        ),
-        required=False,
-        default=[],
-        missing_value=[],
-        value_type=schema.Choice(
-            vocabulary="rer.solrpush.vocabularies.AvailableSites"
-        ),
-    )
     remote_elevate_schema = schema.TextLine(
         title=_(u"remote_elevate_label", default=u"Remote elevate"),
         description=_(

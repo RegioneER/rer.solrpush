@@ -14,6 +14,7 @@ from six.moves import range
 from time import sleep
 from ZPublisher.HTTPRequest import HTTPRequest
 
+import collective.z3cform.jsonwidget
 import os
 import plone.restapi
 import rer.solrpush
@@ -122,6 +123,7 @@ class RerSolrpushRestApiLayer(PloneRestApiDXLayer):
 
         self.loadZCML(package=rer.solrpush)
         self.loadZCML(package=plone.restapi)
+        self.loadZCML(package=collective.z3cform.jsonwidget)
 
     def tearDownZope(self, app):
         HTTPRequest.retry_max_count = self._orig_retry_max_count
