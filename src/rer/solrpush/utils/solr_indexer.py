@@ -179,9 +179,7 @@ def add_with_attachment(solr, attachment, fields):
         "lowernames": "false",
         "fmap.content": "SearchableText",
         "fmap.title": "SearchableText",
-        "fmap.created": "ignore_created",
-        "fmap.modified": "ignore_modified",
-        "literalsOverride": "false",
+        "literalsOverride": "true",
         "commit": "true",
     }
     params.update(

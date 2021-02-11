@@ -5,7 +5,8 @@ Changelog
 0.3.1 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Fix tika indexing parameters: now modified and created dates are correctly indexed.
+  [cekk]
 
 
 0.3.0 (2021-02-09)
