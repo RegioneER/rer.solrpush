@@ -2,7 +2,7 @@ Changelog
 =========
 
 
-0.3.1 (unreleased)
+0.3.1 (2021-02-11)
 ------------------
 
 - Fix tika indexing parameters: now modified and created dates are correctly indexed.
