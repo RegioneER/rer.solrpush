@@ -5,7 +5,8 @@ Changelog
 0.3.2 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Handle simple datetmie dates.
+  [cekk]
 
 
 0.3.1 (2021-02-11)

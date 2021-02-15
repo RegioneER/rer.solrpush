@@ -13,6 +13,7 @@ from rer.solrpush.utils.solr_common import get_setting
 from rer.solrpush.utils.solr_common import get_index_fields
 from rer.solrpush.utils.solr_common import is_solr_active
 
+import datetime
 import logging
 import pysolr
 import six
@@ -73,6 +74,8 @@ def parse_date_as_datetime(value):
 
 
 def parse_date_str(value):
+    if isinstance(value, datetime.date):
+        value = datetime.datetime.combine(value, datetime.time.min)
     return parse_date_as_datetime(DateTime(value))
 
 
