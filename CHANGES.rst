@@ -2,7 +2,7 @@ Changelog
 =========
 
 
-0.3.2 (unreleased)
+0.3.2 (2021-02-15)
 ------------------
 
 - Handle simple datetmie dates.
