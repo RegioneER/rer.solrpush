@@ -2,7 +2,7 @@ Changelog
 =========
 
 
-0.3.3 (unreleased)
+0.3.3 (2021-03-15)
 ------------------
 
 - Make immediate commits optional from control panel.
