@@ -48,6 +48,21 @@ class IRerSolrpushConf(model.Schema):
         default=False,
     )
 
+    force_commit = schema.Bool(
+        title=_(u"Force commit"),
+        description=_(
+            u"Force commits on CRUD operations. If enabled, each indexing "
+            u"operation to SOLR will be immediately committed and persisted. "
+            u"This means that updates are immediately available on SOLR queries."  # noqa
+            u"If you are using SolrCloud with ZooKeeper, immediate commits "
+            u"will slow down response performances when indexing, so it's "
+            u"better to turn it off. In this case updates will be available "
+            u"when SOLR periodically commit changes."
+        ),
+        required=False,
+        default=True,
+    )
+
     solr_url = schema.TextLine(
         title=_(u"SOLR url"),
         description=_(u"The SOLR core to connect to."),

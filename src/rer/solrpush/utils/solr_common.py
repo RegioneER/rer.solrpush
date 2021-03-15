@@ -27,6 +27,10 @@ def is_solr_active():
     return get_setting(field="active")
 
 
+def should_force_commit():
+    return get_setting(field="force_commit") or False
+
+
 def get_index_fields():
     json_str = get_setting(field="index_fields")
     return json.loads(json_str)
@@ -78,7 +82,6 @@ def init_solr_push():
             chosen_fields = chosen_fields.decode("utf-8")
         set_setting(field="index_fields", value=chosen_fields)
         set_setting(field="ready", value=True)
-        set_setting(field="active", value=True)
         return
 
     return _("No SOLR url provided")

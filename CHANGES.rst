@@ -5,7 +5,8 @@ Changelog
 0.3.3 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Make immediate commits optional from control panel.
+  [cekk]
 
 
 0.3.2 (2021-02-15)

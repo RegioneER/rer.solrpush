@@ -35,4 +35,12 @@
     profile="rer.solrpush:default"
     handler=".upgrades.to_1400"
     />
+  <genericsetup:upgradeStep
+    source="1400"
+    destination="1500"
+    title="Add new field in controlpanel: force_commit"
+    description=""
+    profile="rer.solrpush:default"
+    handler=".upgrades.update_registry"
+    />
 </configure>

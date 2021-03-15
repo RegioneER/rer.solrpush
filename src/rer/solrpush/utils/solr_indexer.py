@@ -12,6 +12,7 @@ from rer.solrpush.utils.solr_common import get_solr_connection
 from rer.solrpush.utils.solr_common import get_setting
 from rer.solrpush.utils.solr_common import get_index_fields
 from rer.solrpush.utils.solr_common import is_solr_active
+from rer.solrpush.utils.solr_common import should_force_commit
 
 import datetime
 import logging
@@ -183,7 +184,7 @@ def add_with_attachment(solr, attachment, fields):
         "fmap.content": "SearchableText",
         "fmap.title": "SearchableText",
         "literalsOverride": "true",
-        "commit": "true",
+        "commit": should_force_commit() and "true" or "false",
     }
     params.update(
         {
@@ -225,7 +226,7 @@ def push_to_solr(item_or_obj):
             solr=solr, attachment=attachment, fields=item_or_obj
         )
     else:
-        solr.add([item_or_obj])
+        solr.add(docs=[item_or_obj], commit=should_force_commit())
     return True
 
 
@@ -241,7 +242,9 @@ def remove_from_solr(uid):
         logger.error("Unable to push to solr. Configuration is incomplete.")
         return
     try:
-        solr.delete(q="UID:{}".format(uid), commit=True)
+        solr.delete(
+            q="UID:{}".format(uid), commit=should_force_commit(),
+        )
     except (pysolr.SolrError, TypeError) as err:
         logger.error(err)
         message = _(
@@ -259,4 +262,7 @@ def reset_solr():
     if not solr:
         logger.error("Unable to push to solr. Configuration is incomplete.")
         return
-    solr.delete(q='site_name:"{}"'.format(get_site_title()), commit=True)
+    solr.delete(
+        q='site_name:"{}"'.format(get_site_title()),
+        commit=should_force_commit(),
+    )
