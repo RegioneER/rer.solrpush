@@ -279,7 +279,7 @@ class ReindexBaseView(BrowserView):
                     len(results["indexed"])
                 )
             )
-            for path in results["synced"]:
+            for path in results["indexed"]:
                 logger.info("- {}".format(path))
         if len(results["removed"]):
             logger.info(
@@ -290,7 +290,11 @@ class ReindexBaseView(BrowserView):
             for path in results["removed"]:
                 logger.info("- {}".format(path))
         if len(results["not_indexed"]):
-            logger.warning("NOT indexed {} items (errors):")
+            logger.info(
+                "NOT indexed {} items (errors):".format(
+                    len(results["not_indexed"])
+                )
+            )
             for path in results["not_indexed"]:
                 logger.info("- {}".format(path))
 
@@ -308,10 +312,11 @@ class ReindexBaseView(BrowserView):
             if not disable_progress:
                 status["counter"] = status["counter"] + 1
                 commit()
+            item = brain.getObject()
             if brain.UID not in solr_items:
                 # missing from solr: try to index it
                 try:
-                    res = push_to_solr(brain.getObject())
+                    res = push_to_solr(item)
                     if res:
                         indexed.append(brain.getPath())
                 except Exception as e:

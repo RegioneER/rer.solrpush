@@ -5,7 +5,8 @@ Changelog
 0.3.4 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Fix logs.
+  [cekk]
 
 
 0.3.3 (2021-03-15)
