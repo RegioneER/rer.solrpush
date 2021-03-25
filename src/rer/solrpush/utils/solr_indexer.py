@@ -177,6 +177,20 @@ def fix_py2_strings(value):
     return value
 
 
+def encode_strings_for_attachments(value):
+    """
+    Needed because attachments POST use standard requests encoding
+    and not utf-8
+    """
+    if isinstance(value, six.string_types):
+        return value.encode("ISO-8859-1")
+    if isinstance(value, list):
+        return list(map(encode_strings_for_attachments, value))
+    if isinstance(value, tuple):
+        return tuple(map(encode_strings_for_attachments, value))
+    return value
+
+
 def add_with_attachment(solr, attachment, fields):
     params = {
         "extractOnly": "false",
@@ -188,13 +202,16 @@ def add_with_attachment(solr, attachment, fields):
     }
     params.update(
         {
-            "literal.{key}".format(key=key): value
+            "literal.{key}".format(key=key): encode_strings_for_attachments(
+                value
+            )
             for (key, value) in fields.items()
         }
     )
+    path = "update/extract"
     return solr._send_request(
-        "post",
-        "update/extract",
+        method="post",
+        path=path,
         body=params,
         files={"file": ("extracted", attachment)},
     )

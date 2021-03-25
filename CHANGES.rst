@@ -5,7 +5,8 @@ Changelog
 0.3.5 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Handle encodings for attachement POST calls.
+  [cekk]
 
 
 0.3.4 (2021-03-18)

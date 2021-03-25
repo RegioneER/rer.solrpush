@@ -7,13 +7,14 @@ from plone.memoize.view import memoize
 from plone.protect.authenticator import createToken
 from Products.CMFCore.interfaces import IIndexQueueProcessor
 from Products.Five import BrowserView
+from pysolr import SolrError
 from rer.solrpush import _
 from rer.solrpush.utils import push_to_solr
 from rer.solrpush.utils import remove_from_solr
 from rer.solrpush.utils import reset_solr
 from rer.solrpush.utils import search
-from rer.solrpush.utils.solr_indexer import can_index
 from rer.solrpush.utils.solr_common import is_solr_active
+from rer.solrpush.utils.solr_indexer import can_index
 from rer.solrpush.utils.solr_indexer import get_site_title
 from rer.solrpush.utils.solr_indexer import parse_date_as_datetime
 from time import strftime
@@ -25,6 +26,7 @@ from zope.annotation.interfaces import IAnnotations
 from zope.component import getMultiAdapter
 from zope.component import getSiteManager
 from zope.i18n import translate
+
 import json
 import logging
 import os
@@ -295,8 +297,13 @@ class ReindexBaseView(BrowserView):
                     len(results["not_indexed"])
                 )
             )
-            for path in results["not_indexed"]:
-                logger.info("- {}".format(path))
+            for error in results["not_indexed"]:
+                logger.info(
+                    "- {path} ({message})".format(
+                        path=error.get("path", ""),
+                        message=error.get("message", "Undefined Error"),
+                    )
+                )
 
     def sync_contents(
         self, brains_to_sync, solr_items, disable_progress=False
@@ -319,9 +326,14 @@ class ReindexBaseView(BrowserView):
                     res = push_to_solr(item)
                     if res:
                         indexed.append(brain.getPath())
+                except SolrError as e:
+                    not_indexed.append(
+                        {"path": brain.getPath(), "message": e.__str__()}
+                    )
                 except Exception as e:
-                    logger.exception(e)
-                    not_indexed.append(brain.getPath())
+                    not_indexed.append(
+                        {"path": brain.getPath(), "message": e.message}
+                    )
             else:
                 item = brain.getObject()
                 if not can_index(item):
@@ -338,8 +350,9 @@ class ReindexBaseView(BrowserView):
                         if res:
                             indexed.append(brain.getPath())
                     except Exception as e:
-                        logger.exception(e)
-                        not_indexed.append(brain.getPath())
+                        not_indexed.append(
+                            {"path": brain.getPath(), "message": e.message}
+                        )
         if not disable_progress:
             status["in_progress"] = False
         return {

@@ -1,30 +1,47 @@
 # -*- coding: utf-8 -*-
-import logging
+from plone import api
 from rer.solrpush.interfaces.adapter import IExtractFileFromTika
 from zope.interface import implementer
+
+try:
+    from collective.limitfilesizepanel.interfaces import ILimitFileSizePanel
+
+    HAS_LFSP = True
+except ImportError:
+    HAS_LFSP = False
+
+import logging
 
 logger = logging.getLogger(__name__)
 
 
 @implementer(IExtractFileFromTika)
 class FileExtractor(object):
-    maxfilesize = 20 * 1024 * 1024
-
     def __init__(self, context):
         self.context = context
+
+    def maxfilesize(self):
+        max_size = 30
+        if HAS_LFSP:
+            max_size = api.portal.get_registry_record(
+                "file_size", interface=ILimitFileSizePanel
+            )
+        return max_size * 1024 * 1024
 
     def get_file_to_index(self):
         """
         """
-        if not self.context.file:
+        file_obj = getattr(self.context, "file", None)
+        if not file_obj:
             return None
-        if self.context.file.getSize() > self.maxfilesize:
+        max_size = self.maxfilesize()
+        if file_obj.getSize() > max_size:
             logger.warning(
-                "maximun file size reached (%s > %s) for %s %s",
-                self.context.file.getSize(),
-                self.maxfilesize,
+                "Maximun file size reached (%s > %s) for %s %s",
+                file_obj.getSize(),
+                max_size,
                 self.context.absolute_url_path(),
-                self.context.file.filename,
+                file_obj.filename,
             )
             return None
-        return self.context.file.data
+        return file_obj.data
