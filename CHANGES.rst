@@ -2,7 +2,7 @@ Changelog
 =========
 
 
-0.4.1 (unreleased)
+0.4.1 (2021-03-26)
 ------------------
 
 - Fix encodings for attachement in POST calls.
