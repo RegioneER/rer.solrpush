@@ -332,7 +332,7 @@ class ReindexBaseView(BrowserView):
                     )
                 except Exception as e:
                     not_indexed.append(
-                        {"path": brain.getPath(), "message": e.message}
+                        {"path": brain.getPath(), "message": str(e)}
                     )
             else:
                 item = brain.getObject()
@@ -351,7 +351,7 @@ class ReindexBaseView(BrowserView):
                             indexed.append(brain.getPath())
                     except Exception as e:
                         not_indexed.append(
-                            {"path": brain.getPath(), "message": e.message}
+                            {"path": brain.getPath(), "message": str(e)}
                         )
         if not disable_progress:
             status["in_progress"] = False

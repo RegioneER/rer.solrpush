@@ -183,7 +183,7 @@ def encode_strings_for_attachments(value):
     and not utf-8
     """
     if isinstance(value, six.string_types):
-        return value.encode("ISO-8859-1")
+        return value.encode("ISO-8859-1", "ignore")
     if isinstance(value, list):
         return list(map(encode_strings_for_attachments, value))
     if isinstance(value, tuple):
