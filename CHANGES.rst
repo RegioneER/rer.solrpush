@@ -5,8 +5,10 @@ Changelog
 0.4.2 (unreleased)
 ------------------
 
-- Nothing changed yet.
-
+- Handle all possible exceptions on search call.
+  [cekk]
+- Fix encodings (again) for attachement in POST calls.
+  [cekk]
 
 0.4.1 (2021-03-26)
 ------------------

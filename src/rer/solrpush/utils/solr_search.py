@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 from plone import api
-from pysolr import SolrError
 from rer.solrpush import _
 from rer.solrpush.interfaces import IElevateSettings
 from zope.i18n import translate
@@ -108,6 +107,7 @@ def generate_query(
         solr_query["sort"] = set_sort_parameter(query)
     if facets:
         solr_query["facet.field"] = facet_fields
+        solr_query["facet.mincount"] = 1
     if fl:
         if "UID" not in fl:
             # we need it because if we ask for [elevated] value, solr returns
@@ -299,7 +299,7 @@ def search(
     try:
         res = solr.search(**solr_query)
         return res
-    except SolrError as e:
+    except Exception as e:
         logger.exception(e)
         return {
             "error": True,

@@ -23,9 +23,14 @@ class FileExtractor(object):
     def maxfilesize(self):
         max_size = 30
         if HAS_LFSP:
-            max_size = api.portal.get_registry_record(
-                "file_size", interface=ILimitFileSizePanel
-            )
+            try:
+                file_size = api.portal.get_registry_record(
+                    "file_size", interface=ILimitFileSizePanel
+                )
+                if file_size:
+                    max_size = file_size
+            except Exception:
+                pass  # we use our default
         return max_size * 1024 * 1024
 
     def get_file_to_index(self):
