@@ -9,6 +9,8 @@ Changelog
   [cekk]
 - Fix encodings (again) for attachement in POST calls.
   [cekk]
+- Handle multilanguage paths in querybuilder for collections (use navigation root path instead portal path).
+  [cekk]
 
 0.4.1 (2021-03-26)
 ------------------

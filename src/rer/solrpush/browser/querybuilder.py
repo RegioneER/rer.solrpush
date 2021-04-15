@@ -130,12 +130,15 @@ class QueryBuilder(BaseView):
             if k == "sort_on":
                 v = SORT_ON_MAPPING.get(v, v)
             if k == "path":
-                portal = api.portal.get()
-                portal_path = "/".join(portal.getPhysicalPath())
+
+                portal_state = api.content.get_view(
+                    context=self.context,
+                    request=self.request,
+                    name=u"plone_portal_state",
+                )
+                root_path = portal_state.navigation_root_path()
                 path = self.extract_value(v)
-                if (
-                    len(path) == 1 and path[0].rstrip("/") == portal_path
-                ):  # noqa
+                if len(path) == 1 and path[0].rstrip("/") == root_path:
                     if "solr_sites" not in query.keys():
                         filtered_sites.append(get_site_title())
                 else:
