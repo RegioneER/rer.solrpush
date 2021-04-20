@@ -2,7 +2,7 @@ Changelog
 =========
 
 
-0.4.2 (unreleased)
+0.5.0 (2021-04-20)
 ------------------
 
 - Handle all possible exceptions on search call.
