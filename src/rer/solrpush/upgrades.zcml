@@ -43,4 +43,12 @@
     profile="rer.solrpush:default"
     handler=".upgrades.update_registry"
     />
+  <genericsetup:upgradeStep
+    source="1500"
+    destination="1600"
+    title="Add new criteria"
+    description=""
+    profile="rer.solrpush:default"
+    handler=".upgrades.update_registry"
+    />
 </configure>
