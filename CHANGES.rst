@@ -5,7 +5,8 @@ Changelog
 0.5.1 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Fix release.
+  [cekk]
 
 
 0.5.0 (2021-04-20)
