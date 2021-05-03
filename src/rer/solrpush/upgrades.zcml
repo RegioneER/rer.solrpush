@@ -46,9 +46,10 @@
   <genericsetup:upgradeStep
     source="1500"
     destination="1600"
-    title="Add new criteria"
+    title="Add new criteria and reindex files"
     description=""
     profile="rer.solrpush:default"
-    handler=".upgrades.update_registry"
+    handler=".upgrades.to_1600"
     />
+  
 </configure>
