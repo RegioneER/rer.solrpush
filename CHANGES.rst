@@ -5,8 +5,10 @@ Changelog
 0.5.1 (unreleased)
 ------------------
 
-- Nothing changed yet.
-
+- Add criteria for search by Subject stored in SOLR.
+  [cekk]
+- Now solr brains also return right content-type icon.
+  [cekk]  
 
 0.5.0 (2021-04-20)
 ------------------

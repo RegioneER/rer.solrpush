@@ -76,3 +76,10 @@ class TestTika(unittest.TestCase):
         st_results = search(query={"SearchableText": "yyy"}, fl="UID")
         self.assertEqual(st_results.hits, 1)
         self.assertEqual(file_item.UID(), st_results.docs[0]["UID"])
+
+    def test_indexed_file_has_right_mimetype(self):
+        self.create_file_item(u"example.pdf")
+
+        solr_results = search(query={"*": "*"}, fl="UID mime_type")
+        self.assertEqual(solr_results.hits, 1)
+        self.assertEqual(solr_results.docs[0]["mime_type"], "application/pdf")
