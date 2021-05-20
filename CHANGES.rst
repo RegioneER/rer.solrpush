@@ -2,7 +2,7 @@ Changelog
 =========
 
 
-0.5.2 (unreleased)
+0.6.0 (2021-05-20)
 ------------------
 
 - Add criteria for search by Subject stored in SOLR.
