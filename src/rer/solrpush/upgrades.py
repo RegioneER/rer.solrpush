@@ -62,7 +62,11 @@ def to_1600(context):
 
     for brain in brains:
         i += 1
-        if i % 100 == 0:
+        if i % 500 == 0:
             logger.info("[PROGRESS] - {}/{}".format(i, tot))
         item = brain.getObject()
-        push_to_solr(item)
+        try:
+            push_to_solr(item)
+        except Exception:
+            # solr can't index it, pass
+            continue
