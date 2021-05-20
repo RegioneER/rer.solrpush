@@ -26,6 +26,7 @@
     <value key="depends">plone</value>
   </records>
 
+  <!-- criteria -->
   <records interface="plone.app.querystring.interfaces.IQueryField"
             prefix="plone.app.querystring.field.searchWithSolr">
     <value key="title" i18n:translate="">Search with Solr</value>
@@ -50,6 +51,18 @@
             <element>plone.app.querystring.operation.selection.any</element>
         </value>
         <value key="vocabulary">rer.solrpush.vocabularies.AvailableSites</value>
+       <value key="group" i18n:translate="">SOLR</value>
+  </records>
+  <records interface="plone.app.querystring.interfaces.IQueryField"
+             prefix="plone.app.querystring.field.solr_subjects">
+        <value key="title" i18n:translate="">Keywords in SOLR</value>
+        <value key="description" i18n:translate="">A complete list of keywords stored in SOLR.</value>
+        <value key="enabled">True</value>
+        <value key="sortable">False</value>
+        <value key="operations">
+            <element>plone.app.querystring.operation.selection.any</element>
+        </value>
+        <value key="vocabulary">rer.solrpush.vocabularies.AvailableSubjects</value>
        <value key="group" i18n:translate="">SOLR</value>
   </records>
 </registry>

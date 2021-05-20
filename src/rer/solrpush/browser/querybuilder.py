@@ -129,8 +129,7 @@ class QueryBuilder(BaseView):
         for k, v in query.items():
             if k == "sort_on":
                 v = SORT_ON_MAPPING.get(v, v)
-            if k == "path":
-
+            elif k == "path":
                 portal_state = api.content.get_view(
                     context=self.context,
                     request=self.request,
@@ -147,6 +146,9 @@ class QueryBuilder(BaseView):
                 sites = self.extract_value(v)
                 if sites != "null":
                     filtered_sites = sites
+            elif k == "solr_subjects":
+                fixed_query["Subject"] = self.extract_value(v)
+                continue
             else:
                 fixed_query[k] = self.extract_value(v)
             if filtered_sites:

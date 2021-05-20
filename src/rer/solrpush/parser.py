@@ -5,11 +5,21 @@ from plone import api
 from rer.solrpush.utils.solr_indexer import get_index_fields
 from rer.solrpush.utils.solr_indexer import get_site_title
 from OFS.Traversable import path2url
+from Products.MimetypesRegistry.MimeTypeItem import guess_icon_path
 
 try:
     from ZTUtils.Lazy import Lazy
 except ImportError:
     from Products.ZCatalog.Lazy import Lazy
+
+try:
+    from design.plone.theme.interfaces import IDesignPloneThemeLayer
+
+    HAS_RER_THEME = True
+except ImportError:
+    HAS_RER_THEME = False
+
+import os
 
 timezone = DateTime().timezone()
 
@@ -109,6 +119,25 @@ class Brain(dict):
         if not value:
             return None
         return DateTime(value).toZone(timezone)
+
+    def MimeTypeIcon(self):
+        mime_type = self.get("mime_type", None)
+        if not mime_type:
+            return ""
+        mtt = api.portal.get_tool(name="mimetypes_registry")
+        navroot_url = api.portal.get().absolute_url()
+        ctype = mtt.lookup(mime_type)
+        mimeicon = None
+        if not ctype:
+            if HAS_RER_THEME:
+                if IDesignPloneThemeLayer.providedBy(self.request):
+                    mimeicon = os.path.join(
+                        navroot_url,
+                        "++plone++design.plone.theme/icons/default.svg",
+                    )
+        else:
+            mimeicon = os.path.join(navroot_url, guess_icon_path(ctype[0]))
+        return mimeicon
 
 
 class SolrResults(list):

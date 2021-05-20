@@ -49,20 +49,24 @@
       description=""
       provides="Products.GenericSetup.interfaces.EXTENSION"
       />
-      
+  
   <utility
       factory=".setuphandlers.HiddenProfiles"
       name="rer.solrpush-hiddenprofiles"
       />
     
-  <utility
-    name="rer.solrpush.vocabularies.AvailableSites"
-    component=".vocabularies.AvailableSitesVocabulary"
-    />
 
-    <utility 
+    <utility
         factory=".indexer.SolrIndexProcessor" 
         name="solrpush.utility"
         />
 
+    <utility
+        name="rer.solrpush.vocabularies.AvailableSites"
+        component=".vocabularies.AvailableSitesVocabulary"
+    />
+    <utility
+        name="rer.solrpush.vocabularies.AvailableSubjects"
+        component=".vocabularies.AvailableSubjectsVocabulary"
+    />
 </configure>
