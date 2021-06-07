@@ -5,7 +5,10 @@ Changelog
 0.6.1 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- [fix] now sort_on is not ignored on querybuilder customization.
+  [cekk]
+- [fix] remove / from frontend_url when not needed in indexing.
+  [cekk]
 
 
 0.6.0 (2021-05-20)

@@ -370,16 +370,17 @@ class DoReindexView(ReindexBaseView):
         if not authenticator.verify():
             raise Unauthorized
         # disable noisy logging from pysolr
-        if os.environ.get("DEBUG_SOLR", "").lower() not in ("true", "1"):
+        debug = os.environ.get("DEBUG_SOLR", "").lower() not in ("true", "1")
+        if debug:
             pysolr_logger = logging.getLogger("pysolr")
             pt_logger = logging.getLogger("PortalTransforms")
             pysolr_logger.setLevel(logging.WARNING)
             pt_logger.setLevel(logging.WARNING)
 
         self.reindexPloneToSolr()
-
-        pysolr_logger.setLevel(logging.INFO)
-        pt_logger.setLevel(logging.INFO)
+        if debug:
+            pysolr_logger.setLevel(logging.INFO)
+            pt_logger.setLevel(logging.INFO)
 
 
 class DoSyncView(ReindexBaseView):

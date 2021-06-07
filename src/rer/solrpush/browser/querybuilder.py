@@ -129,6 +129,7 @@ class QueryBuilder(BaseView):
         for k, v in query.items():
             if k == "sort_on":
                 v = SORT_ON_MAPPING.get(v, v)
+                fixed_query[k] = v
             elif k == "path":
                 portal_state = api.content.get_view(
                     context=self.context,

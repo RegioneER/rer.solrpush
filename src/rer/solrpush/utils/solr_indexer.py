@@ -114,6 +114,8 @@ def create_index_dict(item):
     """
     index_fields = get_index_fields()
     frontend_url = get_setting(field="frontend_url")
+    if frontend_url:
+        frontend_url = frontend_url.rstrip("/")
 
     catalog = api.portal.get_tool(name="portal_catalog")
     adapter = queryMultiAdapter((item, catalog), IIndexableObject)
