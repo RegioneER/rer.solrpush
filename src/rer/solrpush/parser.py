@@ -2,10 +2,10 @@
 from datetime import datetime
 from DateTime import DateTime
 from plone import api
+from Products.MimetypesRegistry.MimeTypeItem import guess_icon_path
+from rer.solrpush.interfaces.settings import IRerSolrpushSettings
 from rer.solrpush.utils.solr_indexer import get_index_fields
 from rer.solrpush.utils.solr_indexer import get_site_title
-from OFS.Traversable import path2url
-from Products.MimetypesRegistry.MimeTypeItem import guess_icon_path
 
 try:
     from ZTUtils.Lazy import Lazy
@@ -20,6 +20,7 @@ except ImportError:
     HAS_RER_THEME = False
 
 import os
+import six
 
 timezone = DateTime().timezone()
 
@@ -74,7 +75,10 @@ class Brain(dict):
 
     def getObject(self, REQUEST=None, restricted=True):
         if self.is_current_site:
-            return api.content.get(self.getPath().encode("utf-8"))
+            path = self.getPath()
+            if six.PY2:
+                path = path.encode("utf-8")
+            return api.content.get(path)
         return self
 
     def _unrestrictedGetObject(self):
@@ -85,14 +89,15 @@ class Brain(dict):
         If site_name is the current site, convert the physical path into a url, if it was stored.
         Else return url attribute stored in SOLR
         """
-        if not self.is_current_site:
-            return self.get("url", "")
-        path = self.getPath()
-        path = path
-        try:
-            url = self.request.physicalPathToURL(path, relative)
-        except AttributeError:
-            url = path2url(path.split("/"))
+        url = self.get("url", "")
+        if self.is_current_site:
+            frontend_url = api.portal.get_registry_record(
+                "frontend_url", interface=IRerSolrpushSettings, default=""
+            )
+            if frontend_url:
+                return url.replace(
+                    frontend_url.rstrip("/"), api.portal.get().portal_url()
+                )
         return url
 
     def Creator(self):
