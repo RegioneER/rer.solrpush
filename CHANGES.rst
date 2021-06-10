@@ -2,7 +2,7 @@ Changelog
 =========
 
 
-0.6.1 (unreleased)
+0.6.1 (2021-06-10)
 ------------------
 
 - [fix] now sort_on is not ignored on querybuilder customization.
