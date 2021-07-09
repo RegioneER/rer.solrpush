@@ -5,7 +5,8 @@ Changelog
 0.6.2 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Do not escape queries in querybuilder because solr_search already manage them.
+  [cekk]
 
 
 0.6.1 (2021-06-10)

@@ -96,7 +96,6 @@ class QueryBuilder(BaseView):
             if parsedquery["searchWithSolr"]["query"]:
                 search_with_solr = True
             del parsedquery["searchWithSolr"]
-
         if not empty_query:
             if search_with_solr:
                 if "SearchableText" in parsedquery:
@@ -151,7 +150,7 @@ class QueryBuilder(BaseView):
                 fixed_query["Subject"] = self.extract_value(v)
                 continue
             else:
-                fixed_query[k] = self.extract_value(v)
+                fixed_query[k] = v
             if filtered_sites:
                 fixed_query["site_name"] = filtered_sites
         return {"query": fixed_query}
