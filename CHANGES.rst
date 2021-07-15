@@ -2,7 +2,7 @@ Changelog
 =========
 
 
-0.6.2 (unreleased)
+0.6.2 (2021-07-15)
 ------------------
 
 - Do not escape queries in querybuilder because solr_search already manage them.
