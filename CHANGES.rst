@@ -5,7 +5,8 @@ Changelog
 0.6.3 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- SolrBrains now can return img tags if the original content has an image.
+  [cekk]
 
 
 0.6.2 (2021-07-15)

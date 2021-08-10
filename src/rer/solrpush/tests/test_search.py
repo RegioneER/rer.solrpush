@@ -32,7 +32,7 @@ class TestSearch(unittest.TestCase):
         setRoles(self.portal, TEST_USER_ID, ["Manager"])
         set_registry_record(
             "enabled_types",
-            ["Document", "News Item"],
+            [u"Document", u"News Item"],
             interface=IRerSolrpushSettings,
         )
         init_solr_push()
