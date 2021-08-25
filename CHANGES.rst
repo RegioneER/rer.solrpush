@@ -5,7 +5,8 @@ Changelog
 0.6.3 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Add new feature: if "Query debug" flag is enabled in settings, the SOLR query will be shown to managers.
+  [cekk]
 
 
 0.6.2 (2021-07-15)

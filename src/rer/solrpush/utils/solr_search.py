@@ -9,6 +9,9 @@ from rer.solrpush.utils.solr_common import get_index_fields
 from rer.solrpush.interfaces.settings import IRerSolrpushSettings
 from rer.solrpush.utils.solr_indexer import parse_date_str
 from DateTime import DateTime
+from pysolr import safe_urlencode
+from zope.annotation.interfaces import IAnnotations
+from zope.globalrequest import getRequest
 
 import logging
 import json
@@ -297,6 +300,7 @@ def search(
         query, fl=fl, facets=facets, facet_fields=facet_fields,
     )
     try:
+        _set_query_debug(solr=solr, params=solr_query)
         res = solr.search(**solr_query)
         return res
     except Exception as e:
@@ -313,3 +317,19 @@ def search(
                 context=api.portal.get().REQUEST,
             ),
         }
+
+
+def _set_query_debug(solr, params):
+    try:
+        if not get_setting(
+            field="query_debug", interface=IRerSolrpushSettings
+        ):
+            return
+    except KeyError:
+        # key not available: do not save data
+        return
+    request = getRequest()
+    annotations = IAnnotations(request)
+    annotations["solr_query"] = "{url}/select?{params}".format(
+        url=solr.url, params=safe_urlencode(params, True)
+    )

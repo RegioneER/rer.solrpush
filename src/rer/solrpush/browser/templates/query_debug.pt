@@ -1,0 +1,6 @@
+<div class="portalMessage warning"
+     tal:define="query view/query"
+     tal:condition="query">
+  <strong>SOLR query</strong>
+  <a href="${query}">${query}</a>
+</div>

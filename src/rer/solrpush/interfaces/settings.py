@@ -114,7 +114,16 @@ class IRerSolrpushConf(model.Schema):
 
 
 class IRerSolrpushSearchConf(model.Schema):
-
+    query_debug = schema.Bool(
+        title=_(u"Query debug"),
+        description=_(
+            u"If enabled, when a search to SOLR is performed (for "
+            u"example in Collection), the query will be showed in the page for "
+            u"debug. Only visible to Managers."
+        ),
+        required=False,
+        default=False,
+    )
     remote_elevate_schema = schema.TextLine(
         title=_(u"remote_elevate_label", default=u"Remote elevate"),
         description=_(
