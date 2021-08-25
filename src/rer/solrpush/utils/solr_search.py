@@ -330,6 +330,9 @@ def _set_query_debug(solr, params):
         return
     request = getRequest()
     annotations = IAnnotations(request)
-    annotations["solr_query"] = "{url}/select?{params}".format(
-        url=solr.url, params=safe_urlencode(params, True)
-    )
+    annotations["solr_query"] = {
+        "url": "{url}/select?{params}".format(
+            url=solr.url, params=safe_urlencode(params, True)
+        ),
+        "params": params,
+    }
