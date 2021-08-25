@@ -6,6 +6,7 @@ Changelog
 ------------------
 
 - SolrBrains now can return img tags if the original content has an image.
+- Add new feature: if "Query debug" flag is enabled in settings, the SOLR query will be shown to managers.
   [cekk]
 
 

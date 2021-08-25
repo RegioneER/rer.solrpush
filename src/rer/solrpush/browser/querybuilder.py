@@ -99,9 +99,14 @@ class QueryBuilder(BaseView):
         if not empty_query:
             if search_with_solr:
                 if "SearchableText" in parsedquery:
-                    parsedquery["SearchableText"] = parsedquery[
-                        "SearchableText"
-                    ].rstrip("*")
+                    if isinstance(parsedquery["SearchableText"], dict):
+                        parsedquery["SearchableText"]["query"] = parsedquery[
+                            "SearchableText"
+                        ]["query"].rstrip("*")
+                    else:
+                        parsedquery["SearchableText"] = parsedquery[
+                            "SearchableText"
+                        ].rstrip("*")
                 results = SolrResponse(
                     data=solr_search(
                         **self.clean_query_for_solr(query=parsedquery)
@@ -126,9 +131,9 @@ class QueryBuilder(BaseView):
         fixed_query = {}
         filtered_sites = []
         for k, v in query.items():
+            v = self.extract_value(v)
             if k == "sort_on":
-                v = SORT_ON_MAPPING.get(v, v)
-                fixed_query[k] = v
+                fixed_query[k] = SORT_ON_MAPPING.get(v, v)
             elif k == "path":
                 portal_state = api.content.get_view(
                     context=self.context,
@@ -136,18 +141,16 @@ class QueryBuilder(BaseView):
                     name=u"plone_portal_state",
                 )
                 root_path = portal_state.navigation_root_path()
-                path = self.extract_value(v)
-                if len(path) == 1 and path[0].rstrip("/") == root_path:
+                if len(v) == 1 and v[0].rstrip("/") == root_path:
                     if "solr_sites" not in query.keys():
                         filtered_sites.append(get_site_title())
                 else:
-                    fixed_query["path_parents"] = path
+                    fixed_query["path_parents"] = v
             elif k == "solr_sites":
-                sites = self.extract_value(v)
-                if sites != "null":
-                    filtered_sites = sites
+                if v != "null":
+                    filtered_sites = v
             elif k == "solr_subjects":
-                fixed_query["Subject"] = self.extract_value(v)
+                fixed_query["Subject"] = v
                 continue
             else:
                 fixed_query[k] = v

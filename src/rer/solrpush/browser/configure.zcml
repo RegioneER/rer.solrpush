@@ -88,7 +88,16 @@
         for="*"
         layer="rer.solrpush.interfaces.IRerSolrpushLayer"
         />
-    
+
+    <browser:viewlet
+        name="solrpush.querydebug"
+        manager="plone.app.layout.viewlets.interfaces.IBelowContent"
+        class=".query_debug.QueryDebug"
+        permission="cmf.ManagePortal"
+        template="templates/query_debug.pt"
+        />
+
+
     <browser:page
         name="images"
         class=".scales.SolrScalesHandler"
