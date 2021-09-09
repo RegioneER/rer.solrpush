@@ -8,7 +8,8 @@ Changelog
 - SolrBrains now can return img tags if the original content has an image.
 - Add new feature: if "Query debug" flag is enabled in settings, the SOLR query will be shown to managers.
   [cekk]
-
+- In example schema.xml files (dev and test), set "searchwords" as **lowercase** type, to be case insensitive.
+  [cekk]
 
 0.6.2 (2021-07-15)
 ------------------

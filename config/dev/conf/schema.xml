@@ -168,7 +168,7 @@
    <field name="materie" type="string" indexed="true" stored="true" required="false" multiValued="true" termVectors="false" termPositions="false" termOffsets="false"/>
 
 <!-- campi aggiunti -->
-   <field name="searchwords" type="string" indexed="true" stored="true" required="false" multiValued="true" termVectors="false" termPositions="false" termOffsets="false"/>
+   <field name="searchwords" type="lowercase" indexed="true" stored="true" required="false" multiValued="true" termVectors="false" termPositions="false" termOffsets="false"/>
    <field name="showinsearch" type="boolean" indexed="true" stored="false" required="false" multiValued="false" termVectors="false" termPositions="false" termOffsets="false"/>
    <field name="url" type="string" indexed="false" stored="true" required="false" multiValued="false" termVectors="false" termPositions="false" termOffsets="false"/>
    <field name="@id" type="string" indexed="false" stored="true" required="false" multiValued="false" termVectors="false" termPositions="false" termOffsets="false"/>
