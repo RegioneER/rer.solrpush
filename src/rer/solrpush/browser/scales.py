@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 from Products.Five.browser import BrowserView
 
+import six
+
 
 class SolrScalesHandler(BrowserView):
     """
@@ -20,6 +22,10 @@ class SolrScalesHandler(BrowserView):
             title = self.context.Title
         if not alt:
             alt = self.context.Description or self.context.Title
+
+        if six.PY2:
+            title = title.encode("utf-8")
+            alt = alt.encode("utf-8")
         html = '<img src="{url}/@@images/{fieldname}/{scale}" alt="{alt}" title="{title}"'.format(
             url=self.context.getURL(),
             fieldname=fieldname or "image",
