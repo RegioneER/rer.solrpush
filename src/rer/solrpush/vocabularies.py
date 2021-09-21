@@ -56,7 +56,10 @@ class AvailableSubjectsVocabularyFactory(object):
         return terms
 
     def __call__(self, context):
-        return SimpleVocabulary(self.terms)
+        # we use swallow_duplicates to avoid errors.
+        # SimpleVocabulary init in zope.schema 4.5.0 strips "strange" chars
+        # In python3 probably this is unnecessary
+        return SimpleVocabulary(terms=self.terms, swallow_duplicates=True)
 
 
 AvailableSitesVocabulary = AvailableSitesVocabularyFactory()

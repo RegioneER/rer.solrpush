@@ -9,6 +9,10 @@ Changelog
   [cekk]
 - In example schema.xml files (dev and test), set "searchwords" as **lowercase** type, to be case insensitive.
   [cekk]
+- Disable facet.limit default value (100) to get all facets.
+  [cekk]
+- Use swallow_duplicates in Keywords vocabulary to avoid duplicated tokens by truncated strings by SimpleTerm init.
+  [cekk]
 
 0.6.2 (2021-07-15)
 ------------------
