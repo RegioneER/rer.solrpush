@@ -2,7 +2,7 @@ Changelog
 =========
 
 
-0.6.3 (unreleased)
+0.6.3 (2021-09-21)
 ------------------
 
 - Add new feature: if "Query debug" flag is enabled in settings, the SOLR query will be shown to managers.
