@@ -2,7 +2,7 @@ Changelog
 =========
 
 
-0.6.4 (unreleased)
+0.6.4 (2021-09-27)
 ------------------
 
 - Fix how querybuilder create queries.
