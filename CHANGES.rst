@@ -5,7 +5,8 @@ Changelog
 0.6.4 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Fix how querybuilder create queries.
+  [cekk]
 
 
 0.6.3 (2021-09-21)

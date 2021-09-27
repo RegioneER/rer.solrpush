@@ -131,7 +131,6 @@ class QueryBuilder(BaseView):
         fixed_query = {}
         filtered_sites = []
         for k, v in query.items():
-            v = self.extract_value(v)
             if k == "sort_on":
                 fixed_query[k] = SORT_ON_MAPPING.get(v, v)
             elif k == "path":
@@ -141,16 +140,18 @@ class QueryBuilder(BaseView):
                     name=u"plone_portal_state",
                 )
                 root_path = portal_state.navigation_root_path()
-                if len(v) == 1 and v[0].rstrip("/") == root_path:
+                path = self.extract_value(v)
+                if len(path) == 1 and path[0].rstrip("/") == root_path:
                     if "solr_sites" not in query.keys():
                         filtered_sites.append(get_site_title())
                 else:
-                    fixed_query["path_parents"] = v
+                    fixed_query["path_parents"] = path
             elif k == "solr_sites":
-                if v != "null":
-                    filtered_sites = v
+                sites = self.extract_value(v)
+                if sites != "null":
+                    filtered_sites = sites
             elif k == "solr_subjects":
-                fixed_query["Subject"] = v
+                fixed_query["Subject"] = self.extract_value(v)
                 continue
             else:
                 fixed_query[k] = v
