@@ -5,7 +5,8 @@ Changelog
 0.6.5 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Add new criteria: solr_portal_types to select a list of portal_types indexed on SOLR.
+  [cekk]
 
 
 0.6.4 (2021-09-27)

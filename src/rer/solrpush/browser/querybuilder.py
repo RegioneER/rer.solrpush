@@ -153,6 +153,9 @@ class QueryBuilder(BaseView):
             elif k == "solr_subjects":
                 fixed_query["Subject"] = self.extract_value(v)
                 continue
+            elif k == "solr_portal_types":
+                fixed_query["portal_type"] = self.extract_value(v)
+                continue
             else:
                 fixed_query[k] = v
             if filtered_sites:

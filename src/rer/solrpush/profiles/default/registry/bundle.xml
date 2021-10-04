@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<registry xmlns:i18n="http://xml.zope.org/namespaces/i18n"
+          i18n:domain="rer.solrpush">
+
+  <!-- RESOURCE -->
+  <records prefix="plone.resources/rer-solrpush-css"
+           interface='Products.CMFPlone.interfaces.IResourceRegistry'>
+     <value key="css">
+       <element>++plone++rer.solrpush/styles.css</element>
+     </value>
+  </records>
+
+  <!-- BUNDLE -->
+  <records prefix="plone.bundles/rer-solrpush-css-bundle"
+           interface='Products.CMFPlone.interfaces.IBundleRegistry'>
+    <value key="enabled">True</value>
+    <value key="resources" purge="false">
+      <element>rer-solrpush-css</element>
+    </value>
+    <value key="csscompilation">++plone++rer.solrpush/styles.css</value>
+    <value key="last_compilation">2020-11-17 00:00:00</value>
+    <value key="compile">True</value>
+    <value key="depends">plone</value>
+  </records>
+</registry>
