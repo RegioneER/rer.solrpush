@@ -69,4 +69,8 @@
         name="rer.solrpush.vocabularies.AvailableSubjects"
         component=".vocabularies.AvailableSubjectsVocabulary"
     />
+    <utility
+        name="rer.solrpush.vocabularies.AvailablePortalTypes"
+        component=".vocabularies.AvailablePortalTypesVocabulary"
+    />
 </configure>

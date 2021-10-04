@@ -59,4 +59,12 @@
     profile="rer.solrpush:default"
     handler=".upgrades.update_registry"
     />  
+  <genericsetup:upgradeStep
+    source="1700"
+    destination="1800"
+    title="Add new criteria: solr_portal_types"
+    description=""
+    profile="rer.solrpush:default"
+    handler=".upgrades.update_registry"
+    />  
 </configure>

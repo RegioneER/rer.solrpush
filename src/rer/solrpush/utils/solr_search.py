@@ -95,7 +95,10 @@ def set_sort_parameter(query):
 
 
 def generate_query(
-    query, fl=None, facets=False, facet_fields=["Subject", "portal_type"],
+    query,
+    fl=None,
+    facets=False,
+    facet_fields=["Subject", "portal_type"],
 ):
     solr_query = {
         "q": "",
@@ -114,6 +117,7 @@ def generate_query(
     if facets:
         solr_query["facet.field"] = facet_fields
         solr_query["facet.mincount"] = 1
+        solr_query["facet.limit"] = -1
     if fl:
         if "UID" not in fl:
             # we need it because if we ask for [elevated] value, solr returns
@@ -300,7 +304,10 @@ def search(
             ),
         }
     solr_query = generate_query(
-        query, fl=fl, facets=facets, facet_fields=facet_fields,
+        query,
+        fl=fl,
+        facets=facets,
+        facet_fields=facet_fields,
     )
     try:
         _set_query_debug(solr=solr, params=solr_query)

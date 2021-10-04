@@ -1,32 +1,7 @@
 <?xml version="1.0"?>
 <registry xmlns:i18n="http://xml.zope.org/namespaces/i18n"
           i18n:domain="rer.solrpush">
-  <!-- -*- extra stuff goes here -*- -->
-  <records interface="rer.solrpush.interfaces.settings.IRerSolrpushSettings" />
-  <records interface="rer.solrpush.interfaces.IElevateSettings" />
 
-  <!-- RESOURCE -->
-  <records prefix="plone.resources/rer-solrpush-css"
-           interface='Products.CMFPlone.interfaces.IResourceRegistry'>
-     <value key="css">
-       <element>++plone++rer.solrpush/styles.css</element>
-     </value>
-  </records>
-
-  <!-- BUNDLE -->
-  <records prefix="plone.bundles/rer-solrpush-css-bundle"
-           interface='Products.CMFPlone.interfaces.IBundleRegistry'>
-    <value key="enabled">True</value>
-    <value key="resources" purge="false">
-      <element>rer-solrpush-css</element>
-    </value>
-    <value key="csscompilation">++plone++rer.solrpush/styles.css</value>
-    <value key="last_compilation">2020-11-17 00:00:00</value>
-    <value key="compile">True</value>
-    <value key="depends">plone</value>
-  </records>
-
-  <!-- criteria -->
   <records interface="plone.app.querystring.interfaces.IQueryField"
             prefix="plone.app.querystring.field.searchWithSolr">
     <value key="title" i18n:translate="">Search with Solr</value>
@@ -63,6 +38,18 @@
             <element>plone.app.querystring.operation.selection.any</element>
         </value>
         <value key="vocabulary">rer.solrpush.vocabularies.AvailableSubjects</value>
+       <value key="group" i18n:translate="">SOLR</value>
+  </records>
+  <records interface="plone.app.querystring.interfaces.IQueryField"
+             prefix="plone.app.querystring.field.solr_portal_types">
+        <value key="title" i18n:translate="">Portal types in SOLR</value>
+        <value key="description" i18n:translate="">A complete list of portal_types stored in SOLR.</value>
+        <value key="enabled">True</value>
+        <value key="sortable">False</value>
+        <value key="operations">
+            <element>plone.app.querystring.operation.selection.any</element>
+        </value>
+        <value key="vocabulary">rer.solrpush.vocabularies.AvailablePortalTypes</value>
        <value key="group" i18n:translate="">SOLR</value>
   </records>
 </registry>

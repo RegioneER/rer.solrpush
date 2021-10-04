@@ -2,13 +2,31 @@ Changelog
 =========
 
 
-0.6.3 (unreleased)
+0.6.5 (unreleased)
+------------------
+
+- Add new criteria: solr_portal_types to select a list of portal_types indexed on SOLR.
+  [cekk]
+
+
+0.6.4 (2021-09-27)
+------------------
+
+- Fix how querybuilder create queries.
+  [cekk]
+
+
+0.6.3 (2021-09-21)
 ------------------
 
 - SolrBrains now can return img tags if the original content has an image.
 - Add new feature: if "Query debug" flag is enabled in settings, the SOLR query will be shown to managers.
   [cekk]
 - In example schema.xml files (dev and test), set "searchwords" as **lowercase** type, to be case insensitive.
+  [cekk]
+- Disable facet.limit default value (100) to get all facets.
+  [cekk]
+- Use swallow_duplicates in Keywords vocabulary to avoid duplicated tokens by truncated strings by SimpleTerm init.
   [cekk]
 
 0.6.2 (2021-07-15)
