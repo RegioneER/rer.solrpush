@@ -7,7 +7,8 @@ Changelog
 
 - Add new criteria: solr_portal_types to select a list of portal_types indexed on SOLR.
   [cekk]
-
+- Add link to Elevate control panel also in user actions.
+  [cekk]
 
 0.6.4 (2021-09-27)
 ------------------

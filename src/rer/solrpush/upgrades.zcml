@@ -66,5 +66,13 @@
     description=""
     profile="rer.solrpush:default"
     handler=".upgrades.update_registry"
+    />
+  <genericsetup:upgradeStep
+    source="1800"
+    destination="1900"
+    title="Add elevate control panel link in user actions"
+    description=""
+    profile="rer.solrpush:default"
+    handler=".upgrades.update_actions"
     />  
 </configure>
