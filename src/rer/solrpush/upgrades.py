@@ -24,6 +24,10 @@ def update_controlpanel(context):
     update_profile(context=context, name="controlpanel")
 
 
+def update_actions(context):
+    update_profile(context=context, name="actions")
+
+
 def to_1100(context):
     setup_tool = api.portal.get_tool(name="portal_setup")
     setup_tool.runAllImportStepsFromProfile("profile-rer.solrpush:to_1100")

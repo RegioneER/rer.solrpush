@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2021-10-05 11:43+0000\n"
+"POT-Creation-Date: 2021-10-05 12:56+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI +ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -36,6 +36,10 @@ msgstr ""
 
 #: rer/solrpush/browser/controlpanel.py:62
 msgid "Changes saved."
+msgstr ""
+
+#: rer/solrpush/profiles/default/actions.xml
+msgid "Elevate configuration"
 msgstr ""
 
 #: rer/solrpush/interfaces/settings.py:46
@@ -193,7 +197,7 @@ msgid "content_indexed_error"
 msgstr ""
 
 #. Default: "There was a problem removing this content from SOLR.  Please contact site administrator."
-#: rer/solrpush/utils/solr_indexer.py:269
+#: rer/solrpush/utils/solr_indexer.py:275
 msgid "content_remove_error"
 msgstr ""
 
@@ -341,7 +345,7 @@ msgid "remote_elevate_label"
 msgstr ""
 
 #. Default: "Unable to perform a search with SOLR. Please contact the site administrator or wait some minutes."
-#: rer/solrpush/utils/solr_search.py:318
+#: rer/solrpush/utils/solr_search.py:321
 msgid "search_error_label"
 msgstr ""
 
@@ -365,7 +369,7 @@ msgstr ""
 msgid "settings_search_label"
 msgstr ""
 
-#: rer/solrpush/utils/solr_search.py:299
+#: rer/solrpush/utils/solr_search.py:302
 msgid "solr_configuration_error_label"
 msgstr ""
 
