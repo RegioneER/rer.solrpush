@@ -4,7 +4,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2021-08-25 12:03+0000\n"
+"POT-Creation-Date: 2021-10-05 11:43+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI +ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,11 +17,15 @@ msgstr ""
 "Preferred-Encodings: utf-8 latin1\n"
 "Domain: rer.solrpush\n"
 
-#: rer/solrpush/profiles/default/registry.xml
+#: rer/solrpush/profiles/default/registry/criteria.xml
 msgid "A complete list of keywords stored in SOLR."
 msgstr ""
 
-#: rer/solrpush/profiles/default/registry.xml
+#: rer/solrpush/profiles/default/registry/criteria.xml
+msgid "A complete list of portal_types stored in SOLR."
+msgstr ""
+
+#: rer/solrpush/profiles/default/registry/criteria.xml
 msgid "A list of (SOLR indexed) sites where search items."
 msgstr ""
 
@@ -73,7 +77,7 @@ msgstr ""
 msgid "Installs the rer.solrpush add-on."
 msgstr ""
 
-#: rer/solrpush/profiles/default/registry.xml
+#: rer/solrpush/profiles/default/registry/criteria.xml
 msgid "Keywords in SOLR"
 msgstr ""
 
@@ -83,6 +87,10 @@ msgstr ""
 
 #: rer/solrpush/utils/solr_common.py:87
 msgid "No SOLR url provided"
+msgstr ""
+
+#: rer/solrpush/profiles/default/registry/criteria.xml
+msgid "Portal types in SOLR"
 msgstr ""
 
 #: rer/solrpush/interfaces/settings.py:118
@@ -117,7 +125,7 @@ msgstr ""
 msgid "Reloaded schema.xml from SOLR"
 msgstr ""
 
-#: rer/solrpush/profiles/default/registry.xml
+#: rer/solrpush/profiles/default/registry/criteria.xml
 msgid "SOLR"
 msgstr ""
 
@@ -133,11 +141,11 @@ msgstr ""
 msgid "Save"
 msgstr ""
 
-#: rer/solrpush/profiles/default/registry.xml
+#: rer/solrpush/profiles/default/registry/criteria.xml
 msgid "Search with Solr"
 msgstr ""
 
-#: rer/solrpush/profiles/default/registry.xml
+#: rer/solrpush/profiles/default/registry/criteria.xml
 msgid "Sites"
 msgstr ""
 
@@ -336,7 +344,7 @@ msgid "remote_elevate_label"
 msgstr ""
 
 #. Default: "Unable to perform a search with SOLR. Please contact the site administrator or wait some minutes."
-#: rer/solrpush/utils/solr_search.py:311
+#: rer/solrpush/utils/solr_search.py:318
 msgid "search_error_label"
 msgstr ""
 
@@ -360,7 +368,7 @@ msgstr ""
 msgid "settings_search_label"
 msgstr ""
 
-#: rer/solrpush/utils/solr_search.py:295
+#: rer/solrpush/utils/solr_search.py:299
 msgid "solr_configuration_error_label"
 msgstr ""
 
