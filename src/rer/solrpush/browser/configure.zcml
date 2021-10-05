@@ -15,14 +15,14 @@
       name="solrpush-settings"
       for="Products.CMFPlone.interfaces.IPloneSiteRoot"
       class=".controlpanel.RerSolrpushSettingsView"
-      permission="cmf.ManagePortal"
+      permission="rer.solrpush.editSettings"
       layer="rer.solrpush.interfaces.IRerSolrpushLayer"
       />
   <browser:page
       name="elevate-settings"
       for="Products.CMFPlone.interfaces.IPloneSiteRoot"
       class=".elevate_settings.ElevateSettingsView"
-      permission="cmf.ManagePortal"
+      permission="rer.solrpush.editElevate"
       layer="rer.solrpush.interfaces.IRerSolrpushLayer"
       />
 
