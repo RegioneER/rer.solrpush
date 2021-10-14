@@ -2,7 +2,7 @@ Changelog
 =========
 
 
-0.6.5 (unreleased)
+0.7.0 (2021-10-14)
 ------------------
 
 - Add new criteria: solr_portal_types to select a list of portal_types indexed on SOLR.
