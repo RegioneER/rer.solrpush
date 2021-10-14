@@ -96,13 +96,4 @@
         permission="cmf.ManagePortal"
         template="templates/query_debug.pt"
         />
-
-
-    <browser:page
-        name="images"
-        class=".scales.SolrScalesHandler"
-        permission="zope2.View"
-        for="rer.solrpush.interfaces.adapter.ISolrBrain"
-        layer="rer.solrpush.interfaces.IRerSolrpushLayer"
-        />
 </configure>

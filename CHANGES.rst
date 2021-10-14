@@ -5,8 +5,8 @@ Changelog
 0.7.1 (unreleased)
 ------------------
 
-- Nothing changed yet.
-
+- Removed unused view.
+  [cekk]
 
 0.7.0 (2021-10-14)
 ------------------
