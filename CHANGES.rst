@@ -9,6 +9,8 @@ Changelog
   [cekk]
 - Add link to Elevate control panel also in user actions.
   [cekk]
+- Fix remote elevate conditions.
+  [cekk]
 
 0.6.4 (2021-09-27)
 ------------------

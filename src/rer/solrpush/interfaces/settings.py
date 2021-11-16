@@ -131,7 +131,9 @@ class IRerSolrpushSearchConf(model.Schema):
             default=u'If this field is set and no "site_name" is '
             u"passed in query, elevate schema is taken from an external "
             u"source. This is useful if you index several sites and handle "
-            u"elevate configuration in one single site.",
+            u"elevate configuration in one single site. This should be an url "
+            u'that points to "@elevate-schema" view.'
+            u"For example: http://my-site/@elevate-schema.",
         ),
         default=u"",
         required=False,
