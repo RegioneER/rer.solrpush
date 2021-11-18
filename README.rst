@@ -140,6 +140,10 @@ There are two new Collection's criteria that allows to search on SOLR also in Co
 - *Sites*: a list of indexes plone sites on SOLR. The user can select on which sites perform the query.
   If no sites are set (or this criteria not selected), the default search will be made only in the current site.
 
+There is also a customized querybuilder that perform queries to SOLR or to Plone catalog.
+
+Results from SOLR are wrapped into some brain-like objects to be fully compatible with Collection views.
+
 
 Development buildout
 ====================

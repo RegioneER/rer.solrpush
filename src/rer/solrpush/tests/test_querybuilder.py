@@ -4,6 +4,7 @@ from plone import api
 from plone.api.portal import set_registry_record
 from plone.app.testing import setRoles
 from plone.app.testing import TEST_USER_ID
+from plone.namedfile.file import NamedBlobImage
 from rer.solrpush.interfaces.settings import IRerSolrpushSettings
 from rer.solrpush.utils.solr_common import init_solr_push
 from rer.solrpush.utils.solr_common import get_solr_connection
@@ -12,6 +13,7 @@ from rer.solrpush.testing import RER_SOLRPUSH_API_FUNCTIONAL_TESTING
 from transaction import commit
 
 import unittest
+import os
 
 
 class TestCollections(unittest.TestCase):
@@ -29,7 +31,7 @@ class TestCollections(unittest.TestCase):
         setRoles(self.portal, TEST_USER_ID, ["Manager"])
         set_registry_record(
             "enabled_types",
-            ["Document", "News Item"],
+            [u"Document", u"News Item"],
             interface=IRerSolrpushSettings,
         )
         init_solr_push()
@@ -197,3 +199,67 @@ class TestCollections(unittest.TestCase):
         results = self.get_results(query=query)
 
         self.assertEqual(results.sequence_length, 30)
+
+    def test_querybuilderresults_return_image_tag(self):
+        with open(
+            os.path.join(os.path.dirname(__file__), "docs", "plone_logo.png"),
+            "rb",
+        ) as f:
+            image_file = NamedBlobImage(
+                data=f.read(), filename="plone_logo.png"
+            )
+
+        news = api.content.create(
+            container=self.portal,
+            type="News Item",
+            title="News with image",
+            image=image_file,
+        )
+        api.content.transition(obj=news, transition="publish")
+        commit()
+
+        query = [
+            {
+                "i": "portal_type",
+                "o": "plone.app.querystring.operation.selection.any",
+                "v": ["News Item"],
+            },
+            {
+                "i": "searchWithSolr",
+                "o": "plone.app.querystring.operation.boolean.isTrue",
+                "v": "",
+            },
+        ]
+        results = self.get_results(query=query)
+        self.assertEqual(results.sequence_length, 1)
+
+        item = results[0]
+        self.assertEqual(
+            item.restrictedTraverse("@@images").tag(),
+            '<img src="{}/@@images/image/thumb" alt="News with image" title="News with image">'.format(
+                news.absolute_url()
+            ),
+        )
+
+        self.assertEqual(
+            item.restrictedTraverse("@@images").tag(
+                alt="alt text", title="custom title"
+            ),
+            '<img src="{}/@@images/image/thumb" alt="alt text" title="custom title">'.format(
+                news.absolute_url()
+            ),
+        )
+
+        self.assertEqual(
+            item.restrictedTraverse("@@images").tag(css_class="custom-css"),
+            '<img src="{}/@@images/image/thumb" alt="News with image" title="News with image" class="custom-css">'.format(
+                news.absolute_url()
+            ),
+        )
+
+        self.assertEqual(
+            item.restrictedTraverse("@@images").tag(scale="mini"),
+            '<img src="{}/@@images/image/mini" alt="News with image" title="News with image">'.format(
+                news.absolute_url()
+            ),
+        )

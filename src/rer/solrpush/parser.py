@@ -3,9 +3,13 @@ from datetime import datetime
 from DateTime import DateTime
 from plone import api
 from Products.MimetypesRegistry.MimeTypeItem import guess_icon_path
+from rer.solrpush.browser.scales import SolrScalesHandler
+from rer.solrpush.interfaces.adapter import ISolrBrain
 from rer.solrpush.interfaces.settings import IRerSolrpushSettings
 from rer.solrpush.utils.solr_indexer import get_index_fields
 from rer.solrpush.utils.solr_indexer import get_site_title
+from zope.globalrequest import getRequest
+from zope.interface import implementer
 
 try:
     from ZTUtils.Lazy import Lazy
@@ -25,6 +29,7 @@ import six
 timezone = DateTime().timezone()
 
 
+@implementer(ISolrBrain)
 class Brain(dict):
     """ a dictionary with attribute access """
 
@@ -34,7 +39,6 @@ class Brain(dict):
     def __getattr__(self, name):
         """ look up attributes in dict """
         marker = []
-
         value = self.get(name, marker)
         schema = get_index_fields()
         if value is not marker:
@@ -64,6 +68,12 @@ class Brain(dict):
     @property
     def Description(self):
         return self.get("description", "")
+
+    @property
+    def Date(self):
+        if self.EffectiveDate().startswith("1969"):
+            return self.CreationDate()
+        return self.EffectiveDate()
 
     def getId(self):
         return self.id
@@ -106,12 +116,11 @@ class Brain(dict):
     def review_state(self):
         return self.get("review_state", "")
 
-    @property
-    def getIcon(self):
-        return False
-
     def PortalType(self):
         return self.get("portal_type", "")
+
+    def CreationDate(self):
+        return self.get("created", None)
 
     def EffectiveDate(self):
         return self.get("effective", None)
@@ -143,6 +152,11 @@ class Brain(dict):
         else:
             mimeicon = os.path.join(navroot_url, guess_icon_path(ctype[0]))
         return mimeicon
+
+    def restrictedTraverse(self, name):
+        if name == "@@images":
+            return SolrScalesHandler(self, getRequest())
+        return None
 
 
 class SolrResults(list):

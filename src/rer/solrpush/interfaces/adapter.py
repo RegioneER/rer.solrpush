@@ -7,3 +7,7 @@ class IExtractFileFromTika(Interface):
         """ Call solr Tika to extract text from given file
         @return: extracted plain text
         """
+
+
+class ISolrBrain(Interface):
+    """ """

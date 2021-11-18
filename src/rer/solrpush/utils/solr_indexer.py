@@ -153,6 +153,7 @@ def create_index_dict(item):
     index_me["path"] = "/".join(item.getPhysicalPath())
     index_me["path_depth"] = len(item.getPhysicalPath()) - 2
     index_me["attachment"] = attachment_to_index(item)
+    index_me["getIcon"] = False
     if "view_name" in index_fields.keys():
         index_me["view_name"] = item.getLayout()
 
@@ -163,6 +164,11 @@ def create_index_dict(item):
         )
     else:
         index_me["url"] = item.absolute_url()
+
+    has_image = getattr(item.aq_base, "image", None)
+    if has_image:
+        index_me["getIcon"] = True
+
     return index_me
 
 

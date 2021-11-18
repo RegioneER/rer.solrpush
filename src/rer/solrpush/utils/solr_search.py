@@ -71,7 +71,10 @@ def fix_value(value, index_type="", wrap=True):
 def escape_special_characters(value, wrap):
     new_value = ESCAPE_CHARS_RE.sub(r"\\\g<char>", value)
     if six.PY2 and isinstance(new_value, six.string_types):
-        new_value = new_value.encode("utf-8")
+        try:
+            new_value = new_value.encode("utf-8")
+        except UnicodeDecodeError:
+            pass
     if wrap:
         return '"{}"'.format(new_value)
     return new_value
@@ -150,6 +153,7 @@ def manage_elevate(query):
     if not searchableText.replace(" ", ""):
         return params
     elevate_schema = extract_elevate_schema(query=query)
+
     if not elevate_schema:
         return params
     try:
@@ -185,36 +189,38 @@ def extract_elevate_schema(query):
     If no site_name is passed in query and remote_elevate_schema is set,
     return the schema from remote site.
     """
-    local_schema = get_setting(
+    local_schema_json = get_setting(
         field="elevate_schema", interface=IElevateSettings
     )
-    if not local_schema:
-        return []
-    local_schema = json.loads(local_schema)
-    if query.get("site_name", []):
-        return local_schema
-    if query.get("remote_elevate", "false").lower() != "true":
-        return local_schema
     remote_schema = get_setting(
         field="remote_elevate_schema", interface=IRerSolrpushSettings
     )
-    if not remote_schema:
-        return local_schema
-    try:
-        resp = requests.get(
-            remote_schema, headers={"Accept": "application/json"}
-        )
-    except requests.exceptions.RequestException as err:
-        logger.error("Connection problem:\n{0}".format(err))
-        return []
-    if resp.status_code != 200:
-        logger.error(
-            "Problems fetching schema:\n{0}\n{1}".format(
-                resp.status_code, resp.reason
+
+    # if local_schema is set and there is a filter on site_name, return the
+    # local elevate schema
+    if local_schema_json:
+        local_schema = json.loads(local_schema_json)
+        if query.get("site_name", []):
+            return local_schema
+        if not remote_schema:
+            return local_schema
+    if remote_schema:
+        try:
+            resp = requests.get(
+                remote_schema, headers={"Accept": "application/json"}
             )
-        )
-        return []
-    return resp.json()
+        except requests.exceptions.RequestException as err:
+            logger.error("Connection problem:\n{0}".format(err))
+            return []
+        if resp.status_code != 200:
+            logger.error(
+                "Problems fetching schema:\n{0}\n{1}".format(
+                    resp.status_code, resp.reason
+                )
+            )
+            return []
+        return resp.json()
+    return []
 
 
 def extract_from_query(query):

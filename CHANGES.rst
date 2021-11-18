@@ -21,6 +21,8 @@ Changelog
   [cekk]
 - Add link to Elevate control panel also in user actions.
   [cekk]
+- Fix remote elevate conditions.
+  [cekk]
 
 0.6.4 (2021-09-27)
 ------------------
@@ -32,6 +34,7 @@ Changelog
 0.6.3 (2021-09-21)
 ------------------
 
+- SolrBrains now can return img tags if the original content has an image.
 - Add new feature: if "Query debug" flag is enabled in settings, the SOLR query will be shown to managers.
   [cekk]
 - In example schema.xml files (dev and test), set "searchwords" as **lowercase** type, to be case insensitive.

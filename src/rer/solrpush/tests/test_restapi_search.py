@@ -37,7 +37,7 @@ class SearchBandiTest(unittest.TestCase):
 
         set_registry_record(
             "enabled_types",
-            ["Document", "News Item"],
+            [u"Document", u"News Item"],
             interface=IRerSolrpushSettings,
         )
 

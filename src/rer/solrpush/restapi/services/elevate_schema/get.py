@@ -3,7 +3,10 @@ from plone.restapi.services import Service
 from rer.solrpush.utils.solr_common import get_setting
 from rer.solrpush.interfaces import IElevateSettings
 
+import json
+
 
 class ElevateSchemaGet(Service):
     def reply(self):
-        return get_setting(field="elevate_schema", interface=IElevateSettings)
+        data = get_setting(field="elevate_schema", interface=IElevateSettings)
+        return json.loads(data)
