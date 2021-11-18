@@ -2,7 +2,7 @@ Changelog
 =========
 
 
-0.7.2 (unreleased)
+0.8.0 (2021-11-18)
 ------------------
 
 - SolrBrains now can return img tags if the original content has an image.
