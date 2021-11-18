@@ -5,7 +5,8 @@ Changelog
 0.7.2 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- SolrBrains now can return img tags if the original content has an image.
+  [cekk]
 
 
 0.7.1 (2021-10-14)
@@ -34,7 +35,6 @@ Changelog
 0.6.3 (2021-09-21)
 ------------------
 
-- SolrBrains now can return img tags if the original content has an image.
 - Add new feature: if "Query debug" flag is enabled in settings, the SOLR query will be shown to managers.
   [cekk]
 - In example schema.xml files (dev and test), set "searchwords" as **lowercase** type, to be case insensitive.
