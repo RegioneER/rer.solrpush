@@ -200,10 +200,11 @@ def extract_elevate_schema(query):
     # local elevate schema
     if local_schema_json:
         local_schema = json.loads(local_schema_json)
-        if query.get("site_name", []):
-            return local_schema
-        if not remote_schema:
-            return local_schema
+        if local_schema:
+            if query.get("site_name", []):
+                return local_schema
+            if not remote_schema:
+                return local_schema
     if remote_schema:
         try:
             resp = requests.get(

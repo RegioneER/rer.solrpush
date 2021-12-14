@@ -4,7 +4,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2021-11-16 08:49+0000\n"
+"POT-Creation-Date: 2021-12-14 12:39+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI +ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -205,36 +205,36 @@ msgid "content_remove_error"
 msgstr ""
 
 #. Default: "The word that should match in the search."
-#: rer/solrpush/interfaces/elevate.py:24
+#: rer/solrpush/interfaces/elevate.py:30
 #: rer/solrpush/interfaces/settings.py:23
 msgid "elevate_row_schema_text_help"
 msgstr ""
 
 #. Default: "Text"
-#: rer/solrpush/interfaces/elevate.py:23
+#: rer/solrpush/interfaces/elevate.py:29
 #: rer/solrpush/interfaces/settings.py:22
 msgid "elevate_row_schema_text_label"
 msgstr ""
 
 #. Default: "Select a list of elements to elevate for that search word."
-#: rer/solrpush/interfaces/elevate.py:33
+#: rer/solrpush/interfaces/elevate.py:39
 #: rer/solrpush/interfaces/settings.py:31
 msgid "elevate_row_schema_uid_help"
 msgstr ""
 
 #. Default: "Elements"
-#: rer/solrpush/interfaces/elevate.py:32
+#: rer/solrpush/interfaces/elevate.py:38
 #: rer/solrpush/interfaces/settings.py:30
 msgid "elevate_row_schema_uid_label"
 msgstr ""
 
 #. Default: "Insert a list of values for elevate."
-#: rer/solrpush/interfaces/elevate.py:53
+#: rer/solrpush/interfaces/elevate.py:58
 msgid "elevate_schema_help"
 msgstr ""
 
 #. Default: "Elevate configuration"
-#: rer/solrpush/interfaces/elevate.py:52
+#: rer/solrpush/interfaces/elevate.py:57
 msgid "elevate_schema_label"
 msgstr ""
 
@@ -348,7 +348,7 @@ msgid "remote_elevate_label"
 msgstr ""
 
 #. Default: "Unable to perform a search with SOLR. Please contact the site administrator or wait some minutes."
-#: rer/solrpush/utils/solr_search.py:324
+#: rer/solrpush/utils/solr_search.py:325
 msgid "search_error_label"
 msgstr ""
 
@@ -372,7 +372,7 @@ msgstr ""
 msgid "settings_search_label"
 msgstr ""
 
-#: rer/solrpush/utils/solr_search.py:305
+#: rer/solrpush/utils/solr_search.py:306
 msgid "solr_configuration_error_label"
 msgstr ""
 
@@ -389,4 +389,14 @@ msgstr ""
 #. Default: "Start"
 #: rer/solrpush/browser/maintenance.py:65
 msgid "start_label"
+msgstr ""
+
+#. Default: "\"${text}\" is used in several groups."
+#: rer/solrpush/interfaces/elevate.py:91
+msgid "text_duplicated_label"
+msgstr ""
+
+#. Default: "Text field must be filled for Group ${id}."
+#: rer/solrpush/interfaces/elevate.py:75
+msgid "text_required_label"
 msgstr ""
