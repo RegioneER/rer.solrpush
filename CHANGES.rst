@@ -2,7 +2,7 @@ Changelog
 =========
 
 
-0.8.1 (unreleased)
+1.0.0 (2021-12-20)
 ------------------
 
 - Fix elevate logic.
