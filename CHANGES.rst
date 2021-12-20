@@ -5,7 +5,10 @@ Changelog
 0.8.1 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Fix elevate logic.
+  [cekk]
+- Add invariant validation for elevate.
+  [cekk]
 
 
 0.8.0 (2021-11-18)

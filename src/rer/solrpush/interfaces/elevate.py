@@ -7,6 +7,12 @@ from rer.solrpush import _
 from z3c.relationfield.schema import RelationChoice
 from z3c.relationfield.schema import RelationList
 from zope import schema
+from zope.i18n import translate
+from zope.interface import Invalid
+from zope.interface import invariant
+from zope.globalrequest import getRequest
+
+import json
 
 
 class CatalogSource(CatalogSourceBase):
@@ -45,8 +51,7 @@ class IElevateRowSchema(model.Schema):
 
 
 class IElevateSettings(model.Schema):
-    """
-    """
+    """ """
 
     elevate_schema = schema.SourceText(
         title=_(u"elevate_schema_label", default=u"Elevate configuration"),
@@ -56,3 +61,38 @@ class IElevateSettings(model.Schema):
         ),
         required=False,
     )
+
+    @invariant
+    def elevate_invariant(data):
+        schema = json.loads(data.elevate_schema)
+        request = getRequest()
+        words_mapping = [x["text"] for x in schema]
+        for i, schema_item in enumerate(schema):
+            elevate_text = schema_item.get("text", [])
+            if not elevate_text:
+                raise Invalid(
+                    translate(
+                        _(
+                            "text_required_label",
+                            default="Text field must be filled for Group ${id}.",
+                            mapping=dict(id=i + 1),
+                        ),
+                        context=request,
+                    )
+                )
+            for text in elevate_text:
+                for words_i, words in enumerate(words_mapping):
+                    if i == words_i:
+                        # it's the current config
+                        continue
+                    if text in words:
+                        raise Invalid(
+                            translate(
+                                _(
+                                    "text_duplicated_label",
+                                    default='"${text}" is used in several groups.',
+                                    mapping=dict(id=i, text=text),
+                                ),
+                                context=request,
+                            )
+                        )
