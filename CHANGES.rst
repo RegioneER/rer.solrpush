@@ -2,7 +2,7 @@ Changelog
 =========
 
 
-1.0.1 (unreleased)
+1.1.0 (2021-12-22)
 ------------------
 
 - Add indexers for path infos.
