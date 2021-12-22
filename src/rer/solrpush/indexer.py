@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 # from operator import itemgetter
 from plone import api
+from plone.dexterity.interfaces import IDexterityContent
+from plone.indexer import indexer
 from Products.CMFCore.indexing import INDEX
 from Products.CMFCore.indexing import REINDEX
 from Products.CMFCore.indexing import UNINDEX
@@ -9,10 +11,11 @@ from rer.solrpush import _
 from rer.solrpush.interfaces import IRerSolrpushLayer
 from rer.solrpush.interfaces import ISolrIndexQueueProcessor
 from rer.solrpush.interfaces.settings import IRerSolrpushSettings
-from rer.solrpush.utils.solr_indexer import can_index
-from rer.solrpush.utils.solr_indexer import create_index_dict
 from rer.solrpush.utils import push_to_solr
 from rer.solrpush.utils import remove_from_solr
+from rer.solrpush.utils.solr_indexer import can_index
+from rer.solrpush.utils.solr_indexer import create_index_dict
+from six.moves import range
 from zope.globalrequest import getRequest
 from zope.interface import implementer
 
@@ -102,3 +105,16 @@ class SolrIndexProcessor(object):
 
     def abort(self):
         self.queue = []
+
+
+@indexer(IDexterityContent)
+def path_depth(obj, **kwargs):
+    """return depth of physical path"""
+    return len(obj.getPhysicalPath())
+
+
+@indexer(IDexterityContent)
+def path_parents(obj, **kwargs):
+    """return all parent paths leading up to the object"""
+    elements = obj.getPhysicalPath()
+    return ["/".join(elements[: n + 1]) for n in range(1, len(elements))]

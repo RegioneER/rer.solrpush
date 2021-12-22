@@ -5,7 +5,8 @@ Changelog
 1.0.1 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Add indexers for path infos.
+  [cekk]
 
 
 1.0.0 (2021-12-20)

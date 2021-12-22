@@ -56,11 +56,7 @@
       />
     
 
-    <utility
-        factory=".indexer.SolrIndexProcessor" 
-        name="solrpush.utility"
-        />
-
+    <!-- vocabularies -->
     <utility
         name="rer.solrpush.vocabularies.AvailableSites"
         component=".vocabularies.AvailableSitesVocabulary"
@@ -73,4 +69,13 @@
         name="rer.solrpush.vocabularies.AvailablePortalTypes"
         component=".vocabularies.AvailablePortalTypesVocabulary"
     />
+
+    <!-- indexers -->
+    <utility
+        factory=".indexer.SolrIndexProcessor" 
+        name="solrpush.utility"
+        />
+    <adapter name="path_depth" factory=".indexer.path_depth" />
+    <adapter name="path_parents" factory=".indexer.path_parents" />
+
 </configure>

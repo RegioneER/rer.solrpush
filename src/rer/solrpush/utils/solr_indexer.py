@@ -173,7 +173,7 @@ def create_index_dict(item):
 
 
 def fix_py2_strings(value):
-    """ REMOVE ON PYTHON 3 """
+    """REMOVE ON PYTHON 3"""
     if isinstance(value, six.string_types):
         if not isinstance(value, six.text_type):
             value = value.replace("\xc0?", "").decode("utf-8", "ignore")
@@ -268,7 +268,8 @@ def remove_from_solr(uid):
         return
     try:
         solr.delete(
-            q="UID:{}".format(uid), commit=should_force_commit(),
+            q="UID:{}".format(uid),
+            commit=should_force_commit(),
         )
     except (pysolr.SolrError, TypeError) as err:
         logger.error(err)
