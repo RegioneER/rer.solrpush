@@ -31,13 +31,13 @@ timezone = DateTime().timezone()
 
 @implementer(ISolrBrain)
 class Brain(dict):
-    """ a dictionary with attribute access """
+    """a dictionary with attribute access"""
 
     def __repr__(self):
         return "<SolrBrain for {}>".format(self.getPath())
 
     def __getattr__(self, name):
-        """ look up attributes in dict """
+        """look up attributes in dict"""
         marker = []
         value = self.get(name, marker)
         schema = get_index_fields()
@@ -62,7 +62,7 @@ class Brain(dict):
 
     @property
     def id(self):
-        """ convenience alias """
+        """convenience alias"""
         return self.get("id", self.get("getId"))
 
     @property
@@ -79,7 +79,7 @@ class Brain(dict):
         return self.id
 
     def getPath(self):
-        """ convenience alias """
+        """convenience alias"""
 
         return self.get("path", "")
 
@@ -160,7 +160,7 @@ class Brain(dict):
 
 
 class SolrResults(list):
-    """ a list of results returned from solr, i.e. sol(a)r flares """
+    """a list of results returned from solr, i.e. sol(a)r flares"""
 
 
 def parseDate(value):
@@ -185,7 +185,7 @@ def parse_date_as_datetime(value):
 
 
 class SolrResponse(Lazy):
-    """ a solr search response; TODO: this should get an interface!! """
+    """a solr search response; TODO: this should get an interface!!"""
 
     __allow_access_to_unprotected_subobjects__ = True
 
