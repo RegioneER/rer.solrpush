@@ -95,5 +95,7 @@
         class=".query_debug.QueryDebug"
         permission="cmf.ManagePortal"
         template="templates/query_debug.pt"
+        layer="rer.solrpush.interfaces.IRerSolrpushLayer"
         />
+
 </configure>
