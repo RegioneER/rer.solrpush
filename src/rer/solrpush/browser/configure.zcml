@@ -64,13 +64,23 @@
         class=".maintenance.DoSyncView"
         layer="rer.solrpush.interfaces.IRerSolrpushLayer"
     />
-  <browser:page
+    
+    <browser:page
           for="Products.CMFCore.interfaces.ISiteRoot"
           name="reset-solr"
           permission="cmf.ManagePortal"
           class=".maintenance.ResetSolr"
           layer="rer.solrpush.interfaces.IRerSolrpushLayer"
           />
+
+    <!-- return scaled image -->
+    <browser:page
+        name="solr-images"
+        class=".scales.SolrImages"
+        permission="zope2.View"
+        for="*"
+        layer="rer.solrpush.interfaces.IRerSolrpushLayer"
+        />
 
     <!-- CUSTOM COLLECTIONS -->
     <browser:page
