@@ -68,7 +68,10 @@ class TestCollections(unittest.TestCase):
             else:
                 title = "Event %s odd odd" % i
             obj = self.docs[i] = api.content.create(
-                container=self.portal, type="Event", id=id, title=title,
+                container=self.portal,
+                type="Event",
+                id=id,
+                title=title,
             )
             api.content.transition(obj=obj, transition="publish")
 
@@ -236,8 +239,9 @@ class TestCollections(unittest.TestCase):
         item = results[0]
         self.assertEqual(
             item.restrictedTraverse("@@images").tag(),
-            '<img src="{}/@@images/image/thumb" alt="News with image" title="News with image">'.format(
-                news.absolute_url()
+            '<img src="{url}/@@solr-images/image/thumb?direction=thumbnail&v={date}" alt="News with image" title="News with image" loading="lazy">'.format(
+                url=news.absolute_url(),
+                date=news.modified().strftime("%Y%m%d%H%M%S"),
             ),
         )
 
@@ -245,21 +249,24 @@ class TestCollections(unittest.TestCase):
             item.restrictedTraverse("@@images").tag(
                 alt="alt text", title="custom title"
             ),
-            '<img src="{}/@@images/image/thumb" alt="alt text" title="custom title">'.format(
-                news.absolute_url()
+            '<img src="{url}/@@solr-images/image/thumb?direction=thumbnail&v={date}" alt="alt text" title="custom title" loading="lazy">'.format(
+                url=news.absolute_url(),
+                date=news.modified().strftime("%Y%m%d%H%M%S"),
             ),
         )
 
         self.assertEqual(
             item.restrictedTraverse("@@images").tag(css_class="custom-css"),
-            '<img src="{}/@@images/image/thumb" alt="News with image" title="News with image" class="custom-css">'.format(
-                news.absolute_url()
+            '<img src="{url}/@@solr-images/image/thumb?direction=thumbnail&v={date}" alt="News with image" title="News with image" loading="lazy" class="custom-css">'.format(
+                url=news.absolute_url(),
+                date=news.modified().strftime("%Y%m%d%H%M%S"),
             ),
         )
 
         self.assertEqual(
             item.restrictedTraverse("@@images").tag(scale="mini"),
-            '<img src="{}/@@images/image/mini" alt="News with image" title="News with image">'.format(
-                news.absolute_url()
+            '<img src="{url}/@@solr-images/image/mini?direction=thumbnail&v={date}" alt="News with image" title="News with image" loading="lazy">'.format(
+                url=news.absolute_url(),
+                date=news.modified().strftime("%Y%m%d%H%M%S"),
             ),
         )

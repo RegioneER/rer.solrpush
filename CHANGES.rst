@@ -5,7 +5,8 @@ Changelog
 1.1.1 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Custom scales view to get images from remote contents (to handle also direction).
+  [cekk]
 
 
 1.1.0 (2021-12-22)
