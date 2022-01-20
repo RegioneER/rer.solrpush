@@ -2,7 +2,7 @@ Changelog
 =========
 
 
-1.1.1 (unreleased)
+1.2.0 (2022-01-20)
 ------------------
 
 - Custom scales view to get images from remote contents (to handle also direction).
