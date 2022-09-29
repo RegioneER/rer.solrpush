@@ -86,6 +86,11 @@ class SearchBandiTest(unittest.TestCase):
 
     def tearDown(self):
         set_registry_record("active", True, interface=IRerSolrpushSettings)
+        set_registry_record(
+            "search_enabled",
+            True,
+            interface=IRerSolrpushSettings,
+        )
         reset_solr()
         commit()
 
@@ -97,3 +102,26 @@ class SearchBandiTest(unittest.TestCase):
         plone_results = plone_response.json()
         self.assertEqual(plone_results[u"items_total"], 6)
         self.assertEqual(solr_results[u"items_total"], 3)
+
+    def test_disable_search_will_perform_classic_search(self):
+
+        solr_response = self.api_session.get("/@solr-search")
+        plone_response = self.api_session.get("/@search")
+        solr_results = solr_response.json()
+        plone_results = plone_response.json()
+        self.assertEqual(plone_results[u"items_total"], 6)
+        self.assertEqual(solr_results[u"items_total"], 3)
+
+        set_registry_record(
+            "search_enabled",
+            False,
+            interface=IRerSolrpushSettings,
+        )
+        commit()
+
+        solr_response = self.api_session.get("/@solr-search")
+        plone_response = self.api_session.get("/@search")
+        solr_results = solr_response.json()
+        plone_results = plone_response.json()
+        self.assertEqual(plone_results[u"items_total"], 6)
+        self.assertEqual(solr_results[u"items_total"], 6)

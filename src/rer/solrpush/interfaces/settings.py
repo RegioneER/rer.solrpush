@@ -47,7 +47,14 @@ class IRerSolrpushConf(model.Schema):
         required=False,
         default=False,
     )
-
+    search_enabled = schema.Bool(
+        title=_(u"Search enabled"),
+        description=_(
+            u"Site search will use SOLR as engine instead portal_catalog."
+        ),
+        required=False,
+        default=True,
+    )
     force_commit = schema.Bool(
         title=_(u"Force commit"),
         description=_(

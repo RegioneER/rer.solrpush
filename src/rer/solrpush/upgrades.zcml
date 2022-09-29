@@ -74,5 +74,13 @@
     description=""
     profile="rer.solrpush:default"
     handler=".upgrades.update_actions"
+    />
+  <genericsetup:upgradeStep
+    source="1900"
+    destination="2000"
+    title="Add search_enabled setting field"
+    description=""
+    profile="rer.solrpush:default"
+    handler=".upgrades.update_registry"
     />  
 </configure>

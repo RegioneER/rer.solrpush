@@ -5,7 +5,8 @@ Changelog
 1.2.1 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Add ``search_enabled`` flag to temporary disable search on SOLR.
+  [cekk]
 
 
 1.2.0 (2022-01-20)
