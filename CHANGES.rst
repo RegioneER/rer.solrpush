@@ -2,7 +2,7 @@ Changelog
 =========
 
 
-1.2.1 (unreleased)
+1.3.0 (2022-09-29)
 ------------------
 
 - Add ``search_enabled`` flag to temporary disable search on SOLR.
