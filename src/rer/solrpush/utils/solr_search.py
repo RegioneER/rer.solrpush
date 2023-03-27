@@ -257,6 +257,19 @@ def extract_from_query(query):
             params["fq"].append("expires:[NOW TO *]")
         if "effective" not in query:
             params["fq"].append("effective:[* TO NOW]")
+
+    has_language_filter = False
+    for param in params["fq"]:
+        if param.startswith("Language:"):
+            has_language_filter = True
+    if (
+        not has_language_filter
+        and "Language"  # noqa
+        in api.portal.get_tool("portal_catalog").indexes()  # noqa
+    ):
+        params["fq"].append(
+            f'Language:("{api.portal.get_current_language()}" OR "")'
+        )
     return params
 
 
@@ -282,7 +295,7 @@ def search(
     fl=None,
     facets=False,
     facet_fields=["Subject", "portal_type"],
-    **kwargs
+    **kwargs,
 ):
     """[summary] TODO
 
@@ -298,7 +311,7 @@ def search(
     """
     solr = get_solr_connection()
     if not solr:
-        msg = u"Unable to search using solr. Configuration is incomplete."
+        msg = "Unable to search using solr. Configuration is incomplete."
         logger.error(msg)
         return {
             "error": True,
@@ -324,9 +337,9 @@ def search(
             "message": translate(
                 _(
                     "search_error_label",
-                    default=u"Unable to perform a search with SOLR."
-                    u" Please contact the site administrator or wait some"
-                    u" minutes.",
+                    default="Unable to perform a search with SOLR."
+                    " Please contact the site administrator or wait some"
+                    " minutes.",
                 ),
                 context=api.portal.get().REQUEST,
             ),
