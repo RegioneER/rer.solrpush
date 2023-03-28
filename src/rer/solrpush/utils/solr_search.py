@@ -268,7 +268,7 @@ def extract_from_query(query):
         in api.portal.get_tool("portal_catalog").indexes()  # noqa
     ):
         params["fq"].append(
-            f'Language:("{api.portal.get_current_language()}" OR "")'
+            'Language:("{}" OR "")'.format(api.portal.get_current_language())
         )
     return params
 
