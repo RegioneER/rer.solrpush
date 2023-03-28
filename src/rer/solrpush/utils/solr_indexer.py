@@ -54,9 +54,11 @@ def get_site_title():
             getattr(site_settings, "site_subtitle_style") or ""
         )
         fields_value = getUtility(ICustomFields)
-        site_title = fields_value.titleLang(site_title)
+        lang = api.portal.get_default_language()
+        site_title = fields_value.titleLang(site_title, lang=lang)
         site_subtitle = fields_value.subtitleLang(
-            getattr(site_settings, "site_subtitle") or "{}"
+            getattr(site_settings, "site_subtitle") or "{}",
+            lang=lang,
         )
         if site_subtitle and site_subtitle_style == "subtitle-normal":
             site_title += " {}".format(site_subtitle)
