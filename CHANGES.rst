@@ -5,7 +5,8 @@ Changelog
 1.3.1 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- If Language index is in catalog, search only by current language by default.
+  [cekk]
 
 
 1.3.0 (2022-09-29)
