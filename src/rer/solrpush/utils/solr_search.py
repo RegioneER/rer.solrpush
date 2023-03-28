@@ -295,7 +295,7 @@ def search(
     fl=None,
     facets=False,
     facet_fields=["Subject", "portal_type"],
-    **kwargs,
+    **kwargs
 ):
     """[summary] TODO
 
