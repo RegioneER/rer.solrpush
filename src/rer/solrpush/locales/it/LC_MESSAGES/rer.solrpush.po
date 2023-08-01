@@ -194,7 +194,7 @@ msgstr "Annulla"
 #. Default: "There was a problem indexing or unindexing this content. Please take note of this address and contact site administrator."
 #: rer/solrpush/indexer.py:92
 msgid "content_indexed_error"
-msgstr "Si è verificato un problema: questo contenuto non può essere indicizzato o rimosso da SOLR e quindi non verrà mostrato nelle ricerche e nelle collezioni fatte con SOLR. Avvisa subito gli amministratori del sito indicando l'URL di questo contenuto."
+msgstr "Questo contenuto è stato correttamente aggiornato ma in questo momento non può essere indicizzato o rimosso dal nostro motore di ricerca, quindi non verrà mostrato nelle ricerche e nelle collezioni multiportale. Il motore di ricerca verrà allineato questa notte."
 
 #. Default: "There was a problem removing this content from SOLR.  Please contact site administrator."
 #: rer/solrpush/utils/solr_indexer.py:275

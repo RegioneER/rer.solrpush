@@ -99,7 +99,7 @@ class SolrIndexProcessor(object):
                         u"contact site administrator.",
                     )
                     api.portal.show_message(
-                        message=message, request=getRequest(), type="error"
+                        message=message, request=getRequest(), type="warning"
                     )
             self.queue = []
 
