@@ -5,7 +5,8 @@ Changelog
 1.3.2 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Update translation for content_remove_error.
+  [cekk]
 
 
 1.3.1 (2023-08-01)

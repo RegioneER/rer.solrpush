@@ -279,7 +279,7 @@ def remove_from_solr(uid):
             " Please contact site administrator.",
         )
         api.portal.show_message(
-            message=message, request=portal.REQUEST, type="error"
+            message=message, request=portal.REQUEST, type="warning"
         )
 
 

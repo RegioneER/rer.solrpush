@@ -199,7 +199,7 @@ msgstr "Questo contenuto è stato correttamente aggiornato ma in questo momento 
 #. Default: "There was a problem removing this content from SOLR.  Please contact site administrator."
 #: rer/solrpush/utils/solr_indexer.py:275
 msgid "content_remove_error"
-msgstr "Si è verificato un problema rimuovendo questo contenuto da SOLR. Contatta l'amministratore per maggiori informazioni."
+msgstr "Questo contenuto è stato correttamente aggiornato ma in questo momento non può essere indicizzato o rimosso dal nostro motore di ricerca, quindi non verrà mostrato nelle ricerche e nelle collezioni multiportale. Il motore di ricerca verrà allineato questa notte."
 
 #. Default: "The word that should match in the search."
 #: rer/solrpush/interfaces/elevate.py:30
