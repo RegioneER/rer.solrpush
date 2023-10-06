@@ -19,15 +19,15 @@ logger = logging.getLogger(__name__)
 
 
 class FormDefault(group.Group):
-    label = _("settings_default_label", default=u"Settings")
+    label = _("settings_default_label", default="Settings")
     fields = field.Fields(IRerSolrpushConf)
 
 
 class FormSearch(group.Group):
-    label = _("settings_search_label", default=u"Search")
+    label = _("settings_search_label", default="Search")
     description = _(
         "settings_search_help",
-        default=u"Use these settings to tweak search results.",
+        default="Use these settings to tweak search results.",
     )
     fields = field.Fields(IRerSolrpushSearchConf)
 
@@ -39,11 +39,11 @@ class RerSolrpushEditForm(RegistryEditForm):
 
     schema = IRerSolrpushSettings
     groups = (FormDefault, FormSearch)
-    label = _(u"Solr Push Configuration")
+    label = _("Solr Push Configuration")
 
     formErrorsMessage = _(
         "settings_form_error",
-        default=u"Sono presenti degli errori, si prega di ricontrollare i dati inseriti",
+        default="Sono presenti degli errori, si prega di ricontrollare i dati inseriti",
     )
 
     def updateFields(self):
@@ -59,7 +59,7 @@ class RerSolrpushEditForm(RegistryEditForm):
             self.status = self.formErrorsMessage
             return
         self.applyChanges(data)
-        api.portal.show_message(_(u"Changes saved."), request=self.request)
+        api.portal.show_message(_("Changes saved."), request=self.request)
         init_error = init_solr_push()
         if init_error:
             api.portal.show_message(
@@ -67,7 +67,7 @@ class RerSolrpushEditForm(RegistryEditForm):
             )
         else:
             api.portal.show_message(
-                _(u"Loaded schema.xml from SOLR"), request=self.request
+                _("Loaded schema.xml from SOLR"), request=self.request
             )
         self.request.response.redirect(self.request.getURL())
 
@@ -86,7 +86,7 @@ class RerSolrpushEditForm(RegistryEditForm):
             )
         else:
             api.portal.show_message(
-                _(u"Reloaded schema.xml from SOLR"), request=self.request
+                _("Reloaded schema.xml from SOLR"), request=self.request
             )
         self.request.response.redirect(self.request.getURL())
 

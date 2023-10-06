@@ -31,7 +31,7 @@ class TestCollections(unittest.TestCase):
         setRoles(self.portal, TEST_USER_ID, ["Manager"])
         set_registry_record(
             "enabled_types",
-            [u"Document", u"News Item"],
+            ["Document", "News Item"],
             interface=IRerSolrpushSettings,
         )
         init_solr_push()
@@ -80,9 +80,9 @@ class TestCollections(unittest.TestCase):
     def tearDown(self):
         solr = get_solr_connection()
         solr.delete(q="*:*", commit=True)
-        set_registry_record("qf", u"", interface=IRerSolrpushSettings)
-        set_registry_record("bq", u"", interface=IRerSolrpushSettings)
-        set_registry_record("bf", u"", interface=IRerSolrpushSettings)
+        set_registry_record("qf", "", interface=IRerSolrpushSettings)
+        set_registry_record("bq", "", interface=IRerSolrpushSettings)
+        set_registry_record("bf", "", interface=IRerSolrpushSettings)
         commit()
 
     def get_results(

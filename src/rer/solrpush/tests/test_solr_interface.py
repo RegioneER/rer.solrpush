@@ -28,7 +28,7 @@ class TestSolrIndexActions(unittest.TestCase):
         self.request = self.layer["request"]
         setRoles(self.portal, TEST_USER_ID, ["Manager"])
         set_registry_record(
-            "enabled_types", [u"Document"], interface=IRerSolrpushSettings
+            "enabled_types", ["Document"], interface=IRerSolrpushSettings
         )
         self.published_doc = api.content.create(
             container=self.portal, type="Document", title="Published Document"
@@ -153,7 +153,7 @@ class TestSolrSearch(unittest.TestCase):
         setRoles(self.portal, TEST_USER_ID, ["Manager"])
         set_registry_record(
             "enabled_types",
-            [u"Document", u"News Item"],
+            ["Document", "News Item"],
             interface=IRerSolrpushSettings,
         )
         #  initialize solr push, so solr will be populated automatically

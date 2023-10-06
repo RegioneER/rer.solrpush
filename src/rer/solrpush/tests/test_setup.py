@@ -41,7 +41,6 @@ class TestSetup(unittest.TestCase):
 
 
 class TestUninstall(unittest.TestCase):
-
     layer = RER_SOLRPUSH_API_INTEGRATION_TESTING
 
     def setUp(self):

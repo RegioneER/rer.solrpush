@@ -36,7 +36,7 @@ class TestSOLRPush(unittest.TestCase):
         setRoles(self.portal, TEST_USER_ID, ["Manager"])
         set_registry_record(
             "enabled_types",
-            [u"Document", u"File"],
+            ["Document", "File"],
             interface=IRerSolrpushSettings,
         )
 
@@ -81,7 +81,7 @@ class TestEvents(unittest.TestCase):
         setRoles(self.portal, TEST_USER_ID, ["Manager"])
         set_registry_record(
             "enabled_types",
-            [u"Document", u"File"],
+            ["Document", "File"],
             interface=IRerSolrpushSettings,
         )
         init_solr_push()

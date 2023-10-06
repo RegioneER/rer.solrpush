@@ -57,8 +57,7 @@ class SolrHypermediaBatch(object):
 
     @property
     def links(self):
-        """Get a dictionary with batching links.
-        """
+        """Get a dictionary with batching links."""
         # Don't provide batching links if resultset isn't batched
         if self.hits <= self.b_size:
             return None
@@ -82,8 +81,7 @@ class SolrHypermediaBatch(object):
         return links
 
     def _url_for_batch(self, pagenumber):
-        """Return a new Batch object for the given pagenumber.
-        """
+        """Return a new Batch object for the given pagenumber."""
         new_start = pagenumber * self.b_size
         return self._url_with_params(params={"b_start": new_start})
 

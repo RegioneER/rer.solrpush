@@ -45,7 +45,7 @@ logger = logging.getLogger(__name__)
 
 
 def timer(func=time):
-    """ set up a generator returning the elapsed time since the last call """
+    """set up a generator returning the elapsed time since the last call"""
 
     def gen(last=func()):
         while True:
@@ -57,12 +57,11 @@ def timer(func=time):
 
 
 class SolrMaintenanceBaseForm(form.Form):
-
     # template = ViewPageTemplateFile('templates/reindex_solr.pt')
 
     ignoreContext = True
 
-    @button.buttonAndHandler(_("start_label", default=u"Start"))
+    @button.buttonAndHandler(_("start_label", default="Start"))
     def handleApply(self, action):
         data, errors = self.extractData()
         if errors:
@@ -70,7 +69,7 @@ class SolrMaintenanceBaseForm(form.Form):
             return
         self.do_action()
 
-    @button.buttonAndHandler(_("cancel_label", default=u"Cancel"))
+    @button.buttonAndHandler(_("cancel_label", default="Cancel"))
     def handleCancel(self, action):
         msg_label = _("maintenance_cancel_action", default="Action cancelled")
         api.portal.show_message(message=msg_label, request=self.request)
@@ -108,8 +107,8 @@ class ReindexBaseView(BrowserView):
         return translate(
             _(
                 "solr_error_connection",
-                default=u"There have been problems connecting to SOLR. "
-                u"Contact site administrator.",
+                default="There have been problems connecting to SOLR. "
+                "Contact site administrator.",
             ),
             context=self.request,
         )
@@ -365,7 +364,7 @@ class ReindexBaseView(BrowserView):
 class DoReindexView(ReindexBaseView):
     def __call__(self):
         authenticator = getMultiAdapter(
-            (self.context, self.request), name=u"authenticator"
+            (self.context, self.request), name="authenticator"
         )
         if not authenticator.verify():
             raise Unauthorized
@@ -387,7 +386,7 @@ class DoSyncView(ReindexBaseView):
     def __call__(self, cron_view=False):
         if not cron_view:
             authenticator = getMultiAdapter(
-                (self.context, self.request), name=u"authenticator"
+                (self.context, self.request), name="authenticator"
             )
             if not authenticator.verify():
                 raise Unauthorized
@@ -457,7 +456,6 @@ class ReactView(BrowserView):
 
 
 class ReindexSolrView(ReactView):
-
     label = _("maintenance_reindex_label", default="Reindex SOLR")
     description = _(
         "maintenance_reindex_help",
@@ -467,7 +465,6 @@ class ReindexSolrView(ReactView):
 
 
 class SyncSolrView(ReactView):
-
     label = _("maintenance_sync_label", default="Sync SOLR")
     description = _(
         "maintenance_sync_help",

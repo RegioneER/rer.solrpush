@@ -275,7 +275,7 @@ def remove_from_solr(uid):
         logger.error(err)
         message = _(
             "content_remove_error",
-            default=u"There was a problem removing this content from SOLR. "
+            default="There was a problem removing this content from SOLR. "
             " Please contact site administrator.",
         )
         api.portal.show_message(

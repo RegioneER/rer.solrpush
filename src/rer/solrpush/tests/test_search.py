@@ -32,7 +32,7 @@ class TestSearch(unittest.TestCase):
         setRoles(self.portal, TEST_USER_ID, ["Manager"])
         set_registry_record(
             "enabled_types",
-            [u"Document", u"News Item"],
+            ["Document", "News Item"],
             interface=IRerSolrpushSettings,
         )
         init_solr_push()
@@ -62,9 +62,9 @@ class TestSearch(unittest.TestCase):
 
     def tearDown(self):
         reset_solr()
-        set_registry_record("qf", u"", interface=IRerSolrpushSettings)
-        set_registry_record("bq", u"", interface=IRerSolrpushSettings)
-        set_registry_record("bf", u"", interface=IRerSolrpushSettings)
+        set_registry_record("qf", "", interface=IRerSolrpushSettings)
+        set_registry_record("bq", "", interface=IRerSolrpushSettings)
+        set_registry_record("bf", "", interface=IRerSolrpushSettings)
         commit()
 
     def test_all_items(self):
@@ -82,7 +82,7 @@ class TestSearch(unittest.TestCase):
 
         set_registry_record(
             "qf",
-            u"id^1000.0 SearchableText^1.0",
+            "id^1000.0 SearchableText^1.0",
             interface=IRerSolrpushSettings,
         )
         commit()
@@ -97,7 +97,7 @@ class TestSearch(unittest.TestCase):
 
         set_registry_record(
             "qf",
-            u"searchwords^1000.0 SearchableText^1.0",
+            "searchwords^1000.0 SearchableText^1.0",
             interface=IRerSolrpushSettings,
         )
         commit()
@@ -111,7 +111,7 @@ class TestSearch(unittest.TestCase):
         self.assertEqual(solr_results.hits, len(self.docs) / 2)
         self.assertNotEqual(solr_results.docs[0]["id"], "odd")
 
-        set_registry_record("bq", u"id:odd", interface=IRerSolrpushSettings)
+        set_registry_record("bq", "id:odd", interface=IRerSolrpushSettings)
         commit()
 
         solr_results = search(query={"": "odd"}, fl=["UID", "id", "Title"])

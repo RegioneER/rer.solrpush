@@ -10,7 +10,6 @@ from zope.interface import implementer
 @implementer(IFeedItem)
 @adapter(ISolrBrain, IFeed)
 class SOLRFeedItem(BaseItem):
-
     @property
     def link(self):
         return self.context.getURL()
