@@ -69,6 +69,10 @@ class Brain(dict):
     def Description(self):
         return self.get("description", "")
 
+    def absolute_url(self):
+        """convenience alias"""
+        return self.getUrl()
+
     @property
     def Date(self):
         if self.EffectiveDate().startswith("1969"):
@@ -133,6 +137,9 @@ class Brain(dict):
         if not value:
             return None
         return DateTime(value).toZone(timezone)
+
+    def Subject(self):
+        return self.get("Subject", [])
 
     def MimeTypeIcon(self):
         mime_type = self.get("mime_type", None)

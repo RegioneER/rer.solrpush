@@ -6,6 +6,7 @@
 *.mo
 *.py?
 *.swp
+_schema_analysis_stopwords_english.json
 # dirs
 bin/
 buildout-cache/
