@@ -17,6 +17,7 @@ import unittest
 
 
 class SearchBandiTest(unittest.TestCase):
+
     layer = RER_SOLRPUSH_API_FUNCTIONAL_TESTING
 
     def setUp(self):
@@ -36,7 +37,7 @@ class SearchBandiTest(unittest.TestCase):
 
         set_registry_record(
             "enabled_types",
-            ["Document", "News Item"],
+            [u"Document", u"News Item"],
             interface=IRerSolrpushSettings,
         )
 
@@ -94,20 +95,22 @@ class SearchBandiTest(unittest.TestCase):
         commit()
 
     def test_search_works(self):
+
         solr_response = self.api_session.get("/@solr-search")
         plone_response = self.api_session.get("/@search")
         solr_results = solr_response.json()
         plone_results = plone_response.json()
-        self.assertEqual(plone_results["items_total"], 6)
-        self.assertEqual(solr_results["items_total"], 3)
+        self.assertEqual(plone_results[u"items_total"], 6)
+        self.assertEqual(solr_results[u"items_total"], 3)
 
     def test_disable_search_will_perform_classic_search(self):
+
         solr_response = self.api_session.get("/@solr-search")
         plone_response = self.api_session.get("/@search")
         solr_results = solr_response.json()
         plone_results = plone_response.json()
-        self.assertEqual(plone_results["items_total"], 6)
-        self.assertEqual(solr_results["items_total"], 3)
+        self.assertEqual(plone_results[u"items_total"], 6)
+        self.assertEqual(solr_results[u"items_total"], 3)
 
         set_registry_record(
             "search_enabled",
@@ -120,5 +123,5 @@ class SearchBandiTest(unittest.TestCase):
         plone_response = self.api_session.get("/@search")
         solr_results = solr_response.json()
         plone_results = plone_response.json()
-        self.assertEqual(plone_results["items_total"], 6)
-        self.assertEqual(solr_results["items_total"], 6)
+        self.assertEqual(plone_results[u"items_total"], 6)
+        self.assertEqual(solr_results[u"items_total"], 6)

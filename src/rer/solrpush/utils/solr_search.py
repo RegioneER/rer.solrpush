@@ -276,7 +276,6 @@ def add_query_tweaks():
 
 # END HELPER METHODS
 
-
 # LIBRARY METHODS
 def search(
     query,
@@ -299,7 +298,7 @@ def search(
     """
     solr = get_solr_connection()
     if not solr:
-        msg = "Unable to search using solr. Configuration is incomplete."
+        msg = u"Unable to search using solr. Configuration is incomplete."
         logger.error(msg)
         return {
             "error": True,
@@ -325,9 +324,9 @@ def search(
             "message": translate(
                 _(
                     "search_error_label",
-                    default="Unable to perform a search with SOLR."
-                    " Please contact the site administrator or wait some"
-                    " minutes.",
+                    default=u"Unable to perform a search with SOLR."
+                    u" Please contact the site administrator or wait some"
+                    u" minutes.",
                 ),
                 context=api.portal.get().REQUEST,
             ),

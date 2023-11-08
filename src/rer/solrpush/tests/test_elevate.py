@@ -18,18 +18,20 @@ import six
 
 
 class TestSolrSearch(unittest.TestCase):
-    """ """
+    """
+    """
 
     layer = RER_SOLRPUSH_API_FUNCTIONAL_TESTING
 
     def setUp(self):
-        """ """
+        """
+        """
         self.portal = self.layer["portal"]
         self.request = self.layer["request"]
         setRoles(self.portal, TEST_USER_ID, ["Manager"])
         set_registry_record(
             "enabled_types",
-            ["Document", "News Item"],
+            [u"Document", u"News Item"],
             interface=IRerSolrpushSettings,
         )
 
@@ -76,7 +78,7 @@ class TestSolrSearch(unittest.TestCase):
     def tearDown(self):
         set_registry_record("active", True, interface=IRerSolrpushSettings)
         #  reset elevate
-        set_registry_record("elevate_schema", "", interface=IElevateSettings)
+        set_registry_record("elevate_schema", u"", interface=IElevateSettings)
         reset_solr()
         commit()
 
@@ -102,13 +104,11 @@ class TestSolrSearch(unittest.TestCase):
         )
 
         # now let's set an elevate for third document
-        value = json.dumps([{"text": ["page"], "uid": [{"UID": doc3.UID()}]}])
+        value = json.dumps([{"text": [u"page"], "uid": [{"UID": doc3.UID()}]}])
         if six.PY2:
             value = value.decode("utf-8")
         set_registry_record(
-            "elevate_schema",
-            value,
-            interface=IElevateSettings,
+            "elevate_schema", value, interface=IElevateSettings,
         )
         solr_results = search(
             query={"SearchableText": "page"}, fl=["UID", "Title", "[elevated]"]

@@ -94,9 +94,9 @@ class SolrIndexProcessor(object):
                     logger.exception("error indexing %s %s", iop, uid)
                     message = _(
                         "content_indexed_error",
-                        default="There was a problem indexing or unindexing "
-                        "this content. Please take note of this address and "
-                        "contact site administrator.",
+                        default=u"There was a problem indexing or unindexing "
+                        u"this content. Please take note of this address and "
+                        u"contact site administrator.",
                     )
                     api.portal.show_message(
                         message=message, request=getRequest(), type="warning"

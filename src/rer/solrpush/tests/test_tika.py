@@ -27,7 +27,7 @@ class TestTika(unittest.TestCase):
         self.request = self.layer["request"]
         setRoles(self.portal, TEST_USER_ID, ["Manager"])
         set_registry_record(
-            "enabled_types", ["File"], interface=IRerSolrpushSettings
+            "enabled_types", [u"File"], interface=IRerSolrpushSettings
         )
         init_solr_push()
         commit()
@@ -51,7 +51,7 @@ class TestTika(unittest.TestCase):
         return file_item
 
     def test_index_and_extract_pdf(self):
-        file_item = self.create_file_item("example.pdf")
+        file_item = self.create_file_item(u"example.pdf")
 
         solr_results = search(query={"*": "*"}, fl="UID")
         self.assertEqual(solr_results.hits, 1)
@@ -60,7 +60,7 @@ class TestTika(unittest.TestCase):
         self.assertEqual(file_item.UID(), st_results.docs[0]["UID"])
 
     def test_index_and_extract_docx(self):
-        file_item = self.create_file_item("example.docx")
+        file_item = self.create_file_item(u"example.docx")
 
         solr_results = search(query={"*": "*"}, fl="UID SearchableText")
         self.assertEqual(solr_results.hits, 1)
@@ -69,7 +69,7 @@ class TestTika(unittest.TestCase):
         self.assertEqual(file_item.UID(), st_results.docs[0]["UID"])
 
     def test_index_and_extract_ods(self):
-        file_item = self.create_file_item("example.ods")
+        file_item = self.create_file_item(u"example.ods")
 
         solr_results = search(query={"*": "*"}, fl="UID SearchableText")
         self.assertEqual(solr_results.hits, 1)
@@ -78,7 +78,7 @@ class TestTika(unittest.TestCase):
         self.assertEqual(file_item.UID(), st_results.docs[0]["UID"])
 
     def test_indexed_file_has_right_mimetype(self):
-        self.create_file_item("example.pdf")
+        self.create_file_item(u"example.pdf")
 
         solr_results = search(query={"*": "*"}, fl="UID mime_type")
         self.assertEqual(solr_results.hits, 1)

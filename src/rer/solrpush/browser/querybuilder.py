@@ -137,7 +137,7 @@ class QueryBuilder(BaseView):
                 portal_state = api.content.get_view(
                     context=self.context,
                     request=self.request,
-                    name="plone_portal_state",
+                    name=u"plone_portal_state",
                 )
                 root_path = portal_state.navigation_root_path()
                 path = self.extract_value(v)
