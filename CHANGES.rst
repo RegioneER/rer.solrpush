@@ -5,15 +5,13 @@ Changelog
 1.3.3 (unreleased)
 ------------------
 
-- Nothing changed yet.
-
+- Fix RSS Feed.
+  [cekk]
 
 1.3.2 (2023-11-08)
 ------------------
 
 - Update translation for content_remove_error.
-  [cekk]
-- Fix RSS Feed.
   [cekk]
 
 1.3.1 (2023-08-01)
