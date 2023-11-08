@@ -11,6 +11,8 @@ bin/
 buildout-cache/
 #config/dev/conf/
 #config/test/conf/
+config/dev/conf/_schema_analysis_stopwords_english.json
+config/test/conf/_schema_analysis_stopwords_english.json
 config/dev/data/
 config/test/data/
 develop-eggs/
