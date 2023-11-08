@@ -13,7 +13,8 @@ Changelog
 
 - Update translation for content_remove_error.
   [cekk]
-
+- Fix RSS Feed.
+  [cekk]
 
 1.3.1 (2023-08-01)
 ------------------

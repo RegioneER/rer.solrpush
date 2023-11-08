@@ -8,4 +8,6 @@
       factory=".file.FileExtractor"
       />
 
+  <!-- RSS feed -->
+  <adapter factory=".rss_feed.SOLRFeedItem"/>
 </configure>
