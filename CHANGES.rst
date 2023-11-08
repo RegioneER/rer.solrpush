@@ -2,7 +2,7 @@ Changelog
 =========
 
 
-1.3.2 (unreleased)
+1.3.2 (2023-11-08)
 ------------------
 
 - Update translation for content_remove_error.
