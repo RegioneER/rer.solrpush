@@ -49,7 +49,7 @@ class Brain(dict):
             return value
         else:
             if name not in schema:
-                raise AttributeError(name)
+                return ""
 
     def __init__(self, context, request=None):
         self.context = context

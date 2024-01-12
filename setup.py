@@ -49,7 +49,7 @@ setup(
     package_dir={"": "src"},
     include_package_data=True,
     zip_safe=False,
-    python_requires="==2.7",
+    python_requires=">=3.7",
     install_requires=[
         "setuptools",
         "collective.z3cform.jsonwidget",
@@ -57,6 +57,7 @@ setup(
         "pysolr",
         'ftfy==4.4.3;python_version<="2.7"',
         "plone.restapi",
+        "z3c.jbot",
     ],
     extras_require={
         "test": [

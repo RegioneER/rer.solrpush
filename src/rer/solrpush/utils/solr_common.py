@@ -33,7 +33,7 @@ def should_force_commit():
 
 def get_index_fields():
     json_str = get_setting(field="index_fields")
-    return json.loads(json_str)
+    return json_str and json.loads(json_str) or {}
 
 
 def extract_fields(nodes):

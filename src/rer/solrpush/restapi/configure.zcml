@@ -3,6 +3,14 @@
     xmlns:plone="http://namespaces.plone.org/plone">
 
   <include package="plone.restapi" file="configure.zcml"/>
+  <include package=".deserializer" />
   <include package=".services" />
 
+
+    <!-- enable controlpanel on plone.restapi -->
+  <adapter
+      factory=".controlpanel.RerSolrpushSettingsControlpanel"
+      provides="plone.restapi.controlpanels.interfaces.IDexterityTypesControlpanel"
+      name="solrpush-settings"
+      />
 </configure>
