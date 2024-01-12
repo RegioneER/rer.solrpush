@@ -24,6 +24,7 @@ except ImportError:
     HAS_RER_THEME = False
 
 import os
+import json
 import six
 
 timezone = DateTime().timezone()
@@ -38,6 +39,8 @@ class Brain(dict):
 
     def __getattr__(self, name):
         """look up attributes in dict"""
+        if name not in self.keys():
+            return None
         marker = []
         value = self.get(name, marker)
         schema = get_index_fields()
@@ -49,7 +52,7 @@ class Brain(dict):
             return value
         else:
             if name not in schema:
-                return ""
+                raise AttributeError(name)
 
     def __init__(self, context, request=None):
         self.context = context
@@ -164,6 +167,10 @@ class Brain(dict):
         if name == "@@images":
             return SolrScalesHandler(self, getRequest())
         return None
+
+    @property
+    def image_scales(self):
+        return json.loads(self.get("image_scales", "{}"))
 
 
 class SolrResults(list):

@@ -3,20 +3,23 @@ from DateTime import DateTime
 from plone import api
 from plone.indexer.interfaces import IIndexableObject
 from plone.registry.interfaces import IRegistry
+from plone.restapi.serializer.converters import json_compatible
 from rer.solrpush import _
 from rer.solrpush.interfaces.adapter import IExtractFileFromTika
+from rer.solrpush.utils.solr_common import get_index_fields
+from rer.solrpush.utils.solr_common import get_setting
+from rer.solrpush.utils.solr_common import get_solr_connection
+from rer.solrpush.utils.solr_common import is_solr_active
+from rer.solrpush.utils.solr_common import should_force_commit
 from six.moves import map
 from zope.component import getUtility
 from zope.component import queryMultiAdapter
-from rer.solrpush.utils.solr_common import get_solr_connection
-from rer.solrpush.utils.solr_common import get_setting
-from rer.solrpush.utils.solr_common import get_index_fields
-from rer.solrpush.utils.solr_common import is_solr_active
-from rer.solrpush.utils.solr_common import should_force_commit
+from persistent.mapping import PersistentMapping
 
 import datetime
 import logging
 import pysolr
+import json
 import six
 
 
@@ -140,6 +143,9 @@ def create_index_dict(item):
         else:
             if field_type == "date":
                 value = parse_date_str(value)
+        if isinstance(value, PersistentMapping):
+            # convert dict-like object in json object
+            value = json.dumps(json_compatible(value))
         index_me[field] = value
 
     for field in ADDITIONAL_FIELDS:
@@ -168,7 +174,6 @@ def create_index_dict(item):
     has_image = getattr(item.aq_base, "image", None)
     if has_image:
         index_me["getIcon"] = True
-
     return index_me
 
 
