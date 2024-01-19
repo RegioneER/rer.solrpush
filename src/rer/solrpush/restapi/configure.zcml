@@ -13,4 +13,9 @@
       provides="plone.restapi.controlpanels.interfaces.IDexterityTypesControlpanel"
       name="solrpush-settings"
       />
+  <adapter
+      factory=".controlpanel.ElevateSettingsControlpanel"
+      provides="plone.restapi.controlpanels.interfaces.IDexterityTypesControlpanel"
+      name="elevate-settings"
+      />
 </configure>

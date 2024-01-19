@@ -1,9 +1,13 @@
 <?xml version="1.0"?>
 <rolemap>
+  <roles>
+    <role name="ElevateManager" />
+  </roles>
   <permissions>
     <permission name="rer.solrpush: Edit Elevate" acquire="True">
       <role name="Manager" />
       <role name="Site Administrator" />
+      <role name="ElevateManager" />
     </permission>
     <permission name="rer.solrpush: Edit Settings" acquire="True">
       <role name="Manager" />
