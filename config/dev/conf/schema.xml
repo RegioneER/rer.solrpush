@@ -184,10 +184,6 @@
    <field name="destinatari" type="string" indexed="true" stored="true" required="false" multiValued="true" termVectors="false" termPositions="false" termOffsets="false"/>
    <field name="finanziatori" type="string" indexed="true" stored="true" required="false" multiValued="true" termVectors="false" termPositions="false" termOffsets="false"/>
    <field name="materie" type="string" indexed="true" stored="true" required="false" multiValued="true" termVectors="false" termPositions="false" termOffsets="false"/>
-<!-- plone6/volto -->
-   <field name="image_scales" type="string" indexed="false" stored="true" required="false" multiValued="false" termVectors="false" termPositions="false" termOffsets="false" />
-   <field name="image_field" type="string" indexed="false" stored="true" required="false" multiValued="false" termVectors="false" termPositions="false" termOffsets="false" />
-
 
 
 <!-- indici valorizzati per memorizzare la profondità di navigazione di un contenuto. Si parte da 1 che indica un contenuto creato nella radice del sito -->
@@ -270,7 +266,7 @@
          then default lucene sorting will be used which places docs without the
          field first in an ascending sort and last in a descending sort.
     -->    
-    <fieldType name="date" class="solr.DatePointField" docValues="true" precisionStep="0" positionIncrementGap="0"/>
+    <fieldType name="date" class="solr.DatePointField" docValues="true" sortMissingLast="true" positionIncrementGap="0"/>
 
     <!--
       Numeric field types that index values using KD-trees.
@@ -741,3 +737,4 @@
     -->
 
 </schema>
+
