@@ -81,13 +81,13 @@
           />
 
     <!-- return scaled image -->
-    <browser:page
+    <!-- <browser:page
         name="solr-images"
         class=".scales.SolrImages"
         permission="zope2.View"
         for="*"
         layer="rer.solrpush.interfaces.IRerSolrpushLayer"
-        />
+        /> -->
 
     <!-- CUSTOM COLLECTIONS -->
     <browser:page

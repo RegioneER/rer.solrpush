@@ -71,7 +71,6 @@
                     <metal:block define-slot="entry">
 
                       <article class="mb-3 row">
-
                         <div class="col"
                              metal:define-macro="listitem"
                         >
@@ -108,8 +107,8 @@
                               <tal:byline condition="python:view.show_about">
                                 <tal:name tal:define="
                                             author python:view.pas_member.info(item_creator);
-                                            creator_short_form python:author.get('username');
-                                            creator_long_form string:?author=$${python:author.username};
+                                            creator_short_form python:author.get('username', author.get('id'));
+                                            creator_long_form string:?author=$${creator_short_form};
                                             creator_is_openid python:'/' in creator_short_form;
                                             creator_id python:(creator_short_form, creator_long_form)[creator_is_openid];
                                           "
@@ -158,10 +157,9 @@
                         <div class="col-3 text-end"
                              tal:condition="python:item_has_image and thumb_scale_list"
                         >
-                          <a tal:attributes="
-                               href python:item_link;
-                             ">
-                            <img tal:replace="structure python:image_scale.tag(item, 'image', scale=thumb_scale_list, css_class=img_class, loading='lazy')" />
+                          <a tal:attributes="href python:item_link;"
+                             tal:define="image_field item/image_field|image">
+                            <img tal:replace="structure python:image_scale.tag(item, image_field, scale=thumb_scale_list, css_class=img_class, loading='lazy')" />
                           </a>
                         </div>
                       </article>

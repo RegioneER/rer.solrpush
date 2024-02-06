@@ -5,7 +5,8 @@ Changelog
 1.3.4 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Plone6 compatibility.
+  [cekk]
 
 
 1.3.3 (2023-11-08)
