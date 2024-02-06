@@ -171,9 +171,17 @@ def create_index_dict(item):
     else:
         index_me["url"] = item.absolute_url()
 
-    has_image = getattr(item.aq_base, "image", None)
+    # backward compatibility with Plone < 6 where there wasn't image_field and image_scales indexers
+    has_image = False
+    if index_me.get("image_field", None) and index_me.get(
+        "image_scales", None
+    ):
+        has_image = True
+    else:
+        has_image = getattr(item.aq_base, "image", None)
     if has_image:
         index_me["getIcon"] = True
+
     return index_me
 
 

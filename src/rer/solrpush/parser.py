@@ -170,7 +170,32 @@ class Brain(dict):
 
     @property
     def image_scales(self):
-        return json.loads(self.get("image_scales", "{}"))
+        scales = json.loads(self.get("image_scales", "{}"))
+        if scales:
+            return scales
+
+        # backward compatibility with < Plone6 indexed contents
+        if not self.get("getIcon", False):
+            return {}
+
+        return {
+            "image": [
+                {
+                    "download": "@@images/image",
+                    "scales": {
+                        "preview": {
+                            "download": "@@images/image/preview",
+                        },
+                        "thumb": {
+                            "download": "@@images/image/thumb",
+                        },
+                        "mini": {
+                            "download": "@@images/image/mini",
+                        },
+                    },
+                }
+            ]
+        }
 
 
 class SolrResults(list):
