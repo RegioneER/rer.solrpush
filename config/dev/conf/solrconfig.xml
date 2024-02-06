@@ -13,7 +13,7 @@
   
   <dataDir>${solr.data.dir:}</dataDir>
   <directoryFactory class="${solr.directoryFactory:solr.NRTCachingDirectoryFactory}" name="DirectoryFactory"></directoryFactory>
-  <codecFactory class="solr.SchemaCodecFactory"/>  
+  <codecFactory class="solr.SchemaCodecFactory"/>
   <schemaFactory class="ClassicIndexSchemaFactory"/> 
   
   <indexConfig>
@@ -154,7 +154,6 @@
       <str name="xpath">/xhtml:html/xhtml:body/descendant:node()</str>
       <str name="capture">content</str>
       <str name="fmap.meta">attr_meta_</str>
-      <str name="uprefix">attr_</str>
       <str name="lowernames">false</str>
       <str name="uprefix">ignored_</str>
       <str name="captureAttr">true</str>

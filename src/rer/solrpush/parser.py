@@ -74,7 +74,7 @@ class Brain(dict):
 
     def absolute_url(self):
         """convenience alias"""
-        return self.getUrl()
+        return self.getURL()
 
     @property
     def Date(self):
