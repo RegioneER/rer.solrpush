@@ -184,6 +184,7 @@
    <field name="destinatari" type="string" indexed="true" stored="true" required="false" multiValued="true" termVectors="false" termPositions="false" termOffsets="false"/>
    <field name="finanziatori" type="string" indexed="true" stored="true" required="false" multiValued="true" termVectors="false" termPositions="false" termOffsets="false"/>
    <field name="materie" type="string" indexed="true" stored="true" required="false" multiValued="true" termVectors="false" termPositions="false" termOffsets="false"/>
+   <field name="apertura_bando" type="date" indexed="true" stored="true" required="false" multiValued="false" termVectors="false" termPositions="false" termOffsets="false"/>
 <!-- plone6/volto -->
    <field name="image_scales" type="string" indexed="false" stored="true" required="false" multiValued="false" termVectors="false" termPositions="false" termOffsets="false" />
    <field name="image_field" type="string" indexed="false" stored="true" required="false" multiValued="false" termVectors="false" termPositions="false" termOffsets="false" />

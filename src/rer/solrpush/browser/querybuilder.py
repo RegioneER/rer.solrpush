@@ -23,6 +23,7 @@ logger = logging.getLogger(__name__)
 
 
 class QueryBuilder(BaseView):
+
     def _makequery(
         self,
         query=None,
@@ -43,6 +44,7 @@ class QueryBuilder(BaseView):
         parsedquery = queryparser.parseFormquery(
             self.context, query, sort_on, sort_order
         )
+
         index_modifiers = getUtilitiesFor(IParsedQueryIndexModifier)
         for name, modifier in index_modifiers:
             if name in parsedquery:
@@ -81,9 +83,15 @@ class QueryBuilder(BaseView):
 
         if isinstance(custom_query, dict) and custom_query:
             # Update the parsed query with an extra query dictionary. This may
-            # override the parsed query. The custom_query is a dictonary of
+            # override the parsed query. The custom_query is a dictionary of
             # index names and their associated query values.
-            parsedquery.update(custom_query)
+            for key in custom_query:
+                if isinstance(parsedquery.get(key), dict) and isinstance(
+                    custom_query.get(key), dict
+                ):
+                    parsedquery[key].update(custom_query[key])
+                    continue
+                parsedquery[key] = custom_query[key]
             empty_query = False
 
         # filter bad term and operator in query
@@ -96,6 +104,7 @@ class QueryBuilder(BaseView):
             if parsedquery["searchWithSolr"]["query"]:
                 search_with_solr = True
             del parsedquery["searchWithSolr"]
+
         if not empty_query:
             if search_with_solr:
                 if "SearchableText" in parsedquery:
@@ -116,8 +125,8 @@ class QueryBuilder(BaseView):
                 results = catalog(**parsedquery)
             if (
                 getattr(results, "actual_result_count", False)
-                and limit  # noqa
-                and results.actual_result_count > limit  # noqa
+                and limit
+                and results.actual_result_count > limit
             ):
                 results.actual_result_count = limit
 
@@ -137,7 +146,7 @@ class QueryBuilder(BaseView):
                 portal_state = api.content.get_view(
                     context=self.context,
                     request=self.request,
-                    name=u"plone_portal_state",
+                    name="plone_portal_state",
                 )
                 root_path = portal_state.navigation_root_path()
                 path = self.extract_value(v)
