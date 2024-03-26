@@ -6,6 +6,7 @@ from zope.i18n import translate
 from rer.solrpush.utils.solr_common import get_solr_connection
 from rer.solrpush.utils.solr_common import get_setting
 from rer.solrpush.utils.solr_common import get_index_fields
+from rer.solrpush.utils.solr_common import is_solr_active
 from rer.solrpush.interfaces.settings import IRerSolrpushSettings
 from rer.solrpush.utils.solr_indexer import parse_date_str
 from DateTime import DateTime
@@ -276,6 +277,7 @@ def add_query_tweaks():
 
 # END HELPER METHODS
 
+
 # LIBRARY METHODS
 def search(
     query,
@@ -298,8 +300,10 @@ def search(
     """
     solr = get_solr_connection()
     if not solr:
-        msg = u"Unable to search using solr. Configuration is incomplete."
-        logger.error(msg)
+        msg = "Unable to search using solr. Configuration is incomplete."
+        if is_solr_active():
+            # log it beacuse it's misconfigured
+            logger.error(msg)
         return {
             "error": True,
             "message": translate(
@@ -324,9 +328,9 @@ def search(
             "message": translate(
                 _(
                     "search_error_label",
-                    default=u"Unable to perform a search with SOLR."
-                    u" Please contact the site administrator or wait some"
-                    u" minutes.",
+                    default="Unable to perform a search with SOLR."
+                    " Please contact the site administrator or wait some"
+                    " minutes.",
                 ),
                 context=api.portal.get().REQUEST,
             ),
