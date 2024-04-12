@@ -328,7 +328,9 @@ class ReindexBaseView(BrowserView):
             if brain.UID not in solr_items:
                 # missing from solr: try to index it
                 try:
+                    logger.info("send to solr")
                     res = push_to_solr(item)
+                    logger.info("received response from solr")
                     if res:
                         indexed.append(brain.getPath())
                 except SolrError as e:
