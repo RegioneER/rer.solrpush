@@ -353,9 +353,7 @@ class ReindexBaseView(BrowserView):
                 ):
                     # item has been modified and not synced in solr
                     try:
-                        logger.info("send to solr")
                         res = push_to_solr(item)
-                        logger.info("received response from solr")
                         if res:
                             indexed.append(brain.getPath())
                     except Exception as e:
