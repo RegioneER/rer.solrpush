@@ -3,6 +3,7 @@ from plone import api
 from rer.solrpush.interfaces.adapter import IExtractFileFromTika
 from zope.interface import implementer
 
+
 try:
     from collective.limitfilesizepanel.interfaces import ILimitFileSizePanel
 
@@ -11,6 +12,7 @@ except ImportError:
     HAS_LFSP = False
 
 import logging
+
 
 logger = logging.getLogger(__name__)
 
@@ -34,8 +36,7 @@ class FileExtractor(object):
         return max_size * 1024 * 1024
 
     def get_file_to_index(self):
-        """
-        """
+        """ """
         file_obj = getattr(self.context, "file", None)
         if not file_obj:
             return None

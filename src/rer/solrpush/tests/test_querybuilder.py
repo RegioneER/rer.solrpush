@@ -6,14 +6,14 @@ from plone.app.testing import setRoles
 from plone.app.testing import TEST_USER_ID
 from plone.namedfile.file import NamedBlobImage
 from rer.solrpush.interfaces.settings import IRerSolrpushSettings
-from rer.solrpush.utils.solr_common import init_solr_push
-from rer.solrpush.utils.solr_common import get_solr_connection
-from rer.solrpush.utils import push_to_solr
 from rer.solrpush.testing import RER_SOLRPUSH_API_FUNCTIONAL_TESTING
+from rer.solrpush.utils import push_to_solr
+from rer.solrpush.utils.solr_common import get_solr_connection
+from rer.solrpush.utils.solr_common import init_solr_push
 from transaction import commit
 
-import unittest
 import os
+import unittest
 
 
 class TestCollections(unittest.TestCase):

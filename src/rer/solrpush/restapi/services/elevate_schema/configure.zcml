@@ -1,14 +1,15 @@
 <configure
     xmlns="http://namespaces.zope.org/zope"
-    xmlns:plone="http://namespaces.plone.org/plone">
+    xmlns:plone="http://namespaces.plone.org/plone"
+    >
 
   <plone:service
-    method="GET"
-    for="zope.interface.Interface"
-    factory=".get.ElevateSchemaGet"
-    name="@elevate-schema"
-    permission="zope2.View"
-    layer="rer.solrpush.interfaces.IRerSolrpushLayer"
-    />
+      method="GET"
+      factory=".get.ElevateSchemaGet"
+      for="zope.interface.Interface"
+      permission="zope2.View"
+      layer="rer.solrpush.interfaces.IRerSolrpushLayer"
+      name="@elevate-schema"
+      />
 
 </configure>

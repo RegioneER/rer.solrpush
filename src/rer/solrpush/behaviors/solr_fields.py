@@ -19,7 +19,7 @@ class ISolrFields(model.Schema):
         required=False,
         default=True,
         missing_value=True,
-        title=_("label_showinsearch", default=u"Show in search"),
+        title=_("label_showinsearch", default="Show in search"),
         description=_("help_showinsearch", default=""),
     )
 
@@ -27,13 +27,13 @@ class ISolrFields(model.Schema):
         required=False,
         default=[],
         missing_value=[],
-        title=_("label_searchwords", default=u"Search words"),
+        title=_("label_searchwords", default="Search words"),
         value_type=schema.TextLine(),
         description=_(
             "help_searchwords",
-            u"Specify words for which this item will show up "
-            u"as the first search result. Multiple words can be "
-            u"specified on new lines.",
+            "Specify words for which this item will show up "
+            "as the first search result. Multiple words can be "
+            "specified on new lines.",
         ),
     )
 

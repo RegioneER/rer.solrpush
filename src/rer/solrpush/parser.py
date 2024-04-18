@@ -11,6 +11,7 @@ from rer.solrpush.utils.solr_indexer import get_site_title
 from zope.globalrequest import getRequest
 from zope.interface import implementer
 
+
 try:
     from ZTUtils.Lazy import Lazy
 except ImportError:
@@ -23,9 +24,10 @@ try:
 except ImportError:
     HAS_RER_THEME = False
 
-import os
 import json
+import os
 import six
+
 
 timezone = DateTime().timezone()
 

@@ -22,6 +22,7 @@ import six
 import subprocess
 import sys
 
+
 BIN_DIR = os.path.dirname(os.path.realpath(sys.argv[0]))
 
 
@@ -46,7 +47,7 @@ class SolrLayer(Layer):
         self.solr_host = solr_host
         self.solr_port = solr_port
         self.solr_base = solr_base
-        self.solr_url = u"http://{0}:{1}{2}".format(
+        self.solr_url = "http://{0}:{1}{2}".format(
             solr_host, solr_port, solr_base
         )
 
@@ -96,9 +97,9 @@ class RerSolrpushRestApiLayer(PloneRestApiDXLayer):
         bases=None,
         name="SolrPush Layer",
         module=None,
-        solr_host=u"localhost",
+        solr_host="localhost",
         solr_port=8983,
-        solr_base=u"/solr/solrpush_test",
+        solr_base="/solr/solrpush_test",
     ):
         super(PloneSandboxLayer, self).__init__(bases, name, module)
         self.solr_host = solr_host

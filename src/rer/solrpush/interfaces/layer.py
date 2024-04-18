@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-from zope.publisher.interfaces.browser import IDefaultBrowserLayer
 from plone.restapi.controlpanels.interfaces import IControlpanel
+from zope.publisher.interfaces.browser import IDefaultBrowserLayer
 
 
 class IRerSolrpushLayer(IDefaultBrowserLayer):

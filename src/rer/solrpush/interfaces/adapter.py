@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-from zope.interface import Interface
 from plone.app.contentlisting.interfaces import IContentListingObject
+from zope.interface import Interface
 
 
 class IExtractFileFromTika(Interface):

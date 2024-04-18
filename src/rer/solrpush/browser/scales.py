@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
-from Products.Five.browser import BrowserView
-from zope.publisher.interfaces import IPublishTraverse
-from zope.interface import implementer
 from plone import api
+from Products.Five.browser import BrowserView
+from zope.interface import implementer
+from zope.publisher.interfaces import IPublishTraverse
 
 import six
 

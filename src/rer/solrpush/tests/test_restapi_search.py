@@ -11,8 +11,8 @@ from rer.solrpush.interfaces.settings import IRerSolrpushSettings
 from rer.solrpush.testing import RER_SOLRPUSH_API_FUNCTIONAL_TESTING
 from rer.solrpush.utils import init_solr_push
 from rer.solrpush.utils import reset_solr
-
 from transaction import commit
+
 import unittest
 
 

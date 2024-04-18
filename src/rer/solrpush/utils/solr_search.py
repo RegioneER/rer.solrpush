@@ -1,21 +1,21 @@
 # -*- coding: utf-8 -*-
+from DateTime import DateTime
 from plone import api
+from pysolr import safe_urlencode
 from rer.solrpush import _
 from rer.solrpush.interfaces import IElevateSettings
-from zope.i18n import translate
-from rer.solrpush.utils.solr_common import get_solr_connection
-from rer.solrpush.utils.solr_common import get_setting
-from rer.solrpush.utils.solr_common import get_index_fields
-from rer.solrpush.utils.solr_common import is_solr_active
 from rer.solrpush.interfaces.settings import IRerSolrpushSettings
+from rer.solrpush.utils.solr_common import get_index_fields
+from rer.solrpush.utils.solr_common import get_setting
+from rer.solrpush.utils.solr_common import get_solr_connection
+from rer.solrpush.utils.solr_common import is_solr_active
 from rer.solrpush.utils.solr_indexer import parse_date_str
-from DateTime import DateTime
-from pysolr import safe_urlencode
 from zope.annotation.interfaces import IAnnotations
 from zope.globalrequest import getRequest
+from zope.i18n import translate
 
-import logging
 import json
+import logging
 import re
 import requests
 import six

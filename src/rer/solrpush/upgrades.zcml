@@ -1,86 +1,87 @@
 <configure
-  xmlns="http://namespaces.zope.org/zope"
-  xmlns:genericsetup="http://namespaces.zope.org/genericsetup">
+    xmlns="http://namespaces.zope.org/zope"
+    xmlns:genericsetup="http://namespaces.zope.org/genericsetup"
+    >
 
   <genericsetup:upgradeStep
-    source="1000"
-    destination="1100"
-    title="Remove persistent utility"
-    description=""
-    profile="rer.solrpush:default"
-    handler=".upgrades.to_1100"
-    />
+      title="Remove persistent utility"
+      description=""
+      profile="rer.solrpush:default"
+      source="1000"
+      destination="1100"
+      handler=".upgrades.to_1100"
+      />
 
   <genericsetup:upgradeStep
-    source="1100"
-    destination="1200"
-    title="Added css resource and bundle"
-    description="Styles for controlpanel"
-    profile="rer.solrpush:default"
-    handler=".upgrades.to_1200"
-    />
+      title="Added css resource and bundle"
+      description="Styles for controlpanel"
+      profile="rer.solrpush:default"
+      source="1100"
+      destination="1200"
+      handler=".upgrades.to_1200"
+      />
   <genericsetup:upgradeStep
-    source="1200"
-    destination="1300"
-    title="Remove unused control panel"
-    description=""
-    profile="rer.solrpush:default"
-    handler=".upgrades.to_1300"
-    />
+      title="Remove unused control panel"
+      description=""
+      profile="rer.solrpush:default"
+      source="1200"
+      destination="1300"
+      handler=".upgrades.to_1300"
+      />
   <genericsetup:upgradeStep
-    source="1300"
-    destination="1400"
-    title="Remove unused control panel"
-    description=""
-    profile="rer.solrpush:default"
-    handler=".upgrades.to_1400"
-    />
+      title="Remove unused control panel"
+      description=""
+      profile="rer.solrpush:default"
+      source="1300"
+      destination="1400"
+      handler=".upgrades.to_1400"
+      />
   <genericsetup:upgradeStep
-    source="1400"
-    destination="1500"
-    title="Add new field in controlpanel: force_commit"
-    description=""
-    profile="rer.solrpush:default"
-    handler=".upgrades.update_registry"
-    />
+      title="Add new field in controlpanel: force_commit"
+      description=""
+      profile="rer.solrpush:default"
+      source="1400"
+      destination="1500"
+      handler=".upgrades.update_registry"
+      />
   <genericsetup:upgradeStep
-    source="1500"
-    destination="1600"
-    title="Add new criteria and reindex files"
-    description=""
-    profile="rer.solrpush:default"
-    handler=".upgrades.to_1600"
-    />
+      title="Add new criteria and reindex files"
+      description=""
+      profile="rer.solrpush:default"
+      source="1500"
+      destination="1600"
+      handler=".upgrades.to_1600"
+      />
   <genericsetup:upgradeStep
-    source="1600"
-    destination="1700"
-    title="Add new field in controlpanel: query_debug"
-    description=""
-    profile="rer.solrpush:default"
-    handler=".upgrades.update_registry"
-    />  
+      title="Add new field in controlpanel: query_debug"
+      description=""
+      profile="rer.solrpush:default"
+      source="1600"
+      destination="1700"
+      handler=".upgrades.update_registry"
+      />
   <genericsetup:upgradeStep
-    source="1700"
-    destination="1800"
-    title="Add new criteria: solr_portal_types"
-    description=""
-    profile="rer.solrpush:default"
-    handler=".upgrades.update_registry"
-    />
+      title="Add new criteria: solr_portal_types"
+      description=""
+      profile="rer.solrpush:default"
+      source="1700"
+      destination="1800"
+      handler=".upgrades.update_registry"
+      />
   <genericsetup:upgradeStep
-    source="1800"
-    destination="1900"
-    title="Add elevate control panel link in user actions"
-    description=""
-    profile="rer.solrpush:default"
-    handler=".upgrades.update_actions"
-    />
+      title="Add elevate control panel link in user actions"
+      description=""
+      profile="rer.solrpush:default"
+      source="1800"
+      destination="1900"
+      handler=".upgrades.update_actions"
+      />
   <genericsetup:upgradeStep
-    source="1900"
-    destination="2000"
-    title="Add search_enabled setting field"
-    description=""
-    profile="rer.solrpush:default"
-    handler=".upgrades.update_registry"
-    />  
+      title="Add search_enabled setting field"
+      description=""
+      profile="rer.solrpush:default"
+      source="1900"
+      destination="2000"
+      handler=".upgrades.update_registry"
+      />
 </configure>

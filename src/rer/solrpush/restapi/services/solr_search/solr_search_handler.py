@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 from copy import deepcopy
-from Products.CMFCore.utils import getToolByName
-from plone.restapi.search.handler import SearchHandler as BaseHandler
-from rer.solrpush.utils import search as solr_search
-from rer.solrpush.restapi.services.solr_search.batch import SolrHypermediaBatch
 from plone.restapi.deserializer import boolean_value
+from plone.restapi.search.handler import SearchHandler as BaseHandler
+from Products.CMFCore.utils import getToolByName
+from rer.solrpush.restapi.services.solr_search.batch import SolrHypermediaBatch
+from rer.solrpush.utils import search as solr_search
+
 
 DEFAULT_METADATA_FIELDS = set(
     ["@id", "@type", "description", "review_state", "title"]

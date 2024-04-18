@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from DateTime import DateTime
+from persistent.mapping import PersistentMapping
 from plone import api
 from plone.indexer.interfaces import IIndexableObject
 from plone.registry.interfaces import IRegistry
@@ -14,12 +15,11 @@ from rer.solrpush.utils.solr_common import should_force_commit
 from six.moves import map
 from zope.component import getUtility
 from zope.component import queryMultiAdapter
-from persistent.mapping import PersistentMapping
 
 import datetime
+import json
 import logging
 import pysolr
-import json
 import six
 
 

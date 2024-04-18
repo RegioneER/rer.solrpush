@@ -9,10 +9,9 @@ from plone.app.querystring.querybuilder import QueryBuilder as BaseView
 from plone.batching import Batch
 from Products.CMFCore.utils import getToolByName
 from rer.solrpush.parser import SolrResponse
-from rer.solrpush.utils.solr_indexer import get_site_title
 from rer.solrpush.utils import search as solr_search
+from rer.solrpush.utils.solr_indexer import get_site_title
 from zope.component import getUtilitiesFor
-
 
 import logging
 
@@ -23,7 +22,6 @@ logger = logging.getLogger(__name__)
 
 
 class QueryBuilder(BaseView):
-
     def _makequery(
         self,
         query=None,

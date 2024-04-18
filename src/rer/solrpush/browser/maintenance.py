@@ -57,7 +57,6 @@ def timer(func=time):
 
 
 class SolrMaintenanceBaseForm(form.Form):
-
     # template = ViewPageTemplateFile('templates/reindex_solr.pt')
 
     ignoreContext = True
@@ -464,7 +463,6 @@ class ReactView(BrowserView):
 
 
 class ReindexSolrView(ReactView):
-
     label = _("maintenance_reindex_label", default="Reindex SOLR")
     description = _(
         "maintenance_reindex_help",
@@ -474,7 +472,6 @@ class ReindexSolrView(ReactView):
 
 
 class SyncSolrView(ReactView):
-
     label = _("maintenance_sync_label", default="Sync SOLR")
     description = _(
         "maintenance_sync_help",

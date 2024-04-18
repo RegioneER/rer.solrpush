@@ -1,11 +1,11 @@
-from rer.solrpush.interfaces import IRerSolrpushLayer
+from plone.restapi.controlpanels import RegistryConfigletPanel
 from rer.solrpush.interfaces import IElevateSettings
+from rer.solrpush.interfaces import IRerSolrpushLayer
 from rer.solrpush.interfaces import IRERSolrpushRestapiControlpanel
 from rer.solrpush.interfaces.settings import IRerSolrpushSettings
-from plone.restapi.controlpanels import RegistryConfigletPanel
 from zope.component import adapter
-from zope.interface import Interface
 from zope.interface import implementer
+from zope.interface import Interface
 
 
 @adapter(Interface, IRerSolrpushLayer)
