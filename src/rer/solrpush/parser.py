@@ -11,6 +11,7 @@ from rer.solrpush.utils.solr_indexer import get_site_title
 from zope.globalrequest import getRequest
 from zope.interface import implementer
 
+
 try:
     from ZTUtils.Lazy import Lazy
 except ImportError:
@@ -23,8 +24,10 @@ try:
 except ImportError:
     HAS_RER_THEME = False
 
+import json
 import os
 import six
+
 
 timezone = DateTime().timezone()
 
@@ -38,6 +41,8 @@ class Brain(dict):
 
     def __getattr__(self, name):
         """look up attributes in dict"""
+        if name not in self.keys():
+            return None
         marker = []
         value = self.get(name, marker)
         schema = get_index_fields()
@@ -71,7 +76,7 @@ class Brain(dict):
 
     def absolute_url(self):
         """convenience alias"""
-        return self.getUrl()
+        return self.getURL()
 
     @property
     def Date(self):
@@ -164,6 +169,35 @@ class Brain(dict):
         if name == "@@images":
             return SolrScalesHandler(self, getRequest())
         return None
+
+    @property
+    def image_scales(self):
+        scales = json.loads(self.get("image_scales", "{}"))
+        if scales:
+            return scales
+
+        # backward compatibility with < Plone6 indexed contents
+        if not self.get("getIcon", False):
+            return {}
+
+        return {
+            "image": [
+                {
+                    "download": "@@images/image",
+                    "scales": {
+                        "preview": {
+                            "download": "@@images/image/preview",
+                        },
+                        "thumb": {
+                            "download": "@@images/image/thumb",
+                        },
+                        "mini": {
+                            "download": "@@images/image/mini",
+                        },
+                    },
+                }
+            ]
+        }
 
 
 class SolrResults(list):

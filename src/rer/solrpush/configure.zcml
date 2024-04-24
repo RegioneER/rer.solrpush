@@ -3,7 +3,8 @@
     xmlns:genericsetup="http://namespaces.zope.org/genericsetup"
     xmlns:i18n="http://namespaces.zope.org/i18n"
     xmlns:plone="http://namespaces.plone.org/plone"
-    i18n_domain="rer.solrpush">
+    i18n_domain="rer.solrpush"
+    >
 
   <i18n:registerTranslations directory="locales" />
   <include file="permissions.zcml" />
@@ -12,70 +13,76 @@
   <include package=".behaviors" />
   <include package=".browser" />
   <include package=".restapi" />
-  
+
 
   <include file="upgrades.zcml" />
 
   <genericsetup:registerProfile
       name="default"
       title="RER: Solr push"
-      directory="profiles/default"
       description="Installs the rer.solrpush add-on."
       provides="Products.GenericSetup.interfaces.EXTENSION"
+      directory="profiles/default"
       post_handler=".setuphandlers.post_install"
       />
 
   <genericsetup:registerProfile
       name="uninstall"
       title="RER: Solr push (uninstall)"
-      directory="profiles/uninstall"
       description="Uninstalls the rer.solrpush add-on."
       provides="Products.GenericSetup.interfaces.EXTENSION"
+      directory="profiles/uninstall"
       post_handler=".setuphandlers.uninstall"
       />
-  
+
   <genericsetup:registerProfile
       name="to_1100"
       title="RER: Solr push remove persistent utility"
-      directory="profiles/to_1100"
       description=""
       provides="Products.GenericSetup.interfaces.EXTENSION"
+      directory="profiles/to_1100"
       />
 
   <genericsetup:registerProfile
       name="to_1300"
       title="RER: Solr push remove unused control panel"
-      directory="profiles/to_1300"
       description=""
       provides="Products.GenericSetup.interfaces.EXTENSION"
+      directory="profiles/to_1300"
       />
-  
+
   <utility
       factory=".setuphandlers.HiddenProfiles"
       name="rer.solrpush-hiddenprofiles"
       />
-    
 
-    <!-- vocabularies -->
-    <utility
-        name="rer.solrpush.vocabularies.AvailableSites"
-        component=".vocabularies.AvailableSitesVocabulary"
-    />
-    <utility
-        name="rer.solrpush.vocabularies.AvailableSubjects"
-        component=".vocabularies.AvailableSubjectsVocabulary"
-    />
-    <utility
-        name="rer.solrpush.vocabularies.AvailablePortalTypes"
-        component=".vocabularies.AvailablePortalTypesVocabulary"
-    />
 
-    <!-- indexers -->
-    <utility
-        factory=".indexer.SolrIndexProcessor" 
-        name="solrpush.utility"
-        />
-    <adapter name="path_depth" factory=".indexer.path_depth" />
-    <adapter name="path_parents" factory=".indexer.path_parents" />
+  <!-- vocabularies -->
+  <utility
+      name="rer.solrpush.vocabularies.AvailableSites"
+      component=".vocabularies.AvailableSitesVocabulary"
+      />
+  <utility
+      name="rer.solrpush.vocabularies.AvailableSubjects"
+      component=".vocabularies.AvailableSubjectsVocabulary"
+      />
+  <utility
+      name="rer.solrpush.vocabularies.AvailablePortalTypes"
+      component=".vocabularies.AvailablePortalTypesVocabulary"
+      />
+
+  <!-- indexers -->
+  <utility
+      factory=".indexer.SolrIndexProcessor"
+      name="solrpush.utility"
+      />
+  <adapter
+      factory=".indexer.path_depth"
+      name="path_depth"
+      />
+  <adapter
+      factory=".indexer.path_parents"
+      name="path_parents"
+      />
 
 </configure>

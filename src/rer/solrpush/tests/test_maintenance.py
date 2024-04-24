@@ -8,15 +8,16 @@ from plone.app.testing import setRoles
 from plone.app.testing import TEST_USER_ID
 from plone.protect.authenticator import createToken
 from rer.solrpush.interfaces.settings import IRerSolrpushSettings
-from rer.solrpush.utils import init_solr_push
-from rer.solrpush.utils import reset_solr
-from rer.solrpush.utils import search
 from rer.solrpush.testing import (
     RER_SOLRPUSH_API_FUNCTIONAL_TESTING,
 )  # noqa: E501
+from rer.solrpush.utils import init_solr_push
+from rer.solrpush.utils import reset_solr
+from rer.solrpush.utils import search
 from transaction import commit
 
 import unittest
+
 
 try:
     from Products.CMFPlone.utils import get_installer
@@ -39,7 +40,7 @@ class TestMaintenance(unittest.TestCase):
         setRoles(self.portal, TEST_USER_ID, ["Manager"])
         set_registry_record("active", False, interface=IRerSolrpushSettings)
         set_registry_record(
-            "enabled_types", [u"Document"], interface=IRerSolrpushSettings
+            "enabled_types", ["Document"], interface=IRerSolrpushSettings
         )
         get_registry_record("enabled_types", interface=IRerSolrpushSettings)
         self.published_doc = api.content.create(
@@ -125,7 +126,7 @@ class TestMaintenance(unittest.TestCase):
 
         set_registry_record(
             "enabled_types",
-            [u"Document", u"News Item"],
+            ["Document", "News Item"],
             interface=IRerSolrpushSettings,
         )
         api.content.transition(obj=self.news, transition="publish")
@@ -137,7 +138,7 @@ class TestMaintenance(unittest.TestCase):
         self.assertEqual(solr_results.hits, 3)
 
         set_registry_record(
-            "enabled_types", [u"Document"], interface=IRerSolrpushSettings
+            "enabled_types", ["Document"], interface=IRerSolrpushSettings
         )
         self.reindex_view()
         solr_results = search(query={"*": "*", "b_size": 100000}, fl="UID")
@@ -150,7 +151,7 @@ class TestMaintenance(unittest.TestCase):
         api.content.transition(obj=self.unpublished_doc, transition="publish")
         set_registry_record(
             "enabled_types",
-            [u"Document", u"News Item"],
+            ["Document", "News Item"],
             interface=IRerSolrpushSettings,
         )
         self.reindex_view()
@@ -158,7 +159,7 @@ class TestMaintenance(unittest.TestCase):
         self.assertEqual(solr_results.hits, 3)
 
         set_registry_record(
-            "enabled_types", [u"Document"], interface=IRerSolrpushSettings
+            "enabled_types", ["Document"], interface=IRerSolrpushSettings
         )
         self.sync_view()
         solr_results = search(query={"*": "*", "b_size": 100000}, fl="UID")

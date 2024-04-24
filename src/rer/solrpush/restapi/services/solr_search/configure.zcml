@@ -1,14 +1,15 @@
 <configure
     xmlns="http://namespaces.zope.org/zope"
-    xmlns:plone="http://namespaces.plone.org/plone">
+    xmlns:plone="http://namespaces.plone.org/plone"
+    >
 
   <plone:service
-    method="GET"
-    for="zope.interface.Interface"
-    factory=".get.SearchGet"
-    name="@solr-search"
-    permission="zope2.View"
-    layer="rer.solrpush.interfaces.IRerSolrpushLayer"
-    />
+      method="GET"
+      factory=".get.SearchGet"
+      for="zope.interface.Interface"
+      permission="zope2.View"
+      layer="rer.solrpush.interfaces.IRerSolrpushLayer"
+      name="@solr-search"
+      />
 
 </configure>

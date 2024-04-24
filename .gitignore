@@ -16,6 +16,8 @@ config/dev/conf/_schema_analysis_stopwords_english.json
 config/test/conf/_schema_analysis_stopwords_english.json
 config/dev/data/
 config/test/data/
+config/solr.xml
+config/zoo.cfg
 develop-eggs/
 eggs/
 extras/

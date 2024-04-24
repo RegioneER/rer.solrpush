@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
-from Products.Five.browser import BrowserView
-from zope.publisher.interfaces import IPublishTraverse
-from zope.interface import implementer
 from plone import api
+from Products.Five.browser import BrowserView
+from zope.interface import implementer
+from zope.publisher.interfaces import IPublishTraverse
 
 import six
 
@@ -35,7 +35,7 @@ class SolrScalesHandler(BrowserView):
         # needed for cache invalidation
         date = self.context.modified.strftime("%Y%m%d%H%M%S")
 
-        html = '<img src="{url}/@@solr-images/{fieldname}/{scale}?direction={direction}&v={date}" alt="{alt}" title="{title}" loading="{loading}"'.format(
+        html = '<img src="{url}/@@images/{fieldname}/{scale}?direction={direction}&v={date}" alt="{alt}" title="{title}" loading="{loading}"'.format(
             url=self.context.getURL(),
             fieldname=fieldname or "image",
             scale=scale or "thumb",

@@ -1,13 +1,15 @@
 <configure
     xmlns="http://namespaces.zope.org/zope"
-    i18n_domain="rer.solrpush">
+    i18n_domain="rer.solrpush"
+    >
 
-    <adapter
-      for="plone.app.contenttypes.interfaces.IFile"
-      provides="rer.solrpush.interfaces.adapter.IExtractFileFromTika"
+  <adapter
       factory=".file.FileExtractor"
+      provides="rer.solrpush.interfaces.adapter.IExtractFileFromTika"
+      for="plone.app.contenttypes.interfaces.IFile"
       />
 
   <!-- RSS feed -->
-  <adapter factory=".rss_feed.SOLRFeedItem"/>
+  <adapter factory=".rss_feed.SOLRFeedItem" />
+
 </configure>

@@ -10,19 +10,17 @@ from z3c.form import field
 
 
 class ElevateSettingsEditForm(RegistryEditForm):
-
     schema = IElevateSettings
     label = _(
         "solr_elevate_configuration_label",
-        default=u"Solr Push Elevate Configuration",
+        default="Solr Push Elevate Configuration",
     )
 
     fields = field.Fields(IElevateSettings)
     fields["elevate_schema"].widgetFactory = JSONFieldWidget
 
     def updateWidgets(self):
-        """
-        """
+        """ """
         super(ElevateSettingsEditForm, self).updateWidgets()
         self.widgets["elevate_schema"].schema = IElevateRowSchema
 

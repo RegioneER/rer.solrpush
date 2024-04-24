@@ -6,8 +6,8 @@
 
     <configlet
         title="Configurazione RER SolrPush"
-        action_id="solrpush.configuration"
-        appId="solrpush"
+        action_id="SolrPushSettings"
+        appId="SolrPushSettings"
         category="Products"
         condition_expr=""
         url_expr="string:${portal_url}/@@solrpush-settings"
@@ -18,8 +18,8 @@
     </configlet>
     <configlet
         title="Configurazione Elevate"
-        action_id="solrpush.elevate"
-        appId="solrpush-elevate"
+        action_id="SolrPushElevate"
+        appId="SolrPushElevate"
         category="Products"
         condition_expr=""
         url_expr="string:${portal_url}/@@elevate-settings"

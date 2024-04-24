@@ -6,14 +6,14 @@ from plone.app.testing import setRoles
 from plone.app.testing import TEST_USER_ID
 from plone.namedfile.file import NamedBlobImage
 from rer.solrpush.interfaces.settings import IRerSolrpushSettings
-from rer.solrpush.utils.solr_common import init_solr_push
-from rer.solrpush.utils.solr_common import get_solr_connection
-from rer.solrpush.utils import push_to_solr
 from rer.solrpush.testing import RER_SOLRPUSH_API_FUNCTIONAL_TESTING
+from rer.solrpush.utils import push_to_solr
+from rer.solrpush.utils.solr_common import get_solr_connection
+from rer.solrpush.utils.solr_common import init_solr_push
 from transaction import commit
 
-import unittest
 import os
+import unittest
 
 
 class TestCollections(unittest.TestCase):
@@ -31,7 +31,7 @@ class TestCollections(unittest.TestCase):
         setRoles(self.portal, TEST_USER_ID, ["Manager"])
         set_registry_record(
             "enabled_types",
-            [u"Document", u"News Item"],
+            ["Document", "News Item"],
             interface=IRerSolrpushSettings,
         )
         init_solr_push()
@@ -80,9 +80,9 @@ class TestCollections(unittest.TestCase):
     def tearDown(self):
         solr = get_solr_connection()
         solr.delete(q="*:*", commit=True)
-        set_registry_record("qf", u"", interface=IRerSolrpushSettings)
-        set_registry_record("bq", u"", interface=IRerSolrpushSettings)
-        set_registry_record("bf", u"", interface=IRerSolrpushSettings)
+        set_registry_record("qf", "", interface=IRerSolrpushSettings)
+        set_registry_record("bq", "", interface=IRerSolrpushSettings)
+        set_registry_record("bf", "", interface=IRerSolrpushSettings)
         commit()
 
     def get_results(
@@ -239,7 +239,7 @@ class TestCollections(unittest.TestCase):
         item = results[0]
         self.assertEqual(
             item.restrictedTraverse("@@images").tag(),
-            '<img src="{url}/@@solr-images/image/thumb?direction=thumbnail&v={date}" alt="News with image" title="News with image" loading="lazy">'.format(
+            '<img src="{url}/@@images/image/thumb?direction=thumbnail&v={date}" alt="News with image" title="News with image" loading="lazy">'.format(
                 url=news.absolute_url(),
                 date=news.modified().strftime("%Y%m%d%H%M%S"),
             ),
@@ -249,7 +249,7 @@ class TestCollections(unittest.TestCase):
             item.restrictedTraverse("@@images").tag(
                 alt="alt text", title="custom title"
             ),
-            '<img src="{url}/@@solr-images/image/thumb?direction=thumbnail&v={date}" alt="alt text" title="custom title" loading="lazy">'.format(
+            '<img src="{url}/@@images/image/thumb?direction=thumbnail&v={date}" alt="alt text" title="custom title" loading="lazy">'.format(
                 url=news.absolute_url(),
                 date=news.modified().strftime("%Y%m%d%H%M%S"),
             ),
@@ -257,7 +257,7 @@ class TestCollections(unittest.TestCase):
 
         self.assertEqual(
             item.restrictedTraverse("@@images").tag(css_class="custom-css"),
-            '<img src="{url}/@@solr-images/image/thumb?direction=thumbnail&v={date}" alt="News with image" title="News with image" loading="lazy" class="custom-css">'.format(
+            '<img src="{url}/@@images/image/thumb?direction=thumbnail&v={date}" alt="News with image" title="News with image" loading="lazy" class="custom-css">'.format(
                 url=news.absolute_url(),
                 date=news.modified().strftime("%Y%m%d%H%M%S"),
             ),
@@ -265,7 +265,7 @@ class TestCollections(unittest.TestCase):
 
         self.assertEqual(
             item.restrictedTraverse("@@images").tag(scale="mini"),
-            '<img src="{url}/@@solr-images/image/mini?direction=thumbnail&v={date}" alt="News with image" title="News with image" loading="lazy">'.format(
+            '<img src="{url}/@@images/image/mini?direction=thumbnail&v={date}" alt="News with image" title="News with image" loading="lazy">'.format(
                 url=news.absolute_url(),
                 date=news.modified().strftime("%Y%m%d%H%M%S"),
             ),

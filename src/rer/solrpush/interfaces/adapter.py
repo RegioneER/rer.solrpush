@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from plone.app.contentlisting.interfaces import IContentListingObject
 from zope.interface import Interface
 
 
@@ -9,5 +10,5 @@ class IExtractFileFromTika(Interface):
         """
 
 
-class ISolrBrain(Interface):
+class ISolrBrain(IContentListingObject):
     """ """

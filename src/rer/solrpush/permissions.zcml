@@ -1,17 +1,18 @@
 <configure
-  xmlns="http://namespaces.zope.org/zope"
-  xmlns:zcml="http://namespaces.zope.org/zcml"
-  i18n_domain="plone">
+    xmlns="http://namespaces.zope.org/zope"
+    xmlns:zcml="http://namespaces.zope.org/zcml"
+    i18n_domain="plone"
+    >
 
   <configure zcml:condition="installed AccessControl.security">
     <permission
-      id="rer.solrpush.editElevate"
-      title="rer.solrpush: Edit Elevate"
-      />
+        id="rer.solrpush.editElevate"
+        title="rer.solrpush: Edit Elevate"
+        />
     <permission
-      id="rer.solrpush.editSettings"
-      title="rer.solrpush: Edit Settings"
-      />
+        id="rer.solrpush.editSettings"
+        title="rer.solrpush: Edit Settings"
+        />
 
   </configure>
 

@@ -7,10 +7,10 @@ from rer.solrpush import _
 from z3c.relationfield.schema import RelationChoice
 from z3c.relationfield.schema import RelationList
 from zope import schema
+from zope.globalrequest import getRequest
 from zope.i18n import translate
 from zope.interface import Invalid
 from zope.interface import invariant
-from zope.globalrequest import getRequest
 
 import json
 
@@ -26,19 +26,19 @@ class CatalogSource(CatalogSourceBase):
 
 class IElevateRowSchema(model.Schema):
     text = schema.List(
-        title=_("elevate_row_schema_text_label", default=u"Text"),
+        title=_("elevate_row_schema_text_label", default="Text"),
         description=_(
             "elevate_row_schema_text_help",
-            default=u"The word that should match in the search.",
+            default="The word that should match in the search.",
         ),
         required=True,
         value_type=schema.TextLine(),
     )
     uid = RelationList(
-        title=_("elevate_row_schema_uid_label", u"Elements"),
+        title=_("elevate_row_schema_uid_label", "Elements"),
         description=_(
             "elevate_row_schema_uid_help",
-            u"Select a list of elements to elevate for that search word.",
+            "Select a list of elements to elevate for that search word.",
         ),
         value_type=RelationChoice(vocabulary="plone.app.vocabularies.Catalog"),
         required=True,
@@ -54,10 +54,10 @@ class IElevateSettings(model.Schema):
     """ """
 
     elevate_schema = schema.SourceText(
-        title=_(u"elevate_schema_label", default=u"Elevate configuration"),
+        title=_("elevate_schema_label", default="Elevate configuration"),
         description=_(
-            u"elevate_schema_help",
-            default=u"Insert a list of values for elevate.",
+            "elevate_schema_help",
+            default="Insert a list of values for elevate.",
         ),
         required=False,
     )

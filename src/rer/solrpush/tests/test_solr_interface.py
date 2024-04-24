@@ -5,15 +5,15 @@ from plone.api.portal import set_registry_record
 from plone.app.testing import setRoles
 from plone.app.testing import TEST_USER_ID
 from rer.solrpush.interfaces.settings import IRerSolrpushSettings
+from rer.solrpush.testing import RER_SOLRPUSH_API_FUNCTIONAL_TESTING
 from rer.solrpush.utils import init_solr_push
-from rer.solrpush.utils import reset_solr
-from rer.solrpush.utils import search
 from rer.solrpush.utils import push_to_solr
 from rer.solrpush.utils import remove_from_solr
-from rer.solrpush.testing import RER_SOLRPUSH_API_FUNCTIONAL_TESTING
-import time
+from rer.solrpush.utils import reset_solr
+from rer.solrpush.utils import search
 from transaction import commit
 
+import time
 import unittest
 
 
@@ -28,7 +28,7 @@ class TestSolrIndexActions(unittest.TestCase):
         self.request = self.layer["request"]
         setRoles(self.portal, TEST_USER_ID, ["Manager"])
         set_registry_record(
-            "enabled_types", [u"Document"], interface=IRerSolrpushSettings
+            "enabled_types", ["Document"], interface=IRerSolrpushSettings
         )
         self.published_doc = api.content.create(
             container=self.portal, type="Document", title="Published Document"
@@ -153,7 +153,7 @@ class TestSolrSearch(unittest.TestCase):
         setRoles(self.portal, TEST_USER_ID, ["Manager"])
         set_registry_record(
             "enabled_types",
-            [u"Document", u"News Item"],
+            ["Document", "News Item"],
             interface=IRerSolrpushSettings,
         )
         #  initialize solr push, so solr will be populated automatically

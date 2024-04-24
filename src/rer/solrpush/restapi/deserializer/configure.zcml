@@ -3,7 +3,5 @@
     xmlns:plone="http://namespaces.plone.org/plone"
     >
 
-  <include package=".elevate_schema" />
-  <include package=".solr_search" />
-
+  <adapter factory=".controlpanel.RERSolrpushControlpanelDeserializeFromJson" />
 </configure>
