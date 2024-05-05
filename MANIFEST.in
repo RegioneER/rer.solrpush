@@ -1,6 +1,7 @@
 graft src/rer
 graft docs
 include *.rst
+include *.txt
 include LICENSE.GPL
 include *.yml
 global-exclude *.pyc
