@@ -5,8 +5,8 @@ Changelog
 1.4.1 (unreleased)
 ------------------
 
-- Nothing changed yet.
-
+- Raise custom exception when there is an error.
+  [cekk]
 
 1.4.0 (2024-05-05)
 ------------------

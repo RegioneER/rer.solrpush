@@ -26,6 +26,12 @@ logger = logging.getLogger(__name__)
 TRIM = re.compile(r"\s+")
 ESCAPE_CHARS_RE = re.compile(r'(?<!\\)(?P<char>[&|+\-!(){}[\]^"~*?:])')
 
+
+class SOLRException(Exception):
+    "Raised when the solr respoonse return an error"
+    pass
+
+
 # HELPER METHODS
 
 
@@ -304,13 +310,12 @@ def search(
         if is_solr_active():
             # log it beacuse it's misconfigured
             logger.error(msg)
-        return {
-            "error": True,
-            "message": translate(
+        raise SOLRException(
+            translate(
                 _("solr_configuration_error_label", default=msg),
                 context=api.portal.get().REQUEST,
-            ),
-        }
+            )
+        )
     solr_query = generate_query(
         query,
         fl=fl,
@@ -323,9 +328,8 @@ def search(
         return res
     except Exception as e:
         logger.exception(e)
-        return {
-            "error": True,
-            "message": translate(
+        raise SOLRException(
+            translate(
                 _(
                     "search_error_label",
                     default="Unable to perform a search with SOLR."
@@ -333,8 +337,8 @@ def search(
                     " minutes.",
                 ),
                 context=api.portal.get().REQUEST,
-            ),
-        }
+            )
+        )
 
 
 def _set_query_debug(solr, params):

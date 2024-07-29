@@ -318,7 +318,7 @@ class ReindexBaseView(BrowserView):
         tot = len(brains_to_sync)
         for brain in brains_to_sync:
             i += 1
-            if i % 10 == 0:
+            if i % 100 == 0:
                 logger.info(f"Progress: {i}/{tot}")
             if not disable_progress:
                 status["counter"] = status["counter"] + 1
@@ -327,9 +327,7 @@ class ReindexBaseView(BrowserView):
             if brain.UID not in solr_items:
                 # missing from solr: try to index it
                 try:
-                    logger.info("send to solr")
                     res = push_to_solr(item)
-                    logger.info("received response from solr")
                     if res:
                         indexed.append(brain.getPath())
                 except SolrError as e:
