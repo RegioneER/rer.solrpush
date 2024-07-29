@@ -2,7 +2,7 @@ Changelog
 =========
 
 
-1.4.1 (unreleased)
+1.4.1 (2024-07-29)
 ------------------
 
 - Raise custom exception when there is an error.
