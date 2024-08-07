@@ -5,7 +5,8 @@ Changelog
 1.4.2 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Do not break vocabularies if solr is deactivated and not configured.
+  [cekk]
 
 
 1.4.1 (2024-07-29)
