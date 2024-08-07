@@ -7,6 +7,9 @@ from zope.schema.vocabulary import SimpleVocabulary
 
 
 class FacetsVocabulary(object):
+
+    facet_field = ""
+
     def get_terms(self):
         solr_results = search(
             query={"*": "*", "b_size": 1},

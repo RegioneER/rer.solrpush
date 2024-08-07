@@ -310,12 +310,13 @@ def search(
         if is_solr_active():
             # log it beacuse it's misconfigured
             logger.error(msg)
-        raise SOLRException(
-            translate(
-                _("solr_configuration_error_label", default=msg),
-                context=api.portal.get().REQUEST,
+            raise SOLRException(
+                translate(
+                    _("solr_configuration_error_label", default=msg),
+                    context=api.portal.get().REQUEST,
+                )
             )
-        )
+        return {"error": True}
     solr_query = generate_query(
         query,
         fl=fl,
