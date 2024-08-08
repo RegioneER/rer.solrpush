@@ -2,7 +2,7 @@ Changelog
 =========
 
 
-1.4.2 (unreleased)
+1.4.2 (2024-08-08)
 ------------------
 
 - Do not break vocabularies if solr is deactivated and not configured.
