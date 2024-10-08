@@ -136,9 +136,6 @@ def generate_query(
 
     solr_query.update(add_query_tweaks())
     # elevate
-    import pdb
-
-    pdb.set_trace()
     elevate = manage_elevate(query=query)
     if elevate.get("enableElevation", False):
         solr_query.update(manage_elevate(query=query))
