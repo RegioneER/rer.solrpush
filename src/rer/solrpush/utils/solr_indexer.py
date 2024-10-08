@@ -15,6 +15,7 @@ from rer.solrpush.utils.solr_common import should_force_commit
 from six.moves import map
 from zope.component import getUtility
 from zope.component import queryMultiAdapter
+from zope.globalrequest import getRequest
 
 import datetime
 import json
@@ -22,20 +23,6 @@ import logging
 import pysolr
 import six
 
-
-if six.PY2:
-    from ftfy import fix_text
-
-try:
-    # rer.agidtheme overrides site tile field
-    from rer.agidtheme.base.interfaces import IRERSiteSchema as ISiteSchema
-    from rer.agidtheme.base.utility.interfaces import ICustomFields
-
-    RER_THEME = True
-except ImportError:
-    from Products.CMFPlone.interfaces.controlpanel import ISiteSchema
-
-    RER_THEME = False
 
 logger = logging.getLogger(__name__)
 
@@ -46,27 +33,56 @@ RESTAPI_METADATA_FIELDS = ["@id", "@type", "description", "title"]
 # HELPER METHODS
 
 
-def get_site_title():
+def all_site_titles():
     registry = getUtility(IRegistry)
-    site_settings = registry.forInterface(
-        ISiteSchema, prefix="plone", check=False
-    )
-    site_title = getattr(site_settings, "site_title") or ""
-    if RER_THEME:
-        site_subtitle_style = (
-            getattr(site_settings, "site_subtitle_style") or ""
-        )
-        fields_value = getUtility(ICustomFields)
-        site_title = fields_value.titleLang(site_title)
-        site_subtitle = fields_value.subtitleLang(
-            getattr(site_settings, "site_subtitle") or "{}"
-        )
-        if site_subtitle and site_subtitle_style == "subtitle-normal":
-            site_title += " {}".format(site_subtitle)
+    titles = []
+    for lang in registry["plone.available_languages"]:
+        title = get_site_title(lang=lang)
+        if title not in titles:
+            titles.append(title)
+    return titles
 
-    if six.PY2:
-        site_title = site_title.decode("utf-8")
-    return site_title
+
+def all_site_titles_query():
+    site_titles = all_site_titles()
+    query_value = ""
+    if len(site_titles) == 1:
+        query_value = f'"{site_titles[0]}'
+    else:
+        titles = " OR ".join([f'"{x}"' for x in site_titles])
+        query_value = f"({titles})"
+    return query_value
+
+
+def get_site_title(lang=None):
+    site_props = json.loads(
+        queryMultiAdapter(
+            (api.portal.get(), getRequest()), name="GET_application_json_@site"
+        )()
+    )
+
+    site_title = site_props.get("plone.site_title", "")
+    if isinstance(site_title, str):
+        return site_title
+
+    title_language = ""
+    if lang:
+        title_language = lang
+    else:
+        title_language = api.portal.get_current_language()
+
+    title = site_title.get(title_language, site_title.get("default", ""))
+
+    if not title:
+        raise Exception("Unable to get site title")
+
+    subtitle = site_props.get("plone.site_subtitle", {}).get(
+        title_language, ""
+    )
+    if subtitle:
+        title = f"{title} {subtitle}"
+
+    return title
 
 
 def parse_date_as_datetime(value):
@@ -129,15 +145,11 @@ def create_index_dict(item):
             # repsonses and can be copied in solr configuration.
             continue
         field_type = field_infos.get("type")
-        if six.PY2:
-            field = field.encode("ascii")
         value = getattr(adapter, field, None)
         if not value:
             continue
         if callable(value):
             value = value()
-        if six.PY2:
-            value = fix_py2_strings(value)
         if isinstance(value, DateTime):
             value = parse_date_as_datetime(value)
         else:
@@ -155,7 +167,7 @@ def create_index_dict(item):
     portal = api.portal.get()
 
     # extra-catalog schema
-    index_me["site_name"] = get_site_title()
+    index_me["site_name"] = get_site_title(getattr(item, "language", ""))
     index_me["path"] = "/".join(item.getPhysicalPath())
     index_me["path_depth"] = len(item.getPhysicalPath()) - 2
     index_me["attachment"] = attachment_to_index(item)
@@ -183,19 +195,6 @@ def create_index_dict(item):
         index_me["getIcon"] = True
 
     return index_me
-
-
-def fix_py2_strings(value):
-    """REMOVE ON PYTHON 3"""
-    if isinstance(value, six.string_types):
-        if not isinstance(value, six.text_type):
-            value = value.replace("\xc0?", "").decode("utf-8", "ignore")
-        return fix_text(value)
-    if isinstance(value, list):
-        return list(map(fix_py2_strings, value))
-    if isinstance(value, tuple):
-        return tuple(map(fix_py2_strings, value))
-    return value
 
 
 def encode_strings_for_attachments(value):
@@ -302,6 +301,6 @@ def reset_solr():
         logger.error("Unable to push to solr. Configuration is incomplete.")
         return
     solr.delete(
-        q='site_name:"{}"'.format(get_site_title()),
+        q=f"site_name:{all_site_titles_query()}",
         commit=should_force_commit(),
     )

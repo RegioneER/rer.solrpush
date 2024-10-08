@@ -14,8 +14,8 @@ from rer.solrpush.utils import remove_from_solr
 from rer.solrpush.utils import reset_solr
 from rer.solrpush.utils import search
 from rer.solrpush.utils.solr_common import is_solr_active
+from rer.solrpush.utils.solr_indexer import all_site_titles
 from rer.solrpush.utils.solr_indexer import can_index
-from rer.solrpush.utils.solr_indexer import get_site_title
 from rer.solrpush.utils.solr_indexer import parse_date_as_datetime
 from time import strftime
 from time import time
@@ -218,7 +218,10 @@ class ReindexBaseView(BrowserView):
             brains_to_sync = pc()
         good_uids = [x.UID for x in brains_to_sync]
         solr_results = search(
-            query={"site_name": get_site_title(), "b_size": 100000000},
+            query={
+                "site_name": all_site_titles(),
+                "b_size": 100000000,
+            },
             fl="UID",
         )
         uids_to_remove = [
@@ -256,7 +259,10 @@ class ReindexBaseView(BrowserView):
         logger.info("##### SYNC CONTENTS TO SOLR #####")
         pc = api.portal.get_tool(name="portal_catalog")
         solr_docs = search(
-            query={"site_name": get_site_title(), "b_size": 100000000},
+            query={
+                "site_name": all_site_titles(),
+                "b_size": 100000000,
+            },
             fl="UID modified",
         ).docs
         solr_items = {item["UID"]: item["modified"] for item in solr_docs}

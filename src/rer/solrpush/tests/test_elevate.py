@@ -102,7 +102,14 @@ class TestSolrSearch(unittest.TestCase):
         )
 
         # now let's set an elevate for third document
-        value = json.dumps([{"text": ["page"], "uid": [{"UID": doc3.UID()}]}])
+        value = json.dumps(
+            [
+                {
+                    "keywords": ["page"],
+                    "elevated-contents": [{"UID": doc3.UID()}],
+                }
+            ]
+        )
         if six.PY2:
             value = value.decode("utf-8")
         set_registry_record(

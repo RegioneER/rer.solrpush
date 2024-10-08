@@ -7,7 +7,6 @@ from zope.schema.vocabulary import SimpleVocabulary
 
 
 class FacetsVocabulary(object):
-
     facet_field = ""
 
     def get_terms(self):

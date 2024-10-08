@@ -116,7 +116,6 @@ def generate_query(
         "json.nl": "arrmap",
     }
     solr_query.update(extract_from_query(query=query))
-
     if not solr_query["q"]:
         solr_query["q"] = "*:*"
     if "sort_on" in query:
@@ -137,6 +136,9 @@ def generate_query(
 
     solr_query.update(add_query_tweaks())
     # elevate
+    import pdb
+
+    pdb.set_trace()
     elevate = manage_elevate(query=query)
     if elevate.get("enableElevation", False):
         solr_query.update(manage_elevate(query=query))
@@ -182,9 +184,12 @@ def manage_elevate(query):
             # if s in text:
 
             # contains regexp
-            for word in config.get("text", []):
+            for word in config.get("keywords", []):
                 if re.search("(^|\s+)" + word + "(\s+|$)", text):  # noqa
-                    uids = [x.get("UID", "") for x in config.get("uid", [])]
+                    uids = [
+                        x.get("UID", "")
+                        for x in config.get("elevated-contents", [])
+                    ]
                     params["enableElevation"] = "true"
                     params["elevateIds"] = ",".join(uids)
                     break

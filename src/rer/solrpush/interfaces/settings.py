@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 from plone.app.vocabularies.catalog import CatalogSource as CatalogSourceBase
-from plone.app.z3cform.widget import RelatedItemsFieldWidget
-from plone.autoform import directives as form
 from plone.supermodel import model
 from rer.solrpush import _
 from zope import schema
@@ -15,27 +13,6 @@ class CatalogSource(CatalogSourceBase):
 
     def __contains__(self, value):
         return True  # Always contains to allow lazy handling of removed objs
-
-
-class IElevateRowSchema(model.Schema):
-    text = schema.TextLine(
-        title=_("elevate_row_schema_text_label", default="Text"),
-        description=_(
-            "elevate_row_schema_text_help",
-            default="The word that should match in the search.",
-        ),
-        required=True,
-    )
-    uid = schema.List(
-        title=_("elevate_row_schema_uid_label", "Elements"),
-        description=_(
-            "elevate_row_schema_uid_help",
-            "Select a list of elements to elevate for that search word.",
-        ),
-        value_type=schema.Choice(source=CatalogSource()),
-        required=True,
-    )
-    form.widget("uid", RelatedItemsFieldWidget)
 
 
 class IRerSolrpushConf(model.Schema):

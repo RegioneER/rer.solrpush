@@ -5,9 +5,13 @@ Changelog
 1.4.3 (unreleased)
 ------------------
 
-- Nothing changed yet.
-
-
+- Remove new line characters in get_site_title method.
+  [cekk]
+- Change elevate schema to be editable with Volto.
+  [cekk]
+- Partly remove Python2 compatibility.
+  [cekk]
+  
 1.4.2 (2024-08-08)
 ------------------
 
