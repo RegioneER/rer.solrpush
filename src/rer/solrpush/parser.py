@@ -108,7 +108,7 @@ class Brain(dict):
         If site_name is the current site, convert the physical path into a url, if it was stored.
         Else return url attribute stored in SOLR
         """
-        url = self.get("url", "")
+        url = self.get("url", "") or self.get("@id", "")
         if self.is_current_site:
             frontend_url = api.portal.get_registry_record(
                 "frontend_url", interface=IRerSolrpushSettings, default=""

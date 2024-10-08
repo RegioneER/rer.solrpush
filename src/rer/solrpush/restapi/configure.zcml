@@ -8,6 +8,7 @@
       file="configure.zcml"
       />
   <include package=".deserializer" />
+  <include package=".serializer" />
   <include package=".services" />
 
 

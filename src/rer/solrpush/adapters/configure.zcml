@@ -12,4 +12,7 @@
   <!-- RSS feed -->
   <adapter factory=".rss_feed.SOLRFeedItem" />
 
+  <!-- Summary Serializer Metadata -->
+  <utility factory=".summary.JSONSummarySerializerMetadata" name="rer.solrpush.summary_serializer_metadata" />
+
 </configure>
