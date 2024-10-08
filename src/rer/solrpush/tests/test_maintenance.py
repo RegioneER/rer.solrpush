@@ -130,9 +130,7 @@ class TestMaintenance(unittest.TestCase):
         api.content.transition(obj=self.news, transition="publish")
         api.content.transition(obj=self.unpublished_doc, transition="publish")
         commit()
-        solr_results = search(
-            query={"*": "*", "b_size": 100000}, fl="UID,portal_type"
-        )
+        solr_results = search(query={"*": "*", "b_size": 100000}, fl="UID,portal_type")
         self.assertEqual(solr_results.hits, 3)
 
         set_registry_record(

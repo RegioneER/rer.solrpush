@@ -48,9 +48,7 @@ def to_1300(context):
 
 
 def to_1400(context):
-    installOrReinstallProduct(
-        api.portal.get(), "collective.z3cform.jsonwidget"
-    )
+    installOrReinstallProduct(api.portal.get(), "collective.z3cform.jsonwidget")
     update_registry(context)
     update_controlpanel(context)
 

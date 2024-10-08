@@ -8,9 +8,7 @@ from zope.interface import implementer
 
 @implementer(IDeserializeFromJson)
 @adapter(IRERSolrpushRestapiControlpanel)
-class RERSolrpushControlpanelDeserializeFromJson(
-    ControlpanelDeserializeFromJson
-):
+class RERSolrpushControlpanelDeserializeFromJson(ControlpanelDeserializeFromJson):
     def __call__(self):
         super().__call__()
         init_solr_push()

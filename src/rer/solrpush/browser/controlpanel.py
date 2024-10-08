@@ -63,9 +63,7 @@ class RerSolrpushEditForm(RegistryEditForm):
         api.portal.show_message(_("Changes saved."), request=self.request)
         init_error = init_solr_push()
         if init_error:
-            api.portal.show_message(
-                init_error, type="error", request=self.request
-            )
+            api.portal.show_message(init_error, type="error", request=self.request)
         else:
             api.portal.show_message(
                 _("Loaded schema.xml from SOLR"), request=self.request
@@ -82,9 +80,7 @@ class RerSolrpushEditForm(RegistryEditForm):
 
         init_error = init_solr_push()
         if init_error:
-            api.portal.show_message(
-                init_error, type="error", request=self.request
-            )
+            api.portal.show_message(init_error, type="error", request=self.request)
         else:
             api.portal.show_message(
                 _("Reloaded schema.xml from SOLR"), request=self.request

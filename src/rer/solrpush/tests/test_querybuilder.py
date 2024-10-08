@@ -208,9 +208,7 @@ class TestCollections(unittest.TestCase):
             os.path.join(os.path.dirname(__file__), "docs", "plone_logo.png"),
             "rb",
         ) as f:
-            image_file = NamedBlobImage(
-                data=f.read(), filename="plone_logo.png"
-            )
+            image_file = NamedBlobImage(data=f.read(), filename="plone_logo.png")
 
         news = api.content.create(
             container=self.portal,

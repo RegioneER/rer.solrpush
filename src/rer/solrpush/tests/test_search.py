@@ -118,9 +118,7 @@ class TestSearch(unittest.TestCase):
 
     def test_escape_chars(self):
         self.assertEqual(escape_special_characters("*:*", False), "\\*\\:\\*")
-        self.assertEqual(
-            escape_special_characters("* : *", True), '"\\* \\: \\*"'
-        )
+        self.assertEqual(escape_special_characters("* : *", True), '"\\* \\: \\*"')
 
     def test_search_words_case_insensitive(self):
         """because it's indexed as lowercase"""
@@ -136,40 +134,28 @@ class TestSearch(unittest.TestCase):
         commit()
 
         self.assertEqual(
-            search(
-                query={"searchwords": "FOO"}, fl=["UID", "id", "Title"]
-            ).hits,
+            search(query={"searchwords": "FOO"}, fl=["UID", "id", "Title"]).hits,
             1,
         )
         self.assertEqual(
-            search(
-                query={"searchwords": "foo"}, fl=["UID", "id", "Title"]
-            ).hits,
+            search(query={"searchwords": "foo"}, fl=["UID", "id", "Title"]).hits,
             1,
         )
 
         self.assertEqual(
-            search(
-                query={"searchwords": "bar"}, fl=["UID", "id", "Title"]
-            ).hits,
+            search(query={"searchwords": "bar"}, fl=["UID", "id", "Title"]).hits,
             1,
         )
         self.assertEqual(
-            search(
-                query={"searchwords": "Bar"}, fl=["UID", "id", "Title"]
-            ).hits,
+            search(query={"searchwords": "Bar"}, fl=["UID", "id", "Title"]).hits,
             1,
         )
 
         self.assertEqual(
-            search(
-                query={"searchwords": "baz"}, fl=["UID", "id", "Title"]
-            ).hits,
+            search(query={"searchwords": "baz"}, fl=["UID", "id", "Title"]).hits,
             1,
         )
         self.assertEqual(
-            search(
-                query={"searchwords": "BAZ"}, fl=["UID", "id", "Title"]
-            ).hits,
+            search(query={"searchwords": "BAZ"}, fl=["UID", "id", "Title"]).hits,
             1,
         )

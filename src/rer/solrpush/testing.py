@@ -47,9 +47,7 @@ class SolrLayer(Layer):
         self.solr_host = solr_host
         self.solr_port = solr_port
         self.solr_base = solr_base
-        self.solr_url = "http://{0}:{1}{2}".format(
-            solr_host, solr_port, solr_base
-        )
+        self.solr_url = "http://{0}:{1}{2}".format(solr_host, solr_port, solr_base)
 
     def setUp(self):
         """Start Solr and poll until it is up and running."""
@@ -68,9 +66,7 @@ class SolrLayer(Layer):
                 sleep(3)
                 sys.stdout.write(".")
             if i == 9:
-                subprocess.call(
-                    "./solr-stop", shell=True, close_fds=True, cwd=BIN_DIR
-                )
+                subprocess.call("./solr-stop", shell=True, close_fds=True, cwd=BIN_DIR)
                 sys.stdout.write("Solr Instance could not be started !!!")
 
     def tearDown(self):
@@ -79,9 +75,7 @@ class SolrLayer(Layer):
             self.solr_url
         )
         six.moves.urllib.request.urlopen(solr_clean_url)
-        subprocess.check_call(
-            "./solr-stop", shell=True, close_fds=True, cwd=BIN_DIR
-        )
+        subprocess.check_call("./solr-stop", shell=True, close_fds=True, cwd=BIN_DIR)
 
 
 SOLR_FIXTURE = SolrLayer()

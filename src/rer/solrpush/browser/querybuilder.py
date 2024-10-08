@@ -56,16 +56,12 @@ class QueryBuilder(BaseView):
 
         # Check for valid indexes
         catalog = getToolByName(self.context, "portal_catalog")
-        valid_indexes = [
-            index for index in parsedquery if index in catalog.indexes()
-        ]
+        valid_indexes = [index for index in parsedquery if index in catalog.indexes()]
 
         # We'll ignore any invalid index, but will return an empty set if none
         # of the indexes are valid.
         if not valid_indexes:
-            logger.warning(
-                "Using empty query because there are no valid indexes used."
-            )
+            logger.warning("Using empty query because there are no valid indexes used.")
             parsedquery = {}
 
         empty_query = not parsedquery  # store emptiness
@@ -115,9 +111,7 @@ class QueryBuilder(BaseView):
                             "SearchableText"
                         ].rstrip("*")
                 results = SolrResponse(
-                    data=solr_search(
-                        **self.clean_query_for_solr(query=parsedquery)
-                    )
+                    data=solr_search(**self.clean_query_for_solr(query=parsedquery))
                 )
             else:
                 results = catalog(**parsedquery)

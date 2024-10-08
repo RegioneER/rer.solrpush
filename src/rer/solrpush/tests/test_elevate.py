@@ -85,9 +85,7 @@ class TestSolrSearch(unittest.TestCase):
             container=self.portal, type="Document", title="Third page"
         )
         # page with the shortest title containing keyword has the better score
-        doc4 = api.content.create(
-            container=self.portal, type="Document", title="page"
-        )
+        doc4 = api.content.create(container=self.portal, type="Document", title="page")
         api.content.transition(obj=doc3, transition="publish")
         api.content.transition(obj=doc4, transition="publish")
         commit()

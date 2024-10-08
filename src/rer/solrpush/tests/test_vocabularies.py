@@ -88,15 +88,9 @@ class TestVocabularies(unittest.TestCase):
         vocabulary = factory(self.portal)
 
         self.assertEqual(len(vocabulary), 2)
-        self.assertEqual(
-            [x.title for x in vocabulary], ["bar-subject", "foo-subject"]
-        )
-        self.assertEqual(
-            vocabulary.getTerm("foo-subject").title, "foo-subject"
-        )
-        self.assertEqual(
-            vocabulary.getTerm("bar-subject").title, "bar-subject"
-        )
+        self.assertEqual([x.title for x in vocabulary], ["bar-subject", "foo-subject"])
+        self.assertEqual(vocabulary.getTerm("foo-subject").title, "foo-subject")
+        self.assertEqual(vocabulary.getTerm("bar-subject").title, "bar-subject")
 
     def test_portal_type_vocabulary_return_all_stored_ones(self):
         factory = getUtility(
@@ -106,8 +100,6 @@ class TestVocabularies(unittest.TestCase):
         vocabulary = factory(self.portal)
 
         self.assertEqual(len(vocabulary), 2)
-        self.assertEqual(
-            [x.title for x in vocabulary], ["Document", "News Item"]
-        )
+        self.assertEqual([x.title for x in vocabulary], ["Document", "News Item"])
         self.assertEqual(vocabulary.getTerm("Document").title, "Document")
         self.assertEqual(vocabulary.getTerm("News Item").title, "News Item")

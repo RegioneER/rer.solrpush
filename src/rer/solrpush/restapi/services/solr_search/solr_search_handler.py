@@ -3,9 +3,7 @@ from copy import deepcopy
 from plone.restapi.deserializer import boolean_value
 from plone.restapi.interfaces import ISerializeToJson
 from plone.restapi.search.handler import SearchHandler as BaseHandler
-from plone.restapi.serializer.summary import (
-    merge_serializer_metadata_utilities_data,
-)
+from plone.restapi.serializer.summary import merge_serializer_metadata_utilities_data
 from Products.CMFCore.utils import getToolByName
 from rer.solrpush.parser import SolrResponse
 from rer.solrpush.utils import search as solr_search

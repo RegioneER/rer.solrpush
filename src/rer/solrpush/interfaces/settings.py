@@ -26,9 +26,7 @@ class IRerSolrpushConf(model.Schema):
     )
     search_enabled = schema.Bool(
         title=_("Search enabled"),
-        description=_(
-            "Site search will use SOLR as engine instead portal_catalog."
-        ),
+        description=_("Site search will use SOLR as engine instead portal_catalog."),
         required=False,
         default=True,
     )
@@ -69,16 +67,13 @@ class IRerSolrpushConf(model.Schema):
         required=False,
         default=[],
         missing_value=[],
-        value_type=schema.Choice(
-            vocabulary="plone.app.vocabularies.PortalTypes"
-        ),
+        value_type=schema.Choice(vocabulary="plone.app.vocabularies.PortalTypes"),
     )
 
     index_fields = schema.SourceText(
         title=_(
             "index_fields_label",
-            default="List of fields loaded from SOLR that we use for "
-            "indexing.",
+            default="List of fields loaded from SOLR that we use for " "indexing.",
         ),
         description=_(
             "index_fields_help",

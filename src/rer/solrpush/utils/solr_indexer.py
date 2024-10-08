@@ -76,9 +76,7 @@ def get_site_title(lang=None):
     if not title:
         raise Exception("Unable to get site title")
 
-    subtitle = site_props.get("plone.site_subtitle", {}).get(
-        title_language, ""
-    )
+    subtitle = site_props.get("plone.site_subtitle", {}).get(title_language, "")
     if subtitle:
         title = f"{title} {subtitle}"
 
@@ -177,17 +175,13 @@ def create_index_dict(item):
 
     # convert url to frontend one
     if frontend_url:
-        index_me["url"] = item.absolute_url().replace(
-            portal.portal_url(), frontend_url
-        )
+        index_me["url"] = item.absolute_url().replace(portal.portal_url(), frontend_url)
     else:
         index_me["url"] = item.absolute_url()
 
     # backward compatibility with Plone < 6 where there wasn't image_field and image_scales indexers
     has_image = False
-    if index_me.get("image_field", None) and index_me.get(
-        "image_scales", None
-    ):
+    if index_me.get("image_field", None) and index_me.get("image_scales", None):
         has_image = True
     else:
         has_image = getattr(item.aq_base, "image", None)
@@ -222,9 +216,7 @@ def add_with_attachment(solr, attachment, fields):
     }
     params.update(
         {
-            "literal.{key}".format(key=key): encode_strings_for_attachments(
-                value
-            )
+            "literal.{key}".format(key=key): encode_strings_for_attachments(value)
             for (key, value) in fields.items()
         }
     )
@@ -259,9 +251,7 @@ def push_to_solr(item_or_obj):
         return False
     attachment = item_or_obj.pop("attachment", None)
     if attachment:
-        add_with_attachment(
-            solr=solr, attachment=attachment, fields=item_or_obj
-        )
+        add_with_attachment(solr=solr, attachment=attachment, fields=item_or_obj)
     else:
         solr.add(docs=[item_or_obj], commit=should_force_commit())
     return True
@@ -290,9 +280,7 @@ def remove_from_solr(uid):
             default="There was a problem removing this content from SOLR. "
             " Please contact site administrator.",
         )
-        api.portal.show_message(
-            message=message, request=portal.REQUEST, type="warning"
-        )
+        api.portal.show_message(message=message, request=portal.REQUEST, type="warning")
 
 
 def reset_solr():

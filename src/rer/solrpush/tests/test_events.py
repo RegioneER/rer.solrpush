@@ -60,9 +60,7 @@ class TestSOLRPush(unittest.TestCase):
         self.assertEqual(res["response"]["numFound"], 0)
 
         # File types has no wf, so they are published
-        api.content.create(
-            container=self.portal, type="File", title="bar file"
-        )
+        api.content.create(container=self.portal, type="File", title="bar file")
         commit()
         res = requests.get("{}/select?q=*%3A*&wt=json".format(solr_url)).json()
         self.assertEqual(res["response"]["numFound"], 1)
@@ -98,9 +96,7 @@ class TestEvents(unittest.TestCase):
 
     def get_solr_results(self):
         solr_url = get_registry_record("solr_url", IRerSolrpushSettings)
-        return requests.get(
-            "{}/select?q=*%3A*&wt=json".format(solr_url)
-        ).json()
+        return requests.get("{}/select?q=*%3A*&wt=json".format(solr_url)).json()
 
     def create_indexed_doc(self):
         published_doc = api.content.create(

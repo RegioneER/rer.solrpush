@@ -33,9 +33,7 @@ import os
 import pkg_resources
 
 
-JS_TEMPLATE = (
-    "{portal_url}/++plone++rer.solrpush/dist/{env_mode}/{name}.js?v={version}"
-)
+JS_TEMPLATE = "{portal_url}/++plone++rer.solrpush/dist/{env_mode}/{name}.js?v={version}"
 CSS_TEMPLATE = (
     "{portal_url}/++plone++rer.solrpush/dist/{env_mode}/{name}.css?v={version}"
 )
@@ -91,9 +89,7 @@ class ResetSolr(SolrMaintenanceBaseForm):
 
     def do_action(self):
         reset_solr()
-        msg_label = _(
-            "maintenance_reset_success", default="SOLR index dropped"
-        )
+        msg_label = _("maintenance_reset_success", default="SOLR index dropped")
         logger.info("##### SOLR Index dropped #####")
         api.portal.show_message(message=msg_label, request=self.request)
         return self.request.response.redirect(
@@ -137,9 +133,7 @@ class ReindexBaseView(BrowserView):
         if not self.solr_utility:
             return
         if not is_solr_active():
-            logger.warning(
-                "Trying to reindexing but solr is not set as active"
-            )
+            logger.warning("Trying to reindexing but solr is not set as active")
             return
         elapsed = timer()
         if self.solr_utility.enabled_types:
@@ -155,9 +149,7 @@ class ReindexBaseView(BrowserView):
         )
         logger.info("##### SOLR REINDEX START #####")
         logger.info(
-            "Reindexing {} items.".format(
-                brains_to_reindex.actual_result_count
-            )
+            "Reindexing {} items.".format(brains_to_reindex.actual_result_count)
         )
         skipped = 0
         indexed = 0
@@ -282,25 +274,19 @@ class ReindexBaseView(BrowserView):
         logger.info("Completed in {}.".format(elapsed_time))
         if len(results["indexed"]):
             logger.info(
-                "Indexed {} items (new or modified):".format(
-                    len(results["indexed"])
-                )
+                "Indexed {} items (new or modified):".format(len(results["indexed"]))
             )
             for path in results["indexed"]:
                 logger.info("- {}".format(path))
         if len(results["removed"]):
             logger.info(
-                "Removed {} items (no more indexeable):".format(
-                    len(results["removed"])
-                )
+                "Removed {} items (no more indexeable):".format(len(results["removed"]))
             )
             for path in results["removed"]:
                 logger.info("- {}".format(path))
         if len(results["not_indexed"]):
             logger.info(
-                "NOT indexed {} items (errors):".format(
-                    len(results["not_indexed"])
-                )
+                "NOT indexed {} items (errors):".format(len(results["not_indexed"]))
             )
             for error in results["not_indexed"]:
                 logger.info(
@@ -310,9 +296,7 @@ class ReindexBaseView(BrowserView):
                     )
                 )
 
-    def sync_contents(
-        self, brains_to_sync, solr_items, disable_progress=False
-    ):
+    def sync_contents(self, brains_to_sync, solr_items, disable_progress=False):
         indexed = []
         not_indexed = []
         removed = []
@@ -341,9 +325,7 @@ class ReindexBaseView(BrowserView):
                         {"path": brain.getPath(), "message": e.__str__()}
                     )
                 except Exception as e:
-                    not_indexed.append(
-                        {"path": brain.getPath(), "message": str(e)}
-                    )
+                    not_indexed.append({"path": brain.getPath(), "message": str(e)})
             else:
                 item = brain.getObject()
                 if not can_index(item):
@@ -360,9 +342,7 @@ class ReindexBaseView(BrowserView):
                         if res:
                             indexed.append(brain.getPath())
                     except Exception as e:
-                        not_indexed.append(
-                            {"path": brain.getPath(), "message": str(e)}
-                        )
+                        not_indexed.append({"path": brain.getPath(), "message": str(e)})
         if not disable_progress:
             status["in_progress"] = False
         return {
