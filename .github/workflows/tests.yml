@@ -5,6 +5,8 @@ on:
     paths-ignore:
       - '**.md'
       - '**.rst'
+env:
+  BUILDOUT_SOLR_ENVIRONMENT: true
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -21,8 +23,6 @@ jobs:
             plone: "52"
     steps:
       - uses: actions/checkout@v3
-      - name: Run solr container
-        run: docker compose -f "docker-compose.yml" up -d
       - name: Cache eggs
         uses: actions/cache@v3
         with:
