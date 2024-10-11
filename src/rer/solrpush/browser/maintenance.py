@@ -88,6 +88,7 @@ class ResetSolr(SolrMaintenanceBaseForm):
     )
 
     def do_action(self):
+        self.request._rest_cors_preflight = True
         reset_solr()
         msg_label = _("maintenance_reset_success", default="SOLR index dropped")
         logger.info("##### SOLR Index dropped #####")

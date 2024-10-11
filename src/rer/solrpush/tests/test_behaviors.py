@@ -26,6 +26,9 @@ class TestShowInSearch(unittest.TestCase):
         """
         self.portal = self.layer["portal"]
         self.request = self.layer["request"]
+
+        self.request._rest_cors_preflight = True
+
         setRoles(self.portal, TEST_USER_ID, ["Manager"])
         set_registry_record(
             "enabled_types",
@@ -44,7 +47,7 @@ class TestShowInSearch(unittest.TestCase):
         commit()
 
     def tearDown(self):
-        reset_solr()
+        reset_solr(all=True)
         commit()
 
     def test_items_are_indexed_by_default(self):

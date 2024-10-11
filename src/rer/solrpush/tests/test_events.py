@@ -32,6 +32,8 @@ class TestSOLRPush(unittest.TestCase):
         """Custom shared utility setup for tests."""
         self.portal = self.layer["portal"]
         self.request = self.layer["request"]
+
+        self.request._rest_cors_preflight = True
         setRoles(self.portal, TEST_USER_ID, ["Manager"])
         set_registry_record(
             "enabled_types",
@@ -41,7 +43,7 @@ class TestSOLRPush(unittest.TestCase):
 
     def tearDown(self):
         set_registry_record("active", True, interface=IRerSolrpushSettings)
-        reset_solr()
+        reset_solr(all=True)
 
     def test_item_not_indexed_if_solrpush_is_not_ready(self):
         solr_url = get_registry_record("solr_url", IRerSolrpushSettings)
@@ -75,6 +77,8 @@ class TestEvents(unittest.TestCase):
         """Custom shared utility setup for tests."""
         self.portal = self.layer["portal"]
         self.request = self.layer["request"]
+
+        self.request._rest_cors_preflight = True
         setRoles(self.portal, TEST_USER_ID, ["Manager"])
         set_registry_record(
             "enabled_types",
@@ -85,7 +89,7 @@ class TestEvents(unittest.TestCase):
 
     def tearDown(self):
         set_registry_record("active", True, interface=IRerSolrpushSettings)
-        reset_solr()
+        reset_solr(all=True)
 
     def clean_solr(self):
         solr_url = get_registry_record("solr_url", IRerSolrpushSettings)

@@ -26,6 +26,8 @@ class TestSolrIndexActions(unittest.TestCase):
         """"""
         self.portal = self.layer["portal"]
         self.request = self.layer["request"]
+
+        self.request._rest_cors_preflight = True
         setRoles(self.portal, TEST_USER_ID, ["Manager"])
         set_registry_record(
             "enabled_types", ["Document"], interface=IRerSolrpushSettings
@@ -50,7 +52,7 @@ class TestSolrIndexActions(unittest.TestCase):
 
     def tearDown(self):
         set_registry_record("active", True, interface=IRerSolrpushSettings)
-        reset_solr()
+        reset_solr(all=True)
 
     def test_push_to_solr(self):
         solr_results = search(query={"*": "*", "b_size": 100000}, fl="UID")
@@ -142,6 +144,8 @@ class TestSolrSearch(unittest.TestCase):
         """"""
         self.portal = self.layer["portal"]
         self.request = self.layer["request"]
+
+        self.request._rest_cors_preflight = True
         setRoles(self.portal, TEST_USER_ID, ["Manager"])
         set_registry_record(
             "enabled_types",
@@ -196,7 +200,7 @@ class TestSolrSearch(unittest.TestCase):
 
     def tearDown(self):
         set_registry_record("active", True, interface=IRerSolrpushSettings)
-        reset_solr()
+        reset_solr(all=True)
 
     def test_search_all(self):
         solr_results = search(query={"*": "*"})

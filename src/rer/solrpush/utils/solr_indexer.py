@@ -5,6 +5,7 @@ from plone import api
 from plone.indexer.interfaces import IIndexableObject
 from plone.registry.interfaces import IRegistry
 from plone.restapi.serializer.converters import json_compatible
+from Products.CMFPlone.interfaces.controlpanel import ISiteSchema
 from rer.solrpush import _
 from rer.solrpush.interfaces.adapter import IExtractFileFromTika
 from rer.solrpush.utils.solr_common import get_index_fields
@@ -47,7 +48,7 @@ def all_site_titles_query():
     site_titles = all_site_titles()
     query_value = ""
     if len(site_titles) == 1:
-        query_value = f'"{site_titles[0]}'
+        query_value = f'"{site_titles[0]}"'
     else:
         titles = " OR ".join([f'"{x}"' for x in site_titles])
         query_value = f"({titles})"
@@ -55,16 +56,20 @@ def all_site_titles_query():
 
 
 def get_site_title(lang=None):
-    site_props = json.loads(
-        queryMultiAdapter(
-            (api.portal.get(), getRequest()), name="GET_application_json_@site"
-        )()
-    )
+    site_props = queryMultiAdapter(
+        (api.portal.get(), getRequest()), name="GET_application_json_@site"
+    )()
 
-    site_title = site_props.get("plone.site_title", "")
+    if site_props:
+        site_props = json.loads(site_props)
+        site_title = site_props.get("plone.site_title", "")
+    else:
+        registry = getUtility(IRegistry)
+        site_settings = registry.forInterface(ISiteSchema, prefix="plone", check=False)
+        site_title = getattr(site_settings, "site_title") or ""
+
     if isinstance(site_title, str):
         return site_title
-
     title_language = ""
     if lang:
         title_language = lang
@@ -283,12 +288,15 @@ def remove_from_solr(uid):
         api.portal.show_message(message=message, request=portal.REQUEST, type="warning")
 
 
-def reset_solr():
+def reset_solr(all=False):
+    """
+    Reset solr index
+    """
     solr = get_solr_connection()
     if not solr:
         logger.error("Unable to push to solr. Configuration is incomplete.")
         return
-    solr.delete(
-        q=f"site_name:{all_site_titles_query()}",
-        commit=should_force_commit(),
-    )
+    query = f"site_name:{all_site_titles_query()}"
+    if all:
+        query = "*:*"
+    solr.delete(q=query, commit=should_force_commit())

@@ -10,8 +10,9 @@ from plone.testing import Layer
 from plone.testing import z2
 from rer.solrpush.interfaces.settings import IRerSolrpushSettings
 from rer.solrpush.utils import init_solr_push
-from six.moves import range
-from time import sleep
+
+# from six.moves import range
+# from time import sleep
 from ZPublisher.HTTPRequest import HTTPRequest
 
 import collective.z3cform.jsonwidget
@@ -19,7 +20,8 @@ import os
 import plone.restapi
 import rer.solrpush
 import six
-import subprocess
+
+# import subprocess
 import sys
 
 
@@ -49,25 +51,25 @@ class SolrLayer(Layer):
         self.solr_base = solr_base
         self.solr_url = "http://{0}:{1}{2}".format(solr_host, solr_port, solr_base)
 
-    def setUp(self):
-        """Start Solr and poll until it is up and running."""
-        self.proc = subprocess.call(
-            "./solr-start", shell=True, close_fds=True, cwd=BIN_DIR
-        )
-        # Poll Solr until it is up and running
-        solr_ping_url = "{0}/admin/ping?wt=xml".format(self.solr_url)
-        for i in range(1, 10):
-            try:
-                result = six.moves.urllib.request.urlopen(solr_ping_url)
-                if result.code == 200:
-                    if b'<str name="status">OK</str>' in result.read():
-                        break
-            except six.moves.urllib.error.URLError:
-                sleep(3)
-                sys.stdout.write(".")
-            if i == 9:
-                subprocess.call("./solr-stop", shell=True, close_fds=True, cwd=BIN_DIR)
-                sys.stdout.write("Solr Instance could not be started !!!")
+    # def setUp(self):
+    #     """Start Solr and poll until it is up and running."""
+    #     self.proc = subprocess.call(
+    #         "./solr-start", shell=True, close_fds=True, cwd=BIN_DIR
+    #     )
+    #     # Poll Solr until it is up and running
+    #     solr_ping_url = "{0}/admin/ping?wt=xml".format(self.solr_url)
+    #     for i in range(1, 10):
+    #         try:
+    #             result = six.moves.urllib.request.urlopen(solr_ping_url)
+    #             if result.code == 200:
+    #                 if b'<str name="status">OK</str>' in result.read():
+    #                     break
+    #         except six.moves.urllib.error.URLError:
+    #             sleep(3)
+    #             sys.stdout.write(".")
+    #         if i == 9:
+    #             subprocess.call("./solr-stop", shell=True, close_fds=True, cwd=BIN_DIR)
+    #             sys.stdout.write("Solr Instance could not be started !!!")
 
     def tearDown(self):
         """Stop Solr."""
@@ -75,7 +77,7 @@ class SolrLayer(Layer):
             self.solr_url
         )
         six.moves.urllib.request.urlopen(solr_clean_url)
-        subprocess.check_call("./solr-stop", shell=True, close_fds=True, cwd=BIN_DIR)
+        # subprocess.check_call("./solr-stop", shell=True, close_fds=True, cwd=BIN_DIR)
 
 
 SOLR_FIXTURE = SolrLayer()

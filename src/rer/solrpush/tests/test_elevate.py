@@ -26,6 +26,8 @@ class TestSolrSearch(unittest.TestCase):
         """ """
         self.portal = self.layer["portal"]
         self.request = self.layer["request"]
+
+        self.request._rest_cors_preflight = True
         setRoles(self.portal, TEST_USER_ID, ["Manager"])
         set_registry_record(
             "enabled_types",
@@ -77,7 +79,7 @@ class TestSolrSearch(unittest.TestCase):
         set_registry_record("active", True, interface=IRerSolrpushSettings)
         #  reset elevate
         set_registry_record("elevate_schema", "", interface=IElevateSettings)
-        reset_solr()
+        reset_solr(all=True)
         commit()
 
     def test_search_with_elevate(self):
