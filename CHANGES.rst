@@ -5,7 +5,8 @@ Changelog
 1.4.3 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Fix SolrIndexProcessor logic: avoid not needed reindexes when we are reindexing objects with indexes not in SOLR.
+  [cekk]
 
 
 1.4.2 (2024-08-08)
