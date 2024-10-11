@@ -2,7 +2,7 @@ Changelog
 =========
 
 
-1.4.3 (unreleased)
+1.4.3 (2024-10-11)
 ------------------
 
 - Fix SolrIndexProcessor logic: avoid not needed reindexes when we are reindexing objects with indexes not in SOLR.
