@@ -23,7 +23,7 @@ logger = logging.getLogger(__name__)
 
 class QueryBuilder(BaseView):
 
-    def _makequery(
+    def _makequery(  # noqa: C901
         self,
         query=None,
         batch=False,
