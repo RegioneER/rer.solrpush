@@ -59,7 +59,7 @@ setup(
         "plone.api>=1.8.4",
         "pysolr",
         'ftfy==4.4.3;python_version<="2.7"',
-        "plone.restapi",
+        "plone.restapi>=8.13.0",
         "z3c.jbot",
     ],
     extras_require={
