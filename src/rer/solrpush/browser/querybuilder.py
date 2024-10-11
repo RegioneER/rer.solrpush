@@ -22,6 +22,7 @@ logger = logging.getLogger(__name__)
 
 
 class QueryBuilder(BaseView):
+
     def _makequery(
         self,
         query=None,
@@ -33,7 +34,7 @@ class QueryBuilder(BaseView):
         limit=0,
         brains=False,
         custom_query=None,
-    ):
+    ):  # noqa: C901
         """Parse the (form)query and return using multi-adapter"""
         query_modifiers = getUtilitiesFor(IQueryModifier)
         for name, modifier in sorted(query_modifiers, key=itemgetter(0)):
