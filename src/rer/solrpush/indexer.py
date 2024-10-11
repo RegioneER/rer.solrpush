@@ -20,7 +20,7 @@ from zope.globalrequest import getRequest
 from zope.interface import implementer
 
 import logging
-
+import json
 
 logger = logging.getLogger(__name__)
 
@@ -45,13 +45,17 @@ class SolrIndexProcessor(object):
 
     @property
     def index_fields(self):
-        return api.portal.get_registry_record(
-            "index_fields", interface=IRerSolrpushSettings, default=None
+        indexes = api.portal.get_registry_record(
+            "index_fields", interface=IRerSolrpushSettings, default="{}"
         )
+        if not indexes:
+            return {}
+        return json.loads(indexes)
 
     def index(self, obj, attributes=None):
         if (
             self.active
+            and self.check_attributes(attributes=attributes)  # noqa
             and getattr(obj, "showinsearch", True)  # noqa
             and can_index(obj)  # noqa
         ):
@@ -63,8 +67,28 @@ class SolrIndexProcessor(object):
             return True
         return False
 
+    def check_attributes(self, attributes):
+        """
+        If we are reindexing some indexes that should not be indexed on SOLR,
+        we don't have to update it.
+        """
+        if not attributes:
+            return True
+        index_fields = api.portal.get_registry_record(
+            "index_fields", interface=IRerSolrpushSettings, default="{}"
+        )
+        if not index_fields:
+            return False
+        index_fields = json.loads(index_fields)
+
+        found = False
+        for index in attributes:
+            if index in index_fields:
+                found = True
+        return found
+
     def reindex(self, obj, attributes=None, update_metadata=None):
-        if self.active:
+        if self.active and self.check_attributes(attributes=attributes):
             if not self.index(obj, attributes):
                 self.unindex(obj)
 
