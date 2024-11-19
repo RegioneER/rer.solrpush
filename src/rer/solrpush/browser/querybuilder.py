@@ -102,6 +102,8 @@ class QueryBuilder(BaseView):
 
         if not empty_query:
             if search_with_solr:
+                parsedquery["b_start"] = b_start
+                parsedquery["b_size"] = b_size
                 if "SearchableText" in parsedquery:
                     if isinstance(parsedquery["SearchableText"], dict):
                         parsedquery["SearchableText"]["query"] = parsedquery[
