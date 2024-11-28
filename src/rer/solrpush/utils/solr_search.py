@@ -69,8 +69,7 @@ def fix_value(value, index_type="", wrap=True):
         return "({})".format(
             join_str.join([escape_special_characters(x, wrap) for x in value])
         )
-    logger.warning("[fix_value]: unable to escape value: {}. skipping".format(value))
-    return
+    return value
 
 
 def escape_special_characters(value, wrap):
