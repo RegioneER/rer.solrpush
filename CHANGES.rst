@@ -2,6 +2,12 @@ Changelog
 =========
 
 
+1.3.4 (Unreleased)
+------------------
+
+- Handle also boolean indexes.
+  [cekk]
+
 1.3.3 (2023-11-08)
 ------------------
 
