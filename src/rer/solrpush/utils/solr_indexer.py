@@ -149,7 +149,7 @@ def create_index_dict(item):
             continue
         field_type = field_infos.get("type")
         value = getattr(adapter, field, None)
-        if not value:
+        if not value and value is not False:
             continue
         if callable(value):
             value = value()
@@ -247,18 +247,19 @@ def push_to_solr(item_or_obj):
     if not solr:
         logger.error("Unable to push to solr. Configuration is incomplete.")
         return
-    if not isinstance(item_or_obj, dict):
-        if can_index(item_or_obj):
-            item_or_obj = create_index_dict(item_or_obj)
-        else:
-            item_or_obj = None
-    if not item_or_obj:
+    context = item_or_obj
+    if isinstance(item_or_obj, dict):
+        obj = api.content.get(UID=item_or_obj.get("UID", ""))
+        if obj:
+            context = obj
+    if not can_index(context):
         return False
-    attachment = item_or_obj.pop("attachment", None)
+    index_dict = create_index_dict(context)
+    attachment = index_dict.pop("attachment", None)
     if attachment:
-        add_with_attachment(solr=solr, attachment=attachment, fields=item_or_obj)
+        add_with_attachment(solr=solr, attachment=attachment, fields=index_dict)
     else:
-        solr.add(docs=[item_or_obj], commit=should_force_commit())
+        solr.add(docs=[index_dict], commit=should_force_commit())
     return True
 
 
@@ -274,10 +275,7 @@ def remove_from_solr(uid):
         logger.error("Unable to push to solr. Configuration is incomplete.")
         return
     try:
-        solr.delete(
-            q="UID:{}".format(uid),
-            commit=should_force_commit(),
-        )
+        solr.delete(q=f"UID:{uid}", commit=should_force_commit())
     except (pysolr.SolrError, TypeError) as err:
         logger.error(err)
         message = _(

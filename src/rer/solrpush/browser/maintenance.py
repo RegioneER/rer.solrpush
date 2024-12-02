@@ -328,7 +328,6 @@ class ReindexBaseView(BrowserView):
                 except Exception as e:
                     not_indexed.append({"path": brain.getPath(), "message": str(e)})
             else:
-                item = brain.getObject()
                 if not can_index(item):
                     remove_from_solr(brain.UID)
                     removed.append(brain.getPath())

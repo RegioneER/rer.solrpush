@@ -225,7 +225,7 @@ def extract_from_query(query):
     index_fields = get_index_fields()
     params = {"q": "", "fq": []}
     for index, value in query.items():
-        if not value:
+        if not value and value is not False:
             continue
         if index == "*":
             params["q"] = "*:*"
@@ -239,7 +239,7 @@ def extract_from_query(query):
             continue
         # other indexes will be added in fq
         value = fix_value(value=value, index_type=index_infos.get("type", ""))
-        if value:
+        if value or value is False:
             if index == "path":
                 index = "path_parents"
             params["fq"].append("{index}:{value}".format(index=index, value=value))
