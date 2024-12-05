@@ -1,11 +1,8 @@
 # -*- coding: utf-8 -*-
 from plone.app.vocabularies.catalog import CatalogSource as CatalogSourceBase
-from plone.app.z3cform.widget import RelatedItemsFieldWidget
-from plone.autoform import directives as form
 from plone.supermodel import model
 from rer.solrpush import _
-from z3c.relationfield.schema import RelationChoice
-from z3c.relationfield.schema import RelationList
+from zExceptions import BadRequest
 from zope import schema
 from zope.globalrequest import getRequest
 from zope.i18n import translate
@@ -24,32 +21,6 @@ class CatalogSource(CatalogSourceBase):
         return True  # Always contains to allow lazy handling of removed objs
 
 
-class IElevateRowSchema(model.Schema):
-    text = schema.List(
-        title=_("elevate_row_schema_text_label", default="Text"),
-        description=_(
-            "elevate_row_schema_text_help",
-            default="The word that should match in the search.",
-        ),
-        required=True,
-        value_type=schema.TextLine(),
-    )
-    uid = RelationList(
-        title=_("elevate_row_schema_uid_label", "Elements"),
-        description=_(
-            "elevate_row_schema_uid_help",
-            "Select a list of elements to elevate for that search word.",
-        ),
-        value_type=RelationChoice(vocabulary="plone.app.vocabularies.Catalog"),
-        required=True,
-    )
-    form.widget(
-        "uid",
-        RelatedItemsFieldWidget,
-        vocabulary="plone.app.vocabularies.Catalog",
-    )
-
-
 class IElevateSettings(model.Schema):
     """ """
 
@@ -64,12 +35,12 @@ class IElevateSettings(model.Schema):
 
     @invariant
     def elevate_invariant(data):
-        schema = json.loads(data.elevate_schema)
+        elevate_schema = json.loads(data.elevate_schema)
         request = getRequest()
-        words_mapping = [x["text"] for x in schema]
-        for i, schema_item in enumerate(schema):
-            elevate_text = schema_item.get("text", [])
-            if not elevate_text:
+        words_mapping = [x["keywords"] for x in elevate_schema]
+        for i, schema_item in enumerate(elevate_schema):
+            keywords = schema_item.get("keywords", [])
+            if not keywords:
                 raise Invalid(
                     translate(
                         _(
@@ -80,13 +51,13 @@ class IElevateSettings(model.Schema):
                         context=request,
                     )
                 )
-            for text in elevate_text:
+            for text in keywords:
                 for words_i, words in enumerate(words_mapping):
                     if i == words_i:
                         # it's the current config
                         continue
                     if text in words:
-                        raise Invalid(
+                        raise BadRequest(
                             translate(
                                 _(
                                     "text_duplicated_label",

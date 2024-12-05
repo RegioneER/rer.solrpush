@@ -26,6 +26,8 @@ class TestSolrIndexActions(unittest.TestCase):
         """"""
         self.portal = self.layer["portal"]
         self.request = self.layer["request"]
+
+        self.request._rest_cors_preflight = True
         setRoles(self.portal, TEST_USER_ID, ["Manager"])
         set_registry_record(
             "enabled_types", ["Document"], interface=IRerSolrpushSettings
@@ -50,7 +52,7 @@ class TestSolrIndexActions(unittest.TestCase):
 
     def tearDown(self):
         set_registry_record("active", True, interface=IRerSolrpushSettings)
-        reset_solr()
+        reset_solr(all=True)
 
     def test_push_to_solr(self):
         solr_results = search(query={"*": "*", "b_size": 100000}, fl="UID")
@@ -82,24 +84,18 @@ class TestSolrIndexActions(unittest.TestCase):
 
     def test_update_content(self):
         push_to_solr(self.published_doc)
-        solr_results = search(
-            query={"*": "*", "b_size": 100000}, fl="UID Description"
-        )
+        solr_results = search(query={"*": "*", "b_size": 100000}, fl="UID Description")
         self.assertEqual(solr_results.hits, 1)
         self.assertEqual(solr_results.docs[0]["UID"], self.published_doc.UID())
         self.assertEqual(solr_results.docs[0].get("Description", ""), "")
 
         self.published_doc.setDescription("foo description")
         push_to_solr(self.published_doc)
-        solr_results = search(
-            query={"*": "*", "b_size": 100000}, fl="UID Description"
-        )
+        solr_results = search(query={"*": "*", "b_size": 100000}, fl="UID Description")
         self.assertEqual(solr_results.hits, 1)
         self.assertEqual(solr_results.docs[0]["UID"], self.published_doc.UID())
         self.assertIn("Description", solr_results.docs[0])
-        self.assertEqual(
-            solr_results.docs[0]["Description"], "foo description"
-        )
+        self.assertEqual(solr_results.docs[0]["Description"], "foo description")
 
     def test_remove_from_solr(self):
         solr_results = search(query={"*": "*", "b_size": 100000}, fl="UID")
@@ -118,9 +114,7 @@ class TestSolrIndexActions(unittest.TestCase):
         remove_from_solr(uid=self.published_doc.UID())
         solr_results = search(query={"*": "*", "b_size": 100000}, fl="UID")
         self.assertEqual(solr_results.hits, 1)
-        self.assertEqual(
-            solr_results.docs[0]["UID"], self.unpublished_doc.UID()
-        )
+        self.assertEqual(solr_results.docs[0]["UID"], self.unpublished_doc.UID())
 
     def test_reset_solr(self):
         solr_results = search(query={"*": "*", "b_size": 100000}, fl="UID")
@@ -150,6 +144,8 @@ class TestSolrSearch(unittest.TestCase):
         """"""
         self.portal = self.layer["portal"]
         self.request = self.layer["request"]
+
+        self.request._rest_cors_preflight = True
         setRoles(self.portal, TEST_USER_ID, ["Manager"])
         set_registry_record(
             "enabled_types",
@@ -204,7 +200,7 @@ class TestSolrSearch(unittest.TestCase):
 
     def tearDown(self):
         set_registry_record("active", True, interface=IRerSolrpushSettings)
-        reset_solr()
+        reset_solr(all=True)
 
     def test_search_all(self):
         solr_results = search(query={"*": "*"})
@@ -341,9 +337,7 @@ class TestSolrSearch(unittest.TestCase):
         time.sleep(1)
         self.doc2.reindexObject()
         commit()
-        solr_results = search(
-            query={"portal_type": "Document", "sort_on": "modified"}
-        )
+        solr_results = search(query={"portal_type": "Document", "sort_on": "modified"})
         self.assertEqual(solr_results.hits, 2)
         self.assertEqual(solr_results.docs[0]["UID"], self.doc1.UID())
         self.assertEqual(solr_results.docs[1]["UID"], self.doc2.UID())

@@ -5,9 +5,7 @@ from plone.api.portal import set_registry_record
 from plone.app.testing import setRoles
 from plone.app.testing import TEST_USER_ID
 from rer.solrpush.interfaces.settings import IRerSolrpushSettings
-from rer.solrpush.testing import (
-    RER_SOLRPUSH_API_FUNCTIONAL_TESTING,
-)  # noqa: E501
+from rer.solrpush.testing import RER_SOLRPUSH_API_FUNCTIONAL_TESTING  # noqa: E501
 from rer.solrpush.utils import init_solr_push
 from rer.solrpush.utils import reset_solr
 from rer.solrpush.utils import search
@@ -28,6 +26,9 @@ class TestShowInSearch(unittest.TestCase):
         """
         self.portal = self.layer["portal"]
         self.request = self.layer["request"]
+
+        self.request._rest_cors_preflight = True
+
         setRoles(self.portal, TEST_USER_ID, ["Manager"])
         set_registry_record(
             "enabled_types",
@@ -46,7 +47,7 @@ class TestShowInSearch(unittest.TestCase):
         commit()
 
     def tearDown(self):
-        reset_solr()
+        reset_solr(all=True)
         commit()
 
     def test_items_are_indexed_by_default(self):

@@ -28,6 +28,8 @@ class SearchBandiTest(unittest.TestCase):
         self.portal = self.layer["portal"]
         self.request = self.layer["request"]
 
+        self.request._rest_cors_preflight = True
+
         self.api_session = RelativeSession(self.portal_url)
         self.api_session.headers.update({"Accept": "application/json"})
         self.api_session.auth = (SITE_OWNER_NAME, SITE_OWNER_PASSWORD)
@@ -90,7 +92,7 @@ class SearchBandiTest(unittest.TestCase):
             True,
             interface=IRerSolrpushSettings,
         )
-        reset_solr()
+        reset_solr(all=True)
         commit()
 
     def test_search_works(self):

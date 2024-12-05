@@ -21,7 +21,7 @@ class SolrScalesHandler(BrowserView):
         title=None,
         direction="thumbnail",
         loading="lazy",
-        **args
+        **args,
     ):
         if not title:
             title = self.context.Title

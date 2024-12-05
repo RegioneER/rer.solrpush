@@ -84,4 +84,12 @@
       destination="2000"
       handler=".upgrades.update_registry"
       />
+  <genericsetup:upgradeStep
+      title="Reload solr conf for schema changes (new fields)"
+      description=""
+      profile="rer.solrpush:default"
+      source="2000"
+      destination="3000"
+      handler=".upgrades.to_3000"
+      />
 </configure>

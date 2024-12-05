@@ -26,6 +26,8 @@ class TestSolrSearch(unittest.TestCase):
         """ """
         self.portal = self.layer["portal"]
         self.request = self.layer["request"]
+
+        self.request._rest_cors_preflight = True
         setRoles(self.portal, TEST_USER_ID, ["Manager"])
         set_registry_record(
             "enabled_types",
@@ -77,7 +79,7 @@ class TestSolrSearch(unittest.TestCase):
         set_registry_record("active", True, interface=IRerSolrpushSettings)
         #  reset elevate
         set_registry_record("elevate_schema", "", interface=IElevateSettings)
-        reset_solr()
+        reset_solr(all=True)
         commit()
 
     def test_search_with_elevate(self):
@@ -85,9 +87,7 @@ class TestSolrSearch(unittest.TestCase):
             container=self.portal, type="Document", title="Third page"
         )
         # page with the shortest title containing keyword has the better score
-        doc4 = api.content.create(
-            container=self.portal, type="Document", title="page"
-        )
+        doc4 = api.content.create(container=self.portal, type="Document", title="page")
         api.content.transition(obj=doc3, transition="publish")
         api.content.transition(obj=doc4, transition="publish")
         commit()
@@ -102,7 +102,14 @@ class TestSolrSearch(unittest.TestCase):
         )
 
         # now let's set an elevate for third document
-        value = json.dumps([{"text": ["page"], "uid": [{"UID": doc3.UID()}]}])
+        value = json.dumps(
+            [
+                {
+                    "keywords": ["page"],
+                    "elevated-contents": [{"UID": doc3.UID()}],
+                }
+            ]
+        )
         if six.PY2:
             value = value.decode("utf-8")
         set_registry_record(

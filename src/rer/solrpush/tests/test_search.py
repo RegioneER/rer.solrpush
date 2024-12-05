@@ -5,9 +5,7 @@ from plone.api.portal import set_registry_record
 from plone.app.testing import setRoles
 from plone.app.testing import TEST_USER_ID
 from rer.solrpush.interfaces.settings import IRerSolrpushSettings
-from rer.solrpush.testing import (
-    RER_SOLRPUSH_API_FUNCTIONAL_TESTING,
-)  # noqa: E501
+from rer.solrpush.testing import RER_SOLRPUSH_API_FUNCTIONAL_TESTING  # noqa: E501
 from rer.solrpush.utils import init_solr_push
 from rer.solrpush.utils import reset_solr
 from rer.solrpush.utils import search
@@ -29,6 +27,8 @@ class TestSearch(unittest.TestCase):
         """
         self.portal = self.layer["portal"]
         self.request = self.layer["request"]
+
+        self.request._rest_cors_preflight = True
         setRoles(self.portal, TEST_USER_ID, ["Manager"])
         set_registry_record(
             "enabled_types",
@@ -61,7 +61,7 @@ class TestSearch(unittest.TestCase):
         commit()
 
     def tearDown(self):
-        reset_solr()
+        reset_solr(all=True)
         set_registry_record("qf", "", interface=IRerSolrpushSettings)
         set_registry_record("bq", "", interface=IRerSolrpushSettings)
         set_registry_record("bf", "", interface=IRerSolrpushSettings)
@@ -120,9 +120,7 @@ class TestSearch(unittest.TestCase):
 
     def test_escape_chars(self):
         self.assertEqual(escape_special_characters("*:*", False), "\\*\\:\\*")
-        self.assertEqual(
-            escape_special_characters("* : *", True), '"\\* \\: \\*"'
-        )
+        self.assertEqual(escape_special_characters("* : *", True), '"\\* \\: \\*"')
 
     def test_search_words_case_insensitive(self):
         """because it's indexed as lowercase"""
@@ -138,40 +136,28 @@ class TestSearch(unittest.TestCase):
         commit()
 
         self.assertEqual(
-            search(
-                query={"searchwords": "FOO"}, fl=["UID", "id", "Title"]
-            ).hits,
+            search(query={"searchwords": "FOO"}, fl=["UID", "id", "Title"]).hits,
             1,
         )
         self.assertEqual(
-            search(
-                query={"searchwords": "foo"}, fl=["UID", "id", "Title"]
-            ).hits,
+            search(query={"searchwords": "foo"}, fl=["UID", "id", "Title"]).hits,
             1,
         )
 
         self.assertEqual(
-            search(
-                query={"searchwords": "bar"}, fl=["UID", "id", "Title"]
-            ).hits,
+            search(query={"searchwords": "bar"}, fl=["UID", "id", "Title"]).hits,
             1,
         )
         self.assertEqual(
-            search(
-                query={"searchwords": "Bar"}, fl=["UID", "id", "Title"]
-            ).hits,
+            search(query={"searchwords": "Bar"}, fl=["UID", "id", "Title"]).hits,
             1,
         )
 
         self.assertEqual(
-            search(
-                query={"searchwords": "baz"}, fl=["UID", "id", "Title"]
-            ).hits,
+            search(query={"searchwords": "baz"}, fl=["UID", "id", "Title"]).hits,
             1,
         )
         self.assertEqual(
-            search(
-                query={"searchwords": "BAZ"}, fl=["UID", "id", "Title"]
-            ).hits,
+            search(query={"searchwords": "BAZ"}, fl=["UID", "id", "Title"]).hits,
             1,
         )

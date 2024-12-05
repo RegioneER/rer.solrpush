@@ -8,9 +8,7 @@ from plone.app.testing import setRoles
 from plone.app.testing import TEST_USER_ID
 from plone.protect.authenticator import createToken
 from rer.solrpush.interfaces.settings import IRerSolrpushSettings
-from rer.solrpush.testing import (
-    RER_SOLRPUSH_API_FUNCTIONAL_TESTING,
-)  # noqa: E501
+from rer.solrpush.testing import RER_SOLRPUSH_API_FUNCTIONAL_TESTING  # noqa: E501
 from rer.solrpush.utils import init_solr_push
 from rer.solrpush.utils import reset_solr
 from rer.solrpush.utils import search
@@ -37,6 +35,8 @@ class TestMaintenance(unittest.TestCase):
         """
         self.portal = self.layer["portal"]
         self.request = self.layer["request"]
+
+        self.request._rest_cors_preflight = True
         setRoles(self.portal, TEST_USER_ID, ["Manager"])
         set_registry_record("active", False, interface=IRerSolrpushSettings)
         set_registry_record(
@@ -62,7 +62,7 @@ class TestMaintenance(unittest.TestCase):
 
     def tearDown(self):
         # set_registry_record('active', True, interface=IRerSolrpushSettings)
-        reset_solr()
+        reset_solr(all=True)
 
     @property
     def reindex_view(self):
@@ -132,9 +132,7 @@ class TestMaintenance(unittest.TestCase):
         api.content.transition(obj=self.news, transition="publish")
         api.content.transition(obj=self.unpublished_doc, transition="publish")
         commit()
-        solr_results = search(
-            query={"*": "*", "b_size": 100000}, fl="UID,portal_type"
-        )
+        solr_results = search(query={"*": "*", "b_size": 100000}, fl="UID,portal_type")
         self.assertEqual(solr_results.hits, 3)
 
         set_registry_record(

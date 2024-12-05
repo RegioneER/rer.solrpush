@@ -22,7 +22,8 @@ logger = logging.getLogger(__name__)
 
 
 class QueryBuilder(BaseView):
-    def _makequery(
+
+    def _makequery(  # noqa: C901
         self,
         query=None,
         batch=False,
@@ -33,7 +34,7 @@ class QueryBuilder(BaseView):
         limit=0,
         brains=False,
         custom_query=None,
-    ):
+    ):  # noqa: C901
         """Parse the (form)query and return using multi-adapter"""
         query_modifiers = getUtilitiesFor(IQueryModifier)
         for name, modifier in sorted(query_modifiers, key=itemgetter(0)):
@@ -56,16 +57,12 @@ class QueryBuilder(BaseView):
 
         # Check for valid indexes
         catalog = getToolByName(self.context, "portal_catalog")
-        valid_indexes = [
-            index for index in parsedquery if index in catalog.indexes()
-        ]
+        valid_indexes = [index for index in parsedquery if index in catalog.indexes()]
 
         # We'll ignore any invalid index, but will return an empty set if none
         # of the indexes are valid.
         if not valid_indexes:
-            logger.warning(
-                "Using empty query because there are no valid indexes used."
-            )
+            logger.warning("Using empty query because there are no valid indexes used.")
             parsedquery = {}
 
         empty_query = not parsedquery  # store emptiness
@@ -105,6 +102,8 @@ class QueryBuilder(BaseView):
 
         if not empty_query:
             if search_with_solr:
+                parsedquery["b_start"] = b_start
+                parsedquery["b_size"] = b_size
                 if "SearchableText" in parsedquery:
                     if isinstance(parsedquery["SearchableText"], dict):
                         parsedquery["SearchableText"]["query"] = parsedquery[
@@ -115,9 +114,7 @@ class QueryBuilder(BaseView):
                             "SearchableText"
                         ].rstrip("*")
                 results = SolrResponse(
-                    data=solr_search(
-                        **self.clean_query_for_solr(query=parsedquery)
-                    )
+                    data=solr_search(**self.clean_query_for_solr(query=parsedquery))
                 )
             else:
                 results = catalog(**parsedquery)

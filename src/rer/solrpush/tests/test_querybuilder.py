@@ -8,7 +8,7 @@ from plone.namedfile.file import NamedBlobImage
 from rer.solrpush.interfaces.settings import IRerSolrpushSettings
 from rer.solrpush.testing import RER_SOLRPUSH_API_FUNCTIONAL_TESTING
 from rer.solrpush.utils import push_to_solr
-from rer.solrpush.utils.solr_common import get_solr_connection
+from rer.solrpush.utils import reset_solr
 from rer.solrpush.utils.solr_common import init_solr_push
 from transaction import commit
 
@@ -28,6 +28,8 @@ class TestCollections(unittest.TestCase):
         """
         self.portal = self.layer["portal"]
         self.request = self.layer["request"]
+
+        self.request._rest_cors_preflight = True
         setRoles(self.portal, TEST_USER_ID, ["Manager"])
         set_registry_record(
             "enabled_types",
@@ -78,8 +80,7 @@ class TestCollections(unittest.TestCase):
         commit()
 
     def tearDown(self):
-        solr = get_solr_connection()
-        solr.delete(q="*:*", commit=True)
+        reset_solr(all=True)
         set_registry_record("qf", "", interface=IRerSolrpushSettings)
         set_registry_record("bq", "", interface=IRerSolrpushSettings)
         set_registry_record("bf", "", interface=IRerSolrpushSettings)
@@ -208,9 +209,7 @@ class TestCollections(unittest.TestCase):
             os.path.join(os.path.dirname(__file__), "docs", "plone_logo.png"),
             "rb",
         ) as f:
-            image_file = NamedBlobImage(
-                data=f.read(), filename="plone_logo.png"
-            )
+            image_file = NamedBlobImage(data=f.read(), filename="plone_logo.png")
 
         news = api.content.create(
             container=self.portal,

@@ -48,9 +48,7 @@ def to_1300(context):
 
 
 def to_1400(context):
-    installOrReinstallProduct(
-        api.portal.get(), "collective.z3cform.jsonwidget"
-    )
+    installOrReinstallProduct(api.portal.get(), "collective.z3cform.jsonwidget")
     update_registry(context)
     update_controlpanel(context)
 
@@ -75,3 +73,8 @@ def to_1600(context):
         except Exception:
             # solr can't index it, pass
             continue
+
+
+def to_3000(context):
+    # reload schema
+    init_solr_push()

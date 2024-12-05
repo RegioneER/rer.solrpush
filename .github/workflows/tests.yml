@@ -5,6 +5,8 @@ on:
     paths-ignore:
       - '**.md'
       - '**.rst'
+env:
+  BUILDOUT_SOLR_ENVIRONMENT: true
 jobs:
   build:
     runs-on: ubuntu-latest

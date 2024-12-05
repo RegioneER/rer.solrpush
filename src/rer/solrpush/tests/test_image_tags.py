@@ -25,23 +25,21 @@ class TestTika(unittest.TestCase):
         """Custom shared utility setup for tests."""
         self.portal = self.layer["portal"]
         self.request = self.layer["request"]
+
+        self.request._rest_cors_preflight = True
         setRoles(self.portal, TEST_USER_ID, ["Manager"])
-        set_registry_record(
-            "enabled_types", ["File"], interface=IRerSolrpushSettings
-        )
+        set_registry_record("enabled_types", ["File"], interface=IRerSolrpushSettings)
         init_solr_push()
         commit()
 
     def tearDown(self):
         set_registry_record("active", True, interface=IRerSolrpushSettings)
-        reset_solr()
+        reset_solr(all=True)
         commit()
 
     def create_file_item(self, filename):
         item_file = None
-        with open(
-            os.path.join(os.path.dirname(__file__), "docs", filename), "rb"
-        ) as f:
+        with open(os.path.join(os.path.dirname(__file__), "docs", filename), "rb") as f:
             item_file = NamedFile(data=f.read(), filename=filename)
 
         file_item = api.content.create(

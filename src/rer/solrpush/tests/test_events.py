@@ -6,9 +6,7 @@ from plone.api.portal import set_registry_record
 from plone.app.testing import setRoles
 from plone.app.testing import TEST_USER_ID
 from rer.solrpush.interfaces.settings import IRerSolrpushSettings
-from rer.solrpush.testing import (
-    RER_SOLRPUSH_API_FUNCTIONAL_TESTING,
-)  # noqa: E501
+from rer.solrpush.testing import RER_SOLRPUSH_API_FUNCTIONAL_TESTING  # noqa: E501
 from rer.solrpush.utils import init_solr_push
 from rer.solrpush.utils import reset_solr
 from transaction import commit
@@ -34,6 +32,8 @@ class TestSOLRPush(unittest.TestCase):
         """Custom shared utility setup for tests."""
         self.portal = self.layer["portal"]
         self.request = self.layer["request"]
+
+        self.request._rest_cors_preflight = True
         setRoles(self.portal, TEST_USER_ID, ["Manager"])
         set_registry_record(
             "enabled_types",
@@ -43,7 +43,7 @@ class TestSOLRPush(unittest.TestCase):
 
     def tearDown(self):
         set_registry_record("active", True, interface=IRerSolrpushSettings)
-        reset_solr()
+        reset_solr(all=True)
 
     def test_item_not_indexed_if_solrpush_is_not_ready(self):
         solr_url = get_registry_record("solr_url", IRerSolrpushSettings)
@@ -62,9 +62,7 @@ class TestSOLRPush(unittest.TestCase):
         self.assertEqual(res["response"]["numFound"], 0)
 
         # File types has no wf, so they are published
-        api.content.create(
-            container=self.portal, type="File", title="bar file"
-        )
+        api.content.create(container=self.portal, type="File", title="bar file")
         commit()
         res = requests.get("{}/select?q=*%3A*&wt=json".format(solr_url)).json()
         self.assertEqual(res["response"]["numFound"], 1)
@@ -79,6 +77,8 @@ class TestEvents(unittest.TestCase):
         """Custom shared utility setup for tests."""
         self.portal = self.layer["portal"]
         self.request = self.layer["request"]
+
+        self.request._rest_cors_preflight = True
         setRoles(self.portal, TEST_USER_ID, ["Manager"])
         set_registry_record(
             "enabled_types",
@@ -89,7 +89,7 @@ class TestEvents(unittest.TestCase):
 
     def tearDown(self):
         set_registry_record("active", True, interface=IRerSolrpushSettings)
-        reset_solr()
+        reset_solr(all=True)
 
     def clean_solr(self):
         solr_url = get_registry_record("solr_url", IRerSolrpushSettings)
@@ -100,9 +100,7 @@ class TestEvents(unittest.TestCase):
 
     def get_solr_results(self):
         solr_url = get_registry_record("solr_url", IRerSolrpushSettings)
-        return requests.get(
-            "{}/select?q=*%3A*&wt=json".format(solr_url)
-        ).json()
+        return requests.get("{}/select?q=*%3A*&wt=json".format(solr_url)).json()
 
     def create_indexed_doc(self):
         published_doc = api.content.create(

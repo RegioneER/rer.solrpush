@@ -4,7 +4,7 @@ from plone.app.testing import setRoles
 from plone.app.testing import TEST_USER_ID
 from rer.solrpush.testing import RER_SOLRPUSH_API_FUNCTIONAL_TESTING
 from rer.solrpush.utils import push_to_solr
-from rer.solrpush.utils.solr_common import get_solr_connection
+from rer.solrpush.utils import reset_solr
 from rer.solrpush.utils.solr_common import init_solr_push
 from transaction import commit
 from zope.component import getUtility
@@ -25,6 +25,8 @@ class TestVocabularies(unittest.TestCase):
         """
         self.portal = self.layer["portal"]
         self.request = self.layer["request"]
+
+        self.request._rest_cors_preflight = True
         setRoles(self.portal, TEST_USER_ID, ["Manager"])
 
         init_solr_push()
@@ -66,8 +68,7 @@ class TestVocabularies(unittest.TestCase):
         )
 
     def tearDown(self):
-        solr = get_solr_connection()
-        solr.delete(q="*:*", commit=True)
+        reset_solr(all=True)
         commit()
 
     def test_sites_vocabulary_return_all_stored_ones(self):
@@ -88,15 +89,9 @@ class TestVocabularies(unittest.TestCase):
         vocabulary = factory(self.portal)
 
         self.assertEqual(len(vocabulary), 2)
-        self.assertEqual(
-            [x.title for x in vocabulary], ["bar-subject", "foo-subject"]
-        )
-        self.assertEqual(
-            vocabulary.getTerm("foo-subject").title, "foo-subject"
-        )
-        self.assertEqual(
-            vocabulary.getTerm("bar-subject").title, "bar-subject"
-        )
+        self.assertEqual([x.title for x in vocabulary], ["bar-subject", "foo-subject"])
+        self.assertEqual(vocabulary.getTerm("foo-subject").title, "foo-subject")
+        self.assertEqual(vocabulary.getTerm("bar-subject").title, "bar-subject")
 
     def test_portal_type_vocabulary_return_all_stored_ones(self):
         factory = getUtility(
@@ -106,8 +101,6 @@ class TestVocabularies(unittest.TestCase):
         vocabulary = factory(self.portal)
 
         self.assertEqual(len(vocabulary), 2)
-        self.assertEqual(
-            [x.title for x in vocabulary], ["Document", "News Item"]
-        )
+        self.assertEqual([x.title for x in vocabulary], ["Document", "News Item"])
         self.assertEqual(vocabulary.getTerm("Document").title, "Document")
         self.assertEqual(vocabulary.getTerm("News Item").title, "News Item")

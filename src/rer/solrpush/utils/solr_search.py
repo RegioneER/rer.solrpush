@@ -69,10 +69,7 @@ def fix_value(value, index_type="", wrap=True):
         return "({})".format(
             join_str.join([escape_special_characters(x, wrap) for x in value])
         )
-    logger.warning(
-        "[fix_value]: unable to escape value: {}. skipping".format(value)
-    )
-    return
+    return value
 
 
 def escape_special_characters(value, wrap):
@@ -96,9 +93,7 @@ def set_sort_parameter(query):
         sort_order = "desc"
     if sort_order in ["ascending"]:
         sort_order = "asc"
-    return "{sort_on} {sort_order}".format(
-        sort_on=sort_on, sort_order=sort_order
-    )
+    return "{sort_on} {sort_order}".format(sort_on=sort_on, sort_order=sort_order)
 
 
 def generate_query(
@@ -116,7 +111,6 @@ def generate_query(
         "json.nl": "arrmap",
     }
     solr_query.update(extract_from_query(query=query))
-
     if not solr_query["q"]:
         solr_query["q"] = "*:*"
     if "sort_on" in query:
@@ -165,9 +159,7 @@ def manage_elevate(query):
         return params
     try:
         if six.PY2:
-            text = (
-                TRIM.sub(" ", searchableText).strip().decode("utf-8").lower()
-            )
+            text = TRIM.sub(" ", searchableText).strip().decode("utf-8").lower()
         else:
             text = TRIM.sub(" ", searchableText).strip().lower()
     except Exception:
@@ -182,9 +174,11 @@ def manage_elevate(query):
             # if s in text:
 
             # contains regexp
-            for word in config.get("text", []):
+            for word in config.get("keywords", []):
                 if re.search("(^|\s+)" + word + "(\s+|$)", text):  # noqa
-                    uids = [x.get("UID", "") for x in config.get("uid", [])]
+                    uids = [
+                        x.get("UID", "") for x in config.get("elevated-contents", [])
+                    ]
                     params["enableElevation"] = "true"
                     params["elevateIds"] = ",".join(uids)
                     break
@@ -196,9 +190,7 @@ def extract_elevate_schema(query):
     If no site_name is passed in query and remote_elevate_schema is set,
     return the schema from remote site.
     """
-    local_schema_json = get_setting(
-        field="elevate_schema", interface=IElevateSettings
-    )
+    local_schema_json = get_setting(field="elevate_schema", interface=IElevateSettings)
     remote_schema = get_setting(
         field="remote_elevate_schema", interface=IRerSolrpushSettings
     )
@@ -214,9 +206,7 @@ def extract_elevate_schema(query):
                 return local_schema
     if remote_schema:
         try:
-            resp = requests.get(
-                remote_schema, headers={"Accept": "application/json"}
-            )
+            resp = requests.get(remote_schema, headers={"Accept": "application/json"})
         except requests.exceptions.RequestException as err:
             logger.error("Connection problem:\n{0}".format(err))
             return []
@@ -235,7 +225,7 @@ def extract_from_query(query):
     index_fields = get_index_fields()
     params = {"q": "", "fq": []}
     for index, value in query.items():
-        if not value:
+        if not value and value is not False:
             continue
         if index == "*":
             params["q"] = "*:*"
@@ -249,15 +239,11 @@ def extract_from_query(query):
             continue
         # other indexes will be added in fq
         value = fix_value(value=value, index_type=index_infos.get("type", ""))
-        if value:
+        if value or value is False:
             if index == "path":
                 index = "path_parents"
-            params["fq"].append(
-                "{index}:{value}".format(index=index, value=value)
-            )
-    can_access_inactive = api.user.has_permission(
-        "Access inactive portal content"
-    )
+            params["fq"].append("{index}:{value}".format(index=index, value=value))
+    can_access_inactive = api.user.has_permission("Access inactive portal content")
     if not can_access_inactive:
         # do not show expired or not yet published items
         if "expires" not in query:
@@ -286,11 +272,7 @@ def add_query_tweaks():
 
 # LIBRARY METHODS
 def search(
-    query,
-    fl=None,
-    facets=False,
-    facet_fields=["Subject", "portal_type"],
-    **kwargs
+    query, fl=None, facets=False, facet_fields=["Subject", "portal_type"], **kwargs
 ):
     """[summary] TODO
 
@@ -344,9 +326,7 @@ def search(
 
 def _set_query_debug(solr, params):
     try:
-        if not get_setting(
-            field="query_debug", interface=IRerSolrpushSettings
-        ):
+        if not get_setting(field="query_debug", interface=IRerSolrpushSettings):
             return
     except KeyError:
         # key not available: do not save data

@@ -11,9 +11,16 @@ Changelog
 1.4.3 (2024-10-11)
 ------------------
 
+- Remove new line characters in get_site_title method.
+  [cekk]
+- Change elevate schema to be editable with Volto.
+  [cekk]
+- Partly remove Python2 compatibility.
+  [cekk]
 - Fix SolrIndexProcessor logic: avoid not needed reindexes when we are reindexing objects with indexes not in SOLR.
   [cekk]
-
+- Fix pagination in querybuilder for solr.
+  [cekk]
 
 1.4.2 (2024-08-08)
 ------------------

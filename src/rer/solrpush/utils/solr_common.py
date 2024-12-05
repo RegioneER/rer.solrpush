@@ -11,15 +11,11 @@ import six
 
 
 def get_setting(field, interface=IRerSolrpushSettings):
-    return api.portal.get_registry_record(
-        field, interface=interface, default=False
-    )
+    return api.portal.get_registry_record(field, interface=interface, default=False)
 
 
 def set_setting(field, value, interface=IRerSolrpushSettings):
-    return api.portal.set_registry_record(
-        field, interface=interface, value=value
-    )
+    return api.portal.set_registry_record(field, interface=interface, value=value)
 
 
 def is_solr_active():
@@ -75,9 +71,7 @@ def init_solr_push():
             return ErrorMessage
 
         root = etree.fromstring(respo.content)
-        chosen_fields = json.dumps(
-            extract_fields(nodes=root.findall(".//field"))
-        )
+        chosen_fields = json.dumps(extract_fields(nodes=root.findall(".//field")))
         if six.PY2:
             chosen_fields = chosen_fields.decode("utf-8")
         set_setting(field="index_fields", value=chosen_fields)

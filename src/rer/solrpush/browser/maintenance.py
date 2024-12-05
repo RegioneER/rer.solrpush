@@ -14,8 +14,8 @@ from rer.solrpush.utils import remove_from_solr
 from rer.solrpush.utils import reset_solr
 from rer.solrpush.utils import search
 from rer.solrpush.utils.solr_common import is_solr_active
+from rer.solrpush.utils.solr_indexer import all_site_titles
 from rer.solrpush.utils.solr_indexer import can_index
-from rer.solrpush.utils.solr_indexer import get_site_title
 from rer.solrpush.utils.solr_indexer import parse_date_as_datetime
 from time import strftime
 from time import time
@@ -33,9 +33,7 @@ import os
 import pkg_resources
 
 
-JS_TEMPLATE = (
-    "{portal_url}/++plone++rer.solrpush/dist/{env_mode}/{name}.js?v={version}"
-)
+JS_TEMPLATE = "{portal_url}/++plone++rer.solrpush/dist/{env_mode}/{name}.js?v={version}"
 CSS_TEMPLATE = (
     "{portal_url}/++plone++rer.solrpush/dist/{env_mode}/{name}.css?v={version}"
 )
@@ -90,10 +88,9 @@ class ResetSolr(SolrMaintenanceBaseForm):
     )
 
     def do_action(self):
+        self.request._rest_cors_preflight = True
         reset_solr()
-        msg_label = _(
-            "maintenance_reset_success", default="SOLR index dropped"
-        )
+        msg_label = _("maintenance_reset_success", default="SOLR index dropped")
         logger.info("##### SOLR Index dropped #####")
         api.portal.show_message(message=msg_label, request=self.request)
         return self.request.response.redirect(
@@ -137,9 +134,7 @@ class ReindexBaseView(BrowserView):
         if not self.solr_utility:
             return
         if not is_solr_active():
-            logger.warning(
-                "Trying to reindexing but solr is not set as active"
-            )
+            logger.warning("Trying to reindexing but solr is not set as active")
             return
         elapsed = timer()
         if self.solr_utility.enabled_types:
@@ -155,9 +150,7 @@ class ReindexBaseView(BrowserView):
         )
         logger.info("##### SOLR REINDEX START #####")
         logger.info(
-            "Reindexing {} items.".format(
-                brains_to_reindex.actual_result_count
-            )
+            "Reindexing {} items.".format(brains_to_reindex.actual_result_count)
         )
         skipped = 0
         indexed = 0
@@ -218,7 +211,10 @@ class ReindexBaseView(BrowserView):
             brains_to_sync = pc()
         good_uids = [x.UID for x in brains_to_sync]
         solr_results = search(
-            query={"site_name": get_site_title(), "b_size": 100000000},
+            query={
+                "site_name": all_site_titles(),
+                "b_size": 100000000,
+            },
             fl="UID",
         )
         uids_to_remove = [
@@ -256,7 +252,10 @@ class ReindexBaseView(BrowserView):
         logger.info("##### SYNC CONTENTS TO SOLR #####")
         pc = api.portal.get_tool(name="portal_catalog")
         solr_docs = search(
-            query={"site_name": get_site_title(), "b_size": 100000000},
+            query={
+                "site_name": all_site_titles(),
+                "b_size": 100000000,
+            },
             fl="UID modified",
         ).docs
         solr_items = {item["UID"]: item["modified"] for item in solr_docs}
@@ -276,25 +275,19 @@ class ReindexBaseView(BrowserView):
         logger.info("Completed in {}.".format(elapsed_time))
         if len(results["indexed"]):
             logger.info(
-                "Indexed {} items (new or modified):".format(
-                    len(results["indexed"])
-                )
+                "Indexed {} items (new or modified):".format(len(results["indexed"]))
             )
             for path in results["indexed"]:
                 logger.info("- {}".format(path))
         if len(results["removed"]):
             logger.info(
-                "Removed {} items (no more indexeable):".format(
-                    len(results["removed"])
-                )
+                "Removed {} items (no more indexeable):".format(len(results["removed"]))
             )
             for path in results["removed"]:
                 logger.info("- {}".format(path))
         if len(results["not_indexed"]):
             logger.info(
-                "NOT indexed {} items (errors):".format(
-                    len(results["not_indexed"])
-                )
+                "NOT indexed {} items (errors):".format(len(results["not_indexed"]))
             )
             for error in results["not_indexed"]:
                 logger.info(
@@ -304,9 +297,7 @@ class ReindexBaseView(BrowserView):
                     )
                 )
 
-    def sync_contents(
-        self, brains_to_sync, solr_items, disable_progress=False
-    ):
+    def sync_contents(self, brains_to_sync, solr_items, disable_progress=False):
         indexed = []
         not_indexed = []
         removed = []
@@ -335,11 +326,8 @@ class ReindexBaseView(BrowserView):
                         {"path": brain.getPath(), "message": e.__str__()}
                     )
                 except Exception as e:
-                    not_indexed.append(
-                        {"path": brain.getPath(), "message": str(e)}
-                    )
+                    not_indexed.append({"path": brain.getPath(), "message": str(e)})
             else:
-                item = brain.getObject()
                 if not can_index(item):
                     remove_from_solr(brain.UID)
                     removed.append(brain.getPath())
@@ -354,9 +342,7 @@ class ReindexBaseView(BrowserView):
                         if res:
                             indexed.append(brain.getPath())
                     except Exception as e:
-                        not_indexed.append(
-                            {"path": brain.getPath(), "message": str(e)}
-                        )
+                        not_indexed.append({"path": brain.getPath(), "message": str(e)})
         if not disable_progress:
             status["in_progress"] = False
         return {

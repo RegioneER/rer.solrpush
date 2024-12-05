@@ -12,7 +12,6 @@ logger = logging.getLogger(__name__)
 
 
 class FacetsVocabulary(object):
-
     facet_field = ""
 
     def get_terms(self):
