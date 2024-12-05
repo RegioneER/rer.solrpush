@@ -2,7 +2,7 @@ Changelog
 =========
 
 
-1.3.5 (unreleased)
+1.3.5 (2024-12-05)
 ------------------
 
 - Reload schema from solr with upgrade-step.
