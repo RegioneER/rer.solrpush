@@ -2,7 +2,7 @@ Changelog
 =========
 
 
-1.3.4 (Unreleased)
+1.3.4 (2024-12-05)
 ------------------
 
 - Handle also boolean indexes.
