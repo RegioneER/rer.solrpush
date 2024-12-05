@@ -2,7 +2,7 @@ Changelog
 =========
 
 
-1.4.4 (unreleased)
+1.5.0 (2024-12-05)
 ------------------
 
 - Remove new line characters in get_site_title method.
