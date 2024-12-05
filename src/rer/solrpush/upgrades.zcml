@@ -83,4 +83,12 @@
     profile="rer.solrpush:default"
     handler=".upgrades.update_registry"
     />  
+  <genericsetup:upgradeStep
+    source="2000"
+    destination="2001"
+    title="Reload schema from solr"
+    description=""
+    profile="rer.solrpush:default"
+    handler=".upgrades.to_2001"
+    />  
 </configure>

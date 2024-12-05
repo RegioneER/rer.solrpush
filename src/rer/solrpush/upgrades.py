@@ -74,3 +74,8 @@ def to_1600(context):
         except Exception:
             # solr can't index it, pass
             continue
+
+
+def to_2001(context):
+    # reload schema
+    init_solr_push()

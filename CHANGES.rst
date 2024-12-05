@@ -5,7 +5,8 @@ Changelog
 1.3.5 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Reload schema from solr with upgrade-step.
+  [cekk]
 
 
 1.3.4 (2024-12-05)
