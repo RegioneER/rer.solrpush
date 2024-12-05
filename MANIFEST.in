@@ -24,3 +24,9 @@ exclude requirements.txt
 exclude tox.ini
 exclude webpack.config.js
 exclude yarn.lock
+exclude .coveragerc
+exclude base.cfg
+exclude bobtemplate.cfg
+exclude buildout.cfg
+exclude test_plone52.cfg
+exclude test_plone60.cfg
