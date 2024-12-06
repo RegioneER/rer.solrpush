@@ -255,7 +255,12 @@ def push_to_solr(item_or_obj):
     if not can_index(context):
         return False
     index_dict = create_index_dict(context)
-    attachment = index_dict.pop("attachment", None)
+    attachment = None
+    if index_dict.get("attachment", None):
+        attachment = index_dict.pop("attachment", None)
+    else:
+        if isinstance(item_or_obj, dict) and item_or_obj.get("attachment", None):
+            attachment = item_or_obj["attachment"]
     if attachment:
         add_with_attachment(solr=solr, attachment=attachment, fields=index_dict)
     else:

@@ -5,7 +5,8 @@ Changelog
 1.5.1 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Fix handle attachements when indexing a new content.
+  [cekk]
 
 
 1.5.0 (2024-12-05)

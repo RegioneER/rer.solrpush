@@ -2,7 +2,8 @@
 from plone import api
 from rer.solrpush.interfaces.adapter import IExtractFileFromTika
 from zope.interface import implementer
-
+from ZODB.POSException import POSKeyError
+from ZODB.POSException import ReadConflictError
 
 try:
     from collective.limitfilesizepanel.interfaces import ILimitFileSizePanel
@@ -50,4 +51,9 @@ class FileExtractor(object):
                 file_obj.filename,
             )
             return None
-        return file_obj.data
+        try:
+            return file_obj.data
+        except (POSKeyError, ReadConflictError):
+            # this is raised if we are creating a new object, because there isn't the blob yet.
+            # this is not a problem, because the file is in dictionary
+            return None
