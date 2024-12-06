@@ -60,7 +60,8 @@ class SolrIndexProcessor(object):
             and can_index(obj)  # noqa
         ):
             uid = obj.UID()
-            data = create_index_dict(obj)
+            with api.env.adopt_roles(["Anonymous"]):
+                data = create_index_dict(obj)
             self.queue = [item for item in self.queue if item[0] != uid] + [
                 (uid, INDEX, data, attributes)
             ]
