@@ -2,7 +2,7 @@ Changelog
 =========
 
 
-1.5.2 (unreleased)
+1.5.2 (2024-12-06)
 ------------------
 
 - Fix error when trying to get @site service to get site title.
