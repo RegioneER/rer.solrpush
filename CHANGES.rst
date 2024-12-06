@@ -5,7 +5,8 @@ Changelog
 1.3.6 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Fix handle attachements when indexing a new content.
+  [cekk]
 
 
 1.3.5 (2024-12-05)
