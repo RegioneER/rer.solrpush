@@ -2,7 +2,7 @@ Changelog
 =========
 
 
-1.5.3 (unreleased)
+1.5.3 (2024-12-06)
 ------------------
 
 - Fix error when trying to get @site service to get site title and make exception more generic.
