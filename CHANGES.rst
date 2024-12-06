@@ -5,7 +5,8 @@ Changelog
 1.5.3 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Fix error when trying to get @site service to get site title and make exception more generic.
+  [cekk]
 
 
 1.5.2 (2024-12-06)
