@@ -5,13 +5,14 @@ Changelog
 1.5.4 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Fix handle attachements when indexing a new File.
+  [cekk]
 
 
 1.5.3 (2024-12-06)
 ------------------
 
-- Fix error when trying to get @site service to get site title and make exception more generic.
+- Fix handle attachements when indexing a new content and make exception more generic.
   [cekk]
 
 
