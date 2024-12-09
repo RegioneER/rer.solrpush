@@ -2,7 +2,7 @@ Changelog
 =========
 
 
-1.3.7 (unreleased)
+1.3.7 (2024-12-09)
 ------------------
 
 - Fix handle attachements when indexing a new content.
