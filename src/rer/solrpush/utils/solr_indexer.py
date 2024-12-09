@@ -108,7 +108,7 @@ def can_index(item):
     return is_right_portal_type(item)
 
 
-def create_index_dict(item):
+def create_index_dict(item, default={}):
     """Restituisce un dizionario pronto per essere 'mandato' a SOLR per
     l'indicizzazione.
     """
@@ -128,7 +128,13 @@ def create_index_dict(item):
         field_type = field_infos.get("type")
         if six.PY2:
             field = field.encode("ascii")
-        value = getattr(adapter, field, None)
+        try:
+            value = getattr(adapter, field, None)
+        except Exception:
+            # if we are in creation and indexing a content with a File, SearchableText
+            # raise PosKeyError because it tries to read the file too, but the blob
+            # isn't created yet.
+            value = default.get(field, None)
         if not value and value is not False:
             continue
         if callable(value):
@@ -245,7 +251,7 @@ def push_to_solr(item_or_obj):
             context = obj
     if not can_index(context):
         return False
-    index_dict = create_index_dict(context)
+    index_dict = create_index_dict(item=context, default=item_or_obj)
     attachment = None
     if index_dict.get("attachment", None):
         attachment = index_dict.pop("attachment", None)
@@ -283,7 +289,7 @@ def remove_from_solr(uid):
         logger.error(err)
         message = _(
             "content_remove_error",
-            default=u"There was a problem removing this content from SOLR. "
+            default="There was a problem removing this content from SOLR. "
             " Please contact site administrator.",
         )
         api.portal.show_message(
