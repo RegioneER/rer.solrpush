@@ -29,6 +29,10 @@ def update_actions(context):
     update_profile(context=context, name="actions")
 
 
+def update_rolemap(context):
+    update_profile(context, "rolemap")
+
+
 def to_1100(context):
     setup_tool = api.portal.get_tool(name="portal_setup")
     setup_tool.runAllImportStepsFromProfile("profile-rer.solrpush:to_1100")

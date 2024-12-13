@@ -92,4 +92,12 @@
       destination="3000"
       handler=".upgrades.to_3000"
       />
+  <genericsetup:upgradeStep
+      title="Add Plone Site Setup: Overview permission to ElevateManager"
+      description=""
+      profile="rer.solrpush:default"
+      source="3000"
+      destination="3100"
+      handler=".upgrades.update_rolemap"
+      />
 </configure>

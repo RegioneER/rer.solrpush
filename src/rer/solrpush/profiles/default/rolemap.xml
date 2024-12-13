@@ -13,5 +13,9 @@
       <role name="Manager" />
       <role name="Site Administrator" />
     </permission>
+    <!-- this is needed to access elevate settings controlpanel -->
+    <permission name="Plone Site Setup: Overview" acquire="True">
+      <role name="ElevateManager" />
+    </permission>
   </permissions>
 </rolemap>

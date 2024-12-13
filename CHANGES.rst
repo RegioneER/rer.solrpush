@@ -5,7 +5,8 @@ Changelog
 1.5.5 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Add Plone Site Setup: Overview permission to ElevateManager to be able to access elevate controlpanel.
+  [cekk]
 
 
 1.5.4 (2024-12-06)
