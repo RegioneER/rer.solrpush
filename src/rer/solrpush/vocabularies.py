@@ -36,7 +36,7 @@ class FacetsVocabulary(object):
                 terms.append(
                     SimpleTerm(value=key, token=key.encode("utf-8"), title=key)
                 )
-        return terms
+        return sorted(terms, key=lambda x: x.title.lower())
 
     def __call__(self, context):
         return SimpleVocabulary(self.get_terms(), swallow_duplicates=True)
