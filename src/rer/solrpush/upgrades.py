@@ -85,13 +85,15 @@ def to_3000(context):
     init_solr_push()
 
 
-def to_3100(context):
+def to_3200(context):
     """
     Remove unused behavior and reindex items
     """
     types_tool = api.portal.get_tool(name="portal_types")
     for ptype in types_tool.listTypeInfo():
-        behaviors = ptype.behaviors
+        behaviors = getattr(ptype, "behaviors", None)
+        if not behaviors:
+            continue
         if "rer.solrpush.behaviors.solr_fields.ISolrFields" in behaviors:
             behaviors = list(behaviors)
             behaviors.remove("rer.solrpush.behaviors.solr_fields.ISolrFields")

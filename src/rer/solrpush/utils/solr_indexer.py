@@ -129,8 +129,10 @@ def can_index(item):
         return False
     if not is_right_portal_type(item):
         return False
-    # if not getattr(item, "showinsearch", True):
-    #     return False
+    if (
+        getattr(item, "exclude_from_search", None) is False
+    ):  # this comes with a design.plone.contenttypes behavior
+        return False
     return True
 
 
