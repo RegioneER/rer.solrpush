@@ -82,3 +82,16 @@ def to_1600(context):
 def to_3000(context):
     # reload schema
     init_solr_push()
+
+
+def to_3100(context):
+    """
+    Remove unused behavior and reindex items
+    """
+    types_tool = api.portal.get_tool(name="portal_types")
+    for ptype in types_tool.listTypeInfo():
+        behaviors = ptype.behaviors
+        if "rer.solrpush.behaviors.solr_fields.ISolrFields" in behaviors:
+            behaviors = list(behaviors)
+            behaviors.remove("rer.solrpush.behaviors.solr_fields.ISolrFields")
+            ptype.behaviors = tuple(behaviors)

@@ -27,7 +27,7 @@ import six
 
 logger = logging.getLogger(__name__)
 
-ADDITIONAL_FIELDS = ["searchwords"]
+ADDITIONAL_FIELDS = [""]
 
 RESTAPI_METADATA_FIELDS = ["@id", "@type", "description", "title"]
 
