@@ -127,7 +127,11 @@ def can_index(item):
             return False
     if not is_solr_active():
         return False
-    return is_right_portal_type(item)
+    if not is_right_portal_type(item):
+        return False
+    # if not getattr(item, "showinsearch", True):
+    #     return False
+    return True
 
 
 def create_index_dict(item, default={}):

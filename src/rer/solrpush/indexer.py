@@ -56,7 +56,6 @@ class SolrIndexProcessor(object):
         if (
             self.active
             and self.check_attributes(attributes=attributes)  # noqa
-            and getattr(obj, "showinsearch", True)  # noqa
             and can_index(obj)  # noqa
         ):
             uid = obj.UID()

@@ -3,6 +3,7 @@ from plone import api
 from plone.app.upgrade.utils import installOrReinstallProduct
 from rer.solrpush.utils.solr_common import init_solr_push
 from rer.solrpush.utils.solr_indexer import push_to_solr
+from rer.solrpush.utils import remove_from_solr
 
 import logging
 
@@ -94,4 +95,28 @@ def to_3100(context):
         if "rer.solrpush.behaviors.solr_fields.ISolrFields" in behaviors:
             behaviors = list(behaviors)
             behaviors.remove("rer.solrpush.behaviors.solr_fields.ISolrFields")
+            behaviors.append("design.plone.contenttypes.behavior.exclude_from_search")
             ptype.behaviors = tuple(behaviors)
+
+    pc = api.portal.get_tool(name="portal_catalog")
+    brains = pc()
+    tot = len(brains)
+    i = 0
+
+    for brain in brains:
+        i += 1
+        if i % 500 == 0:
+            logger.info("[PROGRESS] - {}/{}".format(i, tot))
+
+        item = brain.getObject()
+        showinsearch = getattr(item, "showinsearch", None)
+        exclude_from_search = getattr(item, "exclude_from_search", False)
+
+        if exclude_from_search:
+            remove_from_solr(brain.UID)
+        elif showinsearch is False:
+            del item.showinsearch
+            if hasattr(item, "exclude_from_search"):
+                item.exclude_from_search = True
+                item.reindexObject(idxs=["exclude_from_search"])
+            remove_from_solr(brain.UID)
