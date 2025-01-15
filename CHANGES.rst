@@ -7,7 +7,8 @@ Changelog
 
 - Add Plone Site Setup: Overview permission to ElevateManager to be able to access elevate controlpanel.
   [cekk]
-
+- Sort solr keywords vocabulary in alphabetical order.
+  [cekk]
 
 1.5.4 (2024-12-06)
 ------------------
