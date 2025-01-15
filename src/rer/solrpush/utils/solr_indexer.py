@@ -27,7 +27,7 @@ import six
 
 logger = logging.getLogger(__name__)
 
-ADDITIONAL_FIELDS = ["searchwords"]
+ADDITIONAL_FIELDS = [""]
 
 RESTAPI_METADATA_FIELDS = ["@id", "@type", "description", "title"]
 
@@ -127,7 +127,12 @@ def can_index(item):
             return False
     if not is_solr_active():
         return False
-    return is_right_portal_type(item)
+    if not is_right_portal_type(item):
+        return False
+    if getattr(item, "exclude_from_search", False):
+        # this comes with a design.plone.contenttypes behavior
+        return False
+    return True
 
 
 def create_index_dict(item, default={}):

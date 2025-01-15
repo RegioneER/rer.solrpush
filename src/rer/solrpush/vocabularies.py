@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
 from rer.solrpush.utils import search
+from rer.solrpush.utils.solr_search import SOLRException
 from zope.interface import implementer
 from zope.schema.interfaces import IVocabularyFactory
 from zope.schema.vocabulary import SimpleTerm
 from zope.schema.vocabulary import SimpleVocabulary
-from rer.solrpush.utils.solr_search import SOLRException
 
 import logging
+
 
 logger = logging.getLogger(__name__)
 

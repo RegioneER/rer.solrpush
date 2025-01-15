@@ -41,12 +41,10 @@ class TestCollections(unittest.TestCase):
         # set_registry_record("active", True, interface=IRerSolrpushSettings)
         self.docs = {}
         for i in range(20):
-            searchwords = []
             id = "doc-%03d" % i
             if i == 5:
                 id = "doc-odd"
                 title = "Document %s" % i
-                searchwords = ["odd"]
             elif i % 2 == 0:
                 title = "Document %s even even" % i
             else:
@@ -56,7 +54,6 @@ class TestCollections(unittest.TestCase):
                 type="Document",
                 id=id,
                 title=title,
-                searchwords=searchwords,
             )
             # obj.reindexObject(idxs=['Title'])
             api.content.transition(obj=obj, transition="publish")

@@ -49,7 +49,6 @@ class TestSolrSearch(unittest.TestCase):
             type="Document",
             title="Second page",
             description="lorem ipsum dolor sit amet",
-            searchwords="important",
         )
         self.unpublished_doc = api.content.create(
             container=self.portal, type="Document", title="Unpublished page"

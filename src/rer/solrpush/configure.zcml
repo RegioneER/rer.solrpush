@@ -10,7 +10,6 @@
   <include file="permissions.zcml" />
 
   <include package=".adapters" />
-  <include package=".behaviors" />
   <include package=".browser" />
   <include package=".restapi" />
 

@@ -9,6 +9,8 @@ Changelog
   [cekk]
 - Sort solr keywords vocabulary in alphabetical order.
   [cekk]
+- Remove unused behavior with searchwords and showinsearch fields.
+  [cekk]
 
 1.5.4 (2024-12-06)
 ------------------

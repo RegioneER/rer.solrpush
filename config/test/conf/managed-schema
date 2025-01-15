@@ -174,8 +174,6 @@
    <field name="path_string" type="string" indexed="false" stored="true" required="false" multiValued="false" termVectors="false" termPositions="false" termOffsets="false" />
    <field name="portal_type" type="string" indexed="true" stored="true" required="false" multiValued="false" termVectors="false" termPositions="false" termOffsets="false" />
    <field name="review_state" type="string" indexed="true" stored="true" required="false" multiValued="false" termVectors="false" termPositions="false" termOffsets="false" />
-   <field name="searchwords" type="string" indexed="true" stored="false" required="false" multiValued="true" termVectors="false" termPositions="false" termOffsets="false" />
-   <field name="showinsearch" type="boolean" indexed="true" stored="false" required="false" multiValued="false" termVectors="false" termPositions="false" termOffsets="false" />
    <field name="sortable_title" type="alphaOnlySort" indexed="true" stored="true" required="false" multiValued="false" termVectors="false" termPositions="false" termOffsets="false" />
    <field name="start" type="date" indexed="true" stored="true" required="false" multiValued="false" termVectors="false" termPositions="false" termOffsets="false" />
    <field name="text_no_stem" type="text_no_stem_it" indexed="true" stored="false" required="false" multiValued="true" termVectors="false" termPositions="false" termOffsets="false" />

@@ -3,6 +3,7 @@ from plone import api
 from rer.solrpush.interfaces.adapter import IExtractFileFromTika
 from zope.interface import implementer
 
+
 try:
     from collective.limitfilesizepanel.interfaces import ILimitFileSizePanel
 

@@ -156,8 +156,6 @@
    <field name="modified" type="date" indexed="true" stored="true" required="false" multiValued="false" termVectors="false" termPositions="false" termOffsets="false" />
    <field name="portal_type" type="string" indexed="true" stored="true" required="false" multiValued="false" termVectors="false" termPositions="false" termOffsets="false" />
    <field name="review_state" type="string" indexed="true" stored="true" required="false" multiValued="false" termVectors="false" termPositions="false" termOffsets="false" />
-   <field name="searchwords" type="lowercase" indexed="true" stored="false" required="false" multiValued="true" termVectors="false" termPositions="false" termOffsets="false" />
-   <field name="showinsearch" type="boolean" indexed="true" stored="false" required="false" multiValued="false" termVectors="false" termPositions="false" termOffsets="false" />
    <field name="start" type="date" indexed="true" stored="true" required="false" multiValued="false" termVectors="false" termPositions="false" termOffsets="false" />
    <field name="url" type="string" indexed="true" stored="true" required="false" multiValued="false" termVectors="false" termPositions="false" termOffsets="false" />
 <!-- catchall field per spellcheck, containing all other searchable text fields (implemented via copyField further on in this schema -->
