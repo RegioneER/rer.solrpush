@@ -15,8 +15,6 @@ You can see an example in config folder of this product.
 
 By default we mapped all base Plone indexes/metadata into SOLR, plus some additional fields::
 
-    <field name="searchwords" type="string" indexed="true" stored="true" required="false" multiValued="true" termVectors="false" termPositions="false" termOffsets="false"/>
-    <field name="showinsearch" type="boolean" indexed="true" stored="false" required="false" multiValued="false" termVectors="false" termPositions="false" termOffsets="false"/>
     <field name="url" type="string" indexed="false" stored="true" required="false" multiValued="false" termVectors="false" termPositions="false" termOffsets="false"/>
     <field name="site_name" type="string" indexed="true" stored="true" required="false" multiValued="false" termVectors="false" termPositions="false" termOffsets="false"/>
     <field name="path_depth" type="pint" indexed="false" stored="true" required="false" multiValued="false" termVectors="false" termPositions="false" termOffsets="false"/>
@@ -26,8 +24,7 @@ By default we mapped all base Plone indexes/metadata into SOLR, plus some additi
     <field name="@type" type="string" indexed="false" stored="true" required="false" multiValued="false" termVectors="false" termPositions="false" termOffsets="false"/>
     <field name="title" type="text_it" indexed="false" stored="true" required="false" multiValued="false" termVectors="false" termPositions="false" termOffsets="false"/>
 
-- `searchwords`, `view_name`, `path_parents`, `path_depth`, `site_name` are needed for query filter and boost (see below)
-- `showinsearch` is needed to allow/disallow single content indexing
+- `view_name`, `path_parents`, `path_depth`, `site_name` are needed for query filter and boost (see below)
 - `url` is an index where we store frontend url
 - `@id`, `@type` and `title` are needed for plone.restapi-like responses
 
@@ -112,15 +109,6 @@ For example if you want to give more relevance to results that contains searched
 text into their title than in the text, you could set something like this::
 
     title^1000.0 SearchableText^1.0 description^500.0
-
-You can also elevate by *searchwords*.
-
-`bq` specifies an additional, optional, query clause that will be added to the user’s main query to influence the score.
-For example if we want to boost results that have a specific `searchwords` term::
-
-    searchwords:something^1000
-  
-Solr will improve ranking for results that have "*something*" in their searchwords field.
 
 `bf` specifies functions (with optional boosts) that will be used to construct FunctionQueries
 which will be added to the user’s main query as optional clauses that will influence the score.
