@@ -19,8 +19,9 @@ from six.moves import range
 from zope.globalrequest import getRequest
 from zope.interface import implementer
 
-import logging
 import json
+import logging
+
 
 logger = logging.getLogger(__name__)
 

@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 from plone import api
 from plone.app.upgrade.utils import installOrReinstallProduct
+from rer.solrpush.utils import remove_from_solr
 from rer.solrpush.utils.solr_common import init_solr_push
 from rer.solrpush.utils.solr_indexer import push_to_solr
-from rer.solrpush.utils import remove_from_solr
 
 import logging
 
