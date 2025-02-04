@@ -29,6 +29,7 @@ ESCAPE_CHARS_RE = re.compile(r'(?<!\\)(?P<char>[&|+\-!(){}[\]^"~*?:])')
 
 class SOLRException(Exception):
     "Raised when the solr respoonse return an error"
+
     pass
 
 
