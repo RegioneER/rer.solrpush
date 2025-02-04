@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2021-12-14 12:39+0000\n"
+"POT-Creation-Date: 2025-01-15 14:40+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI +ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -26,15 +26,15 @@ msgstr "Una lista dei portal-types memorizzati su SOLR."
 msgid "A list of (SOLR indexed) sites where search items."
 msgstr "Una lista di siti (indicizzati su SOLR) dove eseguire le ricerche."
 
-#: rer/solrpush/interfaces/settings.py:45
+#: rer/solrpush/interfaces/settings.py:22
 msgid "Active"
 msgstr "Attivo"
 
-#: rer/solrpush/browser/controlpanel.py:74
+#: rer/solrpush/browser/controlpanel.py:73
 msgid "Cancel"
 msgstr "Annulla"
 
-#: rer/solrpush/browser/controlpanel.py:62
+#: rer/solrpush/browser/controlpanel.py:63
 msgid "Changes saved."
 msgstr "Modifiche salvate."
 
@@ -42,23 +42,19 @@ msgstr "Modifiche salvate."
 msgid "Elevate configuration"
 msgstr "Configurazione Elevate"
 
-#: rer/solrpush/interfaces/settings.py:46
+#: rer/solrpush/interfaces/settings.py:23
 msgid "Enable SOLR indexing on this site."
 msgstr "Abilita l'indicizzazione con SOLR su questo sito."
 
-#: rer/solrpush/behaviors/configure.zcml:14
-msgid "Extra fields for Solr indexing"
-msgstr "Campi extra per SOLR"
-
-#: rer/solrpush/interfaces/settings.py:52
+#: rer/solrpush/interfaces/settings.py:34
 msgid "Force commit"
 msgstr "Forza il commit"
 
-#: rer/solrpush/interfaces/settings.py:53
+#: rer/solrpush/interfaces/settings.py:35
 msgid "Force commits on CRUD operations. If enabled, each indexing operation to SOLR will be immediately committed and persisted. This means that updates are immediately available on SOLR queries.If you are using SolrCloud with ZooKeeper, immediate commits will slow down response performances when indexing, so it's better to turn it off. In this case updates will be available when SOLR periodically commit changes."
 msgstr "Forza il commit nelle operazioni di CRUD. Se abilitato, ogni operazione di indicizzazione su SOLR viene committata all'istante. Questo significa che gli aggiornamenti sono immediatamente visibili nelle query su SOLR. Se stai usando SOLRCloud con ZooKeeper, i commit immediati possono rallentare abbastanza i tempi di risposta, quindi è meglio disattivarli. In questo caso gli aggiornamenti saranno disponibili dopo un certo tempo in cui SOLR in autonomia esegue il commit delle modifiche."
 
-#: rer/solrpush/interfaces/settings.py:73
+#: rer/solrpush/interfaces/settings.py:55
 msgid "Frontend url"
 msgstr "Url di frontend"
 
@@ -66,11 +62,11 @@ msgstr "Url di frontend"
 msgid "Go back"
 msgstr "Torna indietro"
 
-#: rer/solrpush/interfaces/settings.py:119
+#: rer/solrpush/interfaces/settings.py:98
 msgid "If enabled, when a search to SOLR is performed (for example in Collection), the query will be showed in the page for debug. Only visible to Managers."
 msgstr "Se abilitato, quando viene effettuata una ricerca su SOLR (per esempio nelle Collezioni), la query viene mostrata in pagina per debug. Questa informazione è disponibile solo ai Manager del sito."
 
-#: rer/solrpush/interfaces/settings.py:74
+#: rer/solrpush/interfaces/settings.py:56
 msgid "If the website has different URL for frontend users."
 msgstr "Se il sito ha un url differente per il frontend."
 
@@ -82,11 +78,11 @@ msgstr "Installa l'add-on rer.solrpush."
 msgid "Keywords in SOLR"
 msgstr "Parole chiave su SOLR"
 
-#: rer/solrpush/browser/controlpanel.py:70
+#: rer/solrpush/browser/controlpanel.py:69
 msgid "Loaded schema.xml from SOLR"
 msgstr "schema.xml caricato correttamente da SOLR"
 
-#: rer/solrpush/utils/solr_common.py:87
+#: rer/solrpush/utils/solr_common.py:81
 msgid "No SOLR url provided"
 msgstr "Nessun url di connessione a SOLR fornito"
 
@@ -94,7 +90,7 @@ msgstr "Nessun url di connessione a SOLR fornito"
 msgid "Portal types in SOLR"
 msgstr "Tipi di contenuto su SOLR"
 
-#: rer/solrpush/interfaces/settings.py:118
+#: rer/solrpush/interfaces/settings.py:97
 msgid "Query debug"
 msgstr "Debug della query"
 
@@ -114,15 +110,15 @@ msgstr "RER: Solr push remove persistent utility"
 msgid "RER: Solr push remove unused control panel"
 msgstr ""
 
-#: rer/solrpush/interfaces/settings.py:109
+#: rer/solrpush/interfaces/settings.py:88
 msgid "Ready"
 msgstr "Pronto"
 
-#: rer/solrpush/browser/controlpanel.py:78
+#: rer/solrpush/browser/controlpanel.py:77
 msgid "Reload schema.xml"
 msgstr "Ricarica schema.xml"
 
-#: rer/solrpush/browser/controlpanel.py:89
+#: rer/solrpush/browser/controlpanel.py:86
 msgid "Reloaded schema.xml from SOLR"
 msgstr "Ricarica le informazioni di schema.xml da SOLR"
 
@@ -130,35 +126,39 @@ msgstr "Ricarica le informazioni di schema.xml da SOLR"
 msgid "SOLR"
 msgstr "SOLR"
 
-#: rer/solrpush/interfaces/settings.py:110
+#: rer/solrpush/interfaces/settings.py:89
 msgid "SOLR push is ready to be used."
 msgstr "SOLR push è pronto per essere utilizzato."
 
-#: rer/solrpush/interfaces/settings.py:67
+#: rer/solrpush/interfaces/settings.py:49
 msgid "SOLR url"
 msgstr "Url di SOLR"
 
-#: rer/solrpush/browser/controlpanel.py:55
+#: rer/solrpush/browser/controlpanel.py:56
 msgid "Save"
 msgstr "Salva"
+
+#: rer/solrpush/interfaces/settings.py:28
+msgid "Search enabled"
+msgstr "Ricerca con SOLR abilitata"
 
 #: rer/solrpush/profiles/default/registry/criteria.xml
 msgid "Search with Solr"
 msgstr "Ricerca su solr"
 
+#: rer/solrpush/interfaces/settings.py:29
+msgid "Site search will use SOLR as engine instead portal_catalog."
+msgstr "La ricerca del sito usera SOLR come motore invece del portal_catalog."
+
 #: rer/solrpush/profiles/default/registry/criteria.xml
 msgid "Sites"
 msgstr "Siti"
 
-#: rer/solrpush/browser/controlpanel.py:42
+#: rer/solrpush/browser/controlpanel.py:43
 msgid "Solr Push Configuration"
 msgstr "Configurazione Solr Push"
 
-#: rer/solrpush/behaviors/configure.zcml:14
-msgid "Solr additional fields"
-msgstr "Campi aggiuntivi di SOLR"
-
-#: rer/solrpush/interfaces/settings.py:68
+#: rer/solrpush/interfaces/settings.py:50
 msgid "The SOLR core to connect to."
 msgstr "Il core di SOLR a cui connettersi."
 
@@ -167,81 +167,57 @@ msgid "Uninstalls the rer.solrpush add-on."
 msgstr "Disinstalla l'add-on rer.solrpush."
 
 #. Default: "Set a list of functions (with optional boosts) that will be used to construct FunctionQueries which will be added to the main query as optional clauses that will influence the score. Any function supported natively by Solr can be used, along with a boost value. For example if we want to give less relevance to items deeper in the tree we can set something like this: recip(path_depth,10,100,1)"
-#: rer/solrpush/interfaces/settings.py:168
+#: rer/solrpush/interfaces/settings.py:145
 msgid "bf_help"
 msgstr "Imposta una serie di funzioni (con boost opzionale) che verranno usate per costruire FunctionQueries aggiuntive alla query principale come clausole opzionali per influenzare lo score finale. Può essere usata qualsiasi funzione supportata da Solr. Per esempio se vogliamo dare meno rilevanza agli elementi più in basso nell'albero di navigazione, possiamo impostare qualcosa del genere: recip(path_depth,10,100,1)"
 
 #. Default: "bf (boost functions)"
-#: rer/solrpush/interfaces/settings.py:167
+#: rer/solrpush/interfaces/settings.py:144
 msgid "bf_label"
 msgstr "bf (boost functions)"
 
-#. Default: "Set a list query clauses that will be added to the main query to influence the score. For example if we want to boost results that have a specific \"searchwords\" term: searchwords:something^1000"
-#: rer/solrpush/interfaces/settings.py:155
+#. Default: "Set a list query clauses that will be added to the main query to influence the score."
+#: rer/solrpush/interfaces/settings.py:134
 msgid "bq_help"
-msgstr "Imposta una lista di clausole aggiuntive alla query principale per influenzare lo score finale. Per esempio se vogliamo dare più rilevanza ai risultati che contengono uno specifico valore di \"searchwords\": searchwords:qualcosa^1000"
+msgstr "Imposta una lista di clausole aggiuntive alla query principale per influenzare lo score finale."
 
 #. Default: "bq (boost query)"
-#: rer/solrpush/interfaces/settings.py:154
+#: rer/solrpush/interfaces/settings.py:133
 msgid "bq_label"
 msgstr "bq (boost query)"
 
 #. Default: "Cancel"
-#: rer/solrpush/browser/maintenance.py:73
+#: rer/solrpush/browser/maintenance.py:70
 msgid "cancel_label"
 msgstr "Annulla"
 
 #. Default: "There was a problem indexing or unindexing this content. Please take note of this address and contact site administrator."
-#: rer/solrpush/indexer.py:92
+#: rer/solrpush/indexer.py:120
 msgid "content_indexed_error"
 msgstr "Questo contenuto è stato correttamente aggiornato ma in questo momento non può essere indicizzato o rimosso dal nostro motore di ricerca, quindi non verrà mostrato nelle ricerche e nelle collezioni multiportale. Il motore di ricerca verrà allineato questa notte."
 
 #. Default: "There was a problem removing this content from SOLR.  Please contact site administrator."
-#: rer/solrpush/utils/solr_indexer.py:275
+#: rer/solrpush/utils/solr_indexer.py:297
 msgid "content_remove_error"
 msgstr "Questo contenuto è stato correttamente aggiornato ma in questo momento non può essere indicizzato o rimosso dal nostro motore di ricerca, quindi non verrà mostrato nelle ricerche e nelle collezioni multiportale. Il motore di ricerca verrà allineato questa notte."
 
-#. Default: "The word that should match in the search."
-#: rer/solrpush/interfaces/elevate.py:30
-#: rer/solrpush/interfaces/settings.py:23
-msgid "elevate_row_schema_text_help"
-msgstr "La parola nella chiave di ricerca necessaria ad elevare determinati contenuti tra i risultati."
-
-#. Default: "Text"
-#: rer/solrpush/interfaces/elevate.py:29
-#: rer/solrpush/interfaces/settings.py:22
-msgid "elevate_row_schema_text_label"
-msgstr "Testo"
-
-#. Default: "Select a list of elements to elevate for that search word."
-#: rer/solrpush/interfaces/elevate.py:39
-#: rer/solrpush/interfaces/settings.py:31
-msgid "elevate_row_schema_uid_help"
-msgstr "Seleziona una lista di contenuti del sito da elevare."
-
-#. Default: "Elements"
-#: rer/solrpush/interfaces/elevate.py:38
-#: rer/solrpush/interfaces/settings.py:30
-msgid "elevate_row_schema_uid_label"
-msgstr "Elementi"
-
 #. Default: "Insert a list of values for elevate."
-#: rer/solrpush/interfaces/elevate.py:58
+#: rer/solrpush/interfaces/elevate.py:29
 msgid "elevate_schema_help"
 msgstr "Inserisci una lista di valori per l'elevate."
 
 #. Default: "Elevate configuration"
-#: rer/solrpush/interfaces/elevate.py:57
+#: rer/solrpush/interfaces/elevate.py:28
 msgid "elevate_schema_label"
 msgstr "Configurazione Elevate"
 
 #. Default: "Select a list of portal types to index in solr. Empty list means that all portal types will be indexed."
-#: rer/solrpush/interfaces/settings.py:80
+#: rer/solrpush/interfaces/settings.py:62
 msgid "enabled_types_help"
 msgstr "Scegli i tipi di contenuto da indicizzare su SOLR. Una lista vuota significa che tutti i tipi di contenuto verranno indicizzati."
 
 #. Default: "Enabled portal types"
-#: rer/solrpush/interfaces/settings.py:79
+#: rer/solrpush/interfaces/settings.py:61
 msgid "enabled_types_label"
 msgstr "Tipi di contenuto"
 
@@ -250,82 +226,63 @@ msgstr "Tipi di contenuto"
 msgid "go_to_controlpanel"
 msgstr "Ritorna alla configurazione"
 
-#. Default: "Specify words for which this item will show up as the first search result. Multiple words can be specified on new lines."
-#: rer/solrpush/behaviors/solr_fields.py:32
-msgid "help_searchwords"
-msgstr "Specifica le parole per cui questo elemento verrà mostrato tra i primi risultati della ricerca. Inserisci una parola per riga."
-
-#: rer/solrpush/behaviors/solr_fields.py:23
-msgid "help_showinsearch"
-msgstr ""
-
 #. Default: "We store this list for performance reasons. If the configuration changes, you need to click on Reload button"
-#: rer/solrpush/interfaces/settings.py:99
+#: rer/solrpush/interfaces/settings.py:78
 msgid "index_fields_help"
 msgstr "Ci salviamo questa lista per motivi di performance. Se la configurazione cambia, bisogna cliccare sul bottone di Aggiornamento."
 
 #. Default: "List of fields loaded from SOLR that we use for indexing."
-#: rer/solrpush/interfaces/settings.py:94
+#: rer/solrpush/interfaces/settings.py:74
 msgid "index_fields_label"
 msgstr "Lista di indici di SOLR che utilizziamo per fare l'inidicizzazione."
 
-#. Default: "Search words"
-#: rer/solrpush/behaviors/solr_fields.py:30
-msgid "label_searchwords"
-msgstr "Parole di ricerca"
-
-#. Default: "Show in search"
-#: rer/solrpush/behaviors/solr_fields.py:22
-msgid "label_showinsearch"
-msgstr "Mostra nella ricerca"
-
 #. Default: "Action cancelled"
-#: rer/solrpush/browser/maintenance.py:75
+#: rer/solrpush/browser/maintenance.py:72
 msgid "maintenance_cancel_action"
 msgstr "Azione annullata"
 
 #. Default: "Get all Plone contents and reindex them on SOLR."
-#: rer/solrpush/browser/maintenance.py:462
+#: rer/solrpush/browser/maintenance.py:456
 msgid "maintenance_reindex_help"
 msgstr "Recupera tutti i contenuti da Plone e reindicizzali su SOLR."
 
 #. Default: "Reindex SOLR"
-#: rer/solrpush/browser/maintenance.py:461
+#: rer/solrpush/browser/maintenance.py:455
 msgid "maintenance_reindex_label"
 msgstr "Reindicizza SOLR"
 
 #. Default: "Drop all items in SOLR index."
-#: rer/solrpush/browser/maintenance.py:88
+#: rer/solrpush/browser/maintenance.py:85
 msgid "maintenance_reset_solr_description"
 msgstr "Rmuovi tutti gli elementi dall'indice SOLR."
 
 #. Default: "Reset SOLR index"
-#: rer/solrpush/browser/maintenance.py:87
+#: rer/solrpush/browser/maintenance.py:84
 msgid "maintenance_reset_solr_label"
 msgstr "Azzera l'indice SOLR"
 
 #. Default: "SOLR index dropped"
-#: rer/solrpush/browser/maintenance.py:95
+#: rer/solrpush/browser/maintenance.py:93
 msgid "maintenance_reset_success"
 msgstr "Indice SOLR azzerato"
 
 #. Default: "Remove no more existing contents from SOLR and sync with Plone."
-#: rer/solrpush/browser/maintenance.py:472
+#: rer/solrpush/browser/maintenance.py:465
 msgid "maintenance_sync_help"
 msgstr "Rimuove da SOLR gli elementi non più presenti su Plone, e fa il sync con Plone"
 
 #. Default: "Sync SOLR"
-#: rer/solrpush/browser/maintenance.py:471
+#: rer/solrpush/browser/maintenance.py:464
 msgid "maintenance_sync_label"
 msgstr "Sincronizza SOLR"
 
 #. Default: "Set a list of fields, each of which is assigned a boost factor to increase or decrease that particular field’s importance in the query. For example: fieldOne^1000.0 fieldTwo fieldThree^10.0"
-#: rer/solrpush/interfaces/settings.py:143
+#: rer/solrpush/interfaces/settings.py:122
 msgid "qf_help"
 msgstr "Imposta una lista di campi, ad ognuno dei quali verrà assegnato un fattore di incremento o decremento per la rilevanza nei risultati della ricerca. Per esempio \"fieldOne^1000.0 fieldTwo fieldThree^10.0\" assegna più importanza ai risultati che hanno la parola cercata nel fieldOne."
 
 #. Default: "qf (query fields)"
-#: rer/solrpush/interfaces/settings.py:142
+#: rer/solrpush/interfaces/settings.py:121
 msgid "qf_label"
 msgstr "qf (query fields)"
 
@@ -335,65 +292,65 @@ msgid "reindex_solr_not_active"
 msgstr "SOLR push non è attivo. Impossibile sincronizzarsi."
 
 #. Default: "If this field is set and no \"site_name\" is passed in query, elevate schema is taken from an external source. This is useful if you index several sites and handle elevate configuration in one single site. This should be an url that points to \"@elevate-schema\" view.For example: http://my-site/@elevate-schema."
-#: rer/solrpush/interfaces/settings.py:129
+#: rer/solrpush/interfaces/settings.py:108
 msgid "remote_elevate_help"
 msgstr "Se questo campo è compilato e non è stato passato nessun valore per \"site_name\" nella query, allora lo schema per l'elevate verrà letto dall'url impostato. Questo è utile quando vengono indicizzati più siti, ma si vuole mantenere un elevate centrale. L'url deve essere un link che punta alla vista \"@elevate-schema\". Per esempio http://my-site.com/@elevate-schema."
 
 #. Default: "Remote elevate"
-#: rer/solrpush/interfaces/settings.py:128
+#: rer/solrpush/interfaces/settings.py:107
 msgid "remote_elevate_label"
 msgstr "Elevate remoto"
 
 #. Default: "Unable to perform a search with SOLR. Please contact the site administrator or wait some minutes."
-#: rer/solrpush/utils/solr_search.py:325
+#: rer/solrpush/utils/solr_search.py:316
 msgid "search_error_label"
 msgstr "Impossibile eseguire la ricerca su SOLR. Contatta l'amministratore del sito o riprova tra qualche minuto."
 
 #. Default: "Settings"
-#: rer/solrpush/browser/controlpanel.py:22
+#: rer/solrpush/browser/controlpanel.py:23
 msgid "settings_default_label"
 msgstr "Impostazioni"
 
 #. Default: "Sono presenti degli errori, si prega di ricontrollare i dati inseriti"
-#: rer/solrpush/browser/controlpanel.py:44
+#: rer/solrpush/browser/controlpanel.py:45
 msgid "settings_form_error"
 msgstr "Sono presenti degli errori, si prega di ricontrollare i dati inseriti"
 
 #. Default: "Use these settings to tweak search results."
-#: rer/solrpush/browser/controlpanel.py:28
+#: rer/solrpush/browser/controlpanel.py:29
 msgid "settings_search_help"
 msgstr "Utilizza questi campi per alterare i risultati delle ricerche."
 
 #. Default: "Search"
-#: rer/solrpush/browser/controlpanel.py:27
+#: rer/solrpush/browser/controlpanel.py:28
 msgid "settings_search_label"
 msgstr "Ricerca"
 
-#: rer/solrpush/utils/solr_search.py:306
+#: rer/solrpush/utils/solr_search.py:297
 msgid "solr_configuration_error_label"
 msgstr "Impossibile cercare usando SOLR. Configurazione incompleta o errata."
 
 #. Default: "Solr Push Elevate Configuration"
-#: rer/solrpush/browser/elevate_settings.py:15
+#: rer/solrpush/browser/elevate_settings.py:11
 msgid "solr_elevate_configuration_label"
 msgstr "Configurazione Elevate per Solr Push"
 
 #. Default: "There have been problems connecting to SOLR. Contact site administrator."
-#: rer/solrpush/browser/maintenance.py:109
+#: rer/solrpush/browser/maintenance.py:105
 msgid "solr_error_connection"
 msgstr "Si è verificato un problema di connessione verso SOLR. Contatta l'amministratore per maggiori informazioni."
 
 #. Default: "Start"
-#: rer/solrpush/browser/maintenance.py:65
+#: rer/solrpush/browser/maintenance.py:62
 msgid "start_label"
 msgstr "Avvia"
 
 #. Default: "\"${text}\" is used in several groups."
-#: rer/solrpush/interfaces/elevate.py:91
+#: rer/solrpush/interfaces/elevate.py:62
 msgid "text_duplicated_label"
 msgstr "\"${text}\" è presente in più gruppi."
 
 #. Default: "Text field must be filled for Group ${id}."
-#: rer/solrpush/interfaces/elevate.py:75
+#: rer/solrpush/interfaces/elevate.py:46
 msgid "text_required_label"
 msgstr "Il campo \"testo\" deve essere compilato per il gruppo ${id}."

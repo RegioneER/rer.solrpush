@@ -19,8 +19,9 @@ from six.moves import range
 from zope.globalrequest import getRequest
 from zope.interface import implementer
 
-import logging
 import json
+import logging
+
 
 logger = logging.getLogger(__name__)
 
@@ -56,7 +57,6 @@ class SolrIndexProcessor(object):
         if (
             self.active
             and self.check_attributes(attributes=attributes)  # noqa
-            and getattr(obj, "showinsearch", True)  # noqa
             and can_index(obj)  # noqa
         ):
             uid = obj.UID()

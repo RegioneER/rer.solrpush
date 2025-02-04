@@ -144,47 +144,52 @@ class ReindexBaseView(BrowserView):
         else:
             pc = api.portal.get_tool(name="portal_catalog")
             brains_to_reindex = pc()
+        tot = brains_to_reindex.actual_result_count
         status = self.setupAnnotations(
-            items_len=brains_to_reindex.actual_result_count,
+            items_len=tot,
             message="Sync items to SOLR",
         )
         logger.info("##### SOLR REINDEX START #####")
-        logger.info(
-            "Reindexing {} items.".format(brains_to_reindex.actual_result_count)
-        )
+        logger.info("Reindexing {} items.".format(tot))
         skipped = 0
         indexed = 0
+        unindexed = 0
+        i = 0
         for brain in brains_to_reindex:
-            tot_indexed = indexed + skipped + 1
+            i += 1
             commit()
             obj = brain.getObject()
-            try:
-                res = push_to_solr(obj)
-            except Exception as e:
-                logger.exception(e)
-                status["in_progress"] = False
-                status["error"] = True
-                status["message"] = self.solr_error_message
-                return
-            if res:
-                indexed += 1
+            if can_index(obj):
+                try:
+                    res = push_to_solr(obj)
+                except Exception as e:
+                    logger.exception(e)
+                    status["in_progress"] = False
+                    status["error"] = True
+                    status["message"] = self.solr_error_message
+                    return
+                if res:
+                    indexed += 1
+                else:
+                    skipped += 1
             else:
-                skipped += 1
+                remove_from_solr(brain.UID)
+                unindexed += 1
             logger.debug(
-                "[{indexed}/{total}] {path} ({type})".format(
-                    indexed=tot_indexed,
-                    total=brains_to_reindex.actual_result_count,
+                "[{idx}/{total}] {path} ({type})".format(
+                    idx=i,
+                    total=tot,
                     path=brain.getPath(),
                     type=brain.portal_type,
                 )
             )
-            if tot_indexed > 0 and tot_indexed % 200 == 0:
+            if i % 200 == 0:
                 logger.info(
                     "[PROGRESS]: {}/{}".format(
-                        tot_indexed, brains_to_reindex.actual_result_count
+                        tot, brains_to_reindex.actual_result_count
                     )
                 )
-            status["counter"] = tot_indexed
+            status["counter"] = i
 
         status["in_progress"] = False
         elapsed_time = next(elapsed)

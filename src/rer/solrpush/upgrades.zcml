@@ -100,4 +100,12 @@
       destination="3100"
       handler=".upgrades.update_rolemap"
       />
+  <genericsetup:upgradeStep
+      title="Remove unused behavior and reindex items"
+      description=""
+      profile="rer.solrpush:default"
+      source="3100"
+      destination="3200"
+      handler=".upgrades.to_3200"
+      />
 </configure>

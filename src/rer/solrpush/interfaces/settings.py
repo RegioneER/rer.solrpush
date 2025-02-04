@@ -134,9 +134,7 @@ class IRerSolrpushSearchConf(model.Schema):
         description=_(
             "bq_help",
             default="Set a list query clauses that will be added to the main "
-            "query to influence the score. For example if we want to boost "
-            'results that have a specific "searchwords" term: '
-            "searchwords:something^1000",
+            "query to influence the score.",
         ),
         required=False,
         default="",
