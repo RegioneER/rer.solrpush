@@ -117,7 +117,6 @@ def to_3200(context):
         if exclude_from_search:
             remove_from_solr(brain.UID)
         elif showinsearch is False:
-            del item.showinsearch
             if hasattr(item, "exclude_from_search"):
                 item.exclude_from_search = True
                 item.reindexObject(idxs=["exclude_from_search"])
