@@ -2,7 +2,7 @@ Changelog
 =========
 
 
-1.5.5 (unreleased)
+1.6.0 (2025-02-04)
 ------------------
 
 - Add Plone Site Setup: Overview permission to ElevateManager to be able to access elevate controlpanel.
