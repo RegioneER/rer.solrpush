@@ -144,6 +144,7 @@
    <field name="Type" type="string" indexed="true" stored="true" required="false" multiValued="false" termVectors="false" termPositions="false" termOffsets="false" />
    <field name="UID" type="string" indexed="true" stored="true" required="true" multiValued="false" termVectors="false" termPositions="false" termOffsets="false" />
    <field name="allowedRolesAndUsers" type="string" indexed="true" stored="true" required="false" multiValued="true" termVectors="false" termPositions="false" termOffsets="false" />
+   <field name="Date" type="date" indexed="true" stored="true" required="false" multiValued="false" termVectors="false" termPositions="false" termOffsets="false" />
    <field name="created" type="date" indexed="true" stored="true" required="false" multiValued="false" termVectors="false" termPositions="false" termOffsets="false" />
    <field name="effective" type="date" indexed="true" stored="true" required="false" multiValued="false" termVectors="false" termPositions="false" termOffsets="false" />
    <field name="end" type="date" indexed="true" stored="true" required="false" multiValued="false" termVectors="false" termPositions="false" termOffsets="false" />
@@ -163,7 +164,7 @@
 <!-- campi aggiunti -->
    <field name="site_name" type="string" indexed="true" stored="true" required="false" multiValued="false" termVectors="false" termPositions="false" termOffsets="false" />
    <field name="path" type="string" indexed="true" stored="true" required="false" multiValued="false" termVectors="false" termPositions="false" termOffsets="false" />
-   <field name="path_parents" type="string" indexed="true" stored="false" multiValued="true"/>
+   <field name="path_parents" type="string" indexed="true" stored="true" multiValued="true"/>
    <field name="authors" type="string" indexed="true" stored="true" required="false" multiValued="true" termVectors="false" termPositions="false" termOffsets="false" />
    <field name="publication_types" type="string" indexed="true" stored="true" required="false" multiValued="true" termVectors="false" termPositions="false" termOffsets="false" />
    <field name="publication_language" type="string" indexed="true" stored="true" required="false" multiValued="false" termVectors="false" termPositions="false" termOffsets="false" />
