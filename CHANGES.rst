@@ -5,7 +5,8 @@ Changelog
 1.6.1 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Do not remap sortable_title on search: now is a real index (#28952).
+  [cekk]
 
 
 1.6.0 (2025-02-04)
