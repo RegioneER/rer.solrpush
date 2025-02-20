@@ -39,8 +39,8 @@ msgid "Changes saved."
 msgstr "Modifiche salvate."
 
 #: rer/solrpush/profiles/default/actions.xml
-msgid "Elevate configuration"
-msgstr "Configurazione Elevate"
+msgid "Elevate SOLR"
+msgstr "Elevate SOLR"
 
 #: rer/solrpush/interfaces/settings.py:23
 msgid "Enable SOLR indexing on this site."
@@ -209,7 +209,7 @@ msgstr "Inserisci una lista di valori per l'elevate."
 #. Default: "Elevate configuration"
 #: rer/solrpush/interfaces/elevate.py:28
 msgid "elevate_schema_label"
-msgstr "Configurazione Elevate"
+msgstr "Configurazione elevate"
 
 #. Default: "Select a list of portal types to index in solr. Empty list means that all portal types will be indexed."
 #: rer/solrpush/interfaces/settings.py:62
@@ -333,7 +333,7 @@ msgstr "Impossibile cercare usando SOLR. Configurazione incompleta o errata."
 #. Default: "Solr Push Elevate Configuration"
 #: rer/solrpush/browser/elevate_settings.py:11
 msgid "solr_elevate_configuration_label"
-msgstr "Configurazione Elevate per Solr Push"
+msgstr "Configurazione Elevate per SOLR Push"
 
 #. Default: "There have been problems connecting to SOLR. Contact site administrator."
 #: rer/solrpush/browser/maintenance.py:105

@@ -5,7 +5,7 @@
     i18n:domain="rer.bandisolr">
 
     <configlet
-        title="Configurazione Elevate"
+        title="Elevate SOLR"
         action_id="solrpush.elevate"
         appId="solrpush-elevate"
         remove="True">

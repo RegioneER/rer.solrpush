@@ -17,7 +17,7 @@
             <permission>rer.solrpush: Edit Settings</permission>
     </configlet>
     <configlet
-        title="Configurazione Elevate"
+        title="Elevate SOLR"
         action_id="SolrPushElevate"
         appId="SolrPushElevate"
         category="Products"

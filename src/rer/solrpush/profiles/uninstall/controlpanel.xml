@@ -12,7 +12,7 @@
         remove="True">
     </configlet>
     <configlet
-        title="Configurazione Elevate"
+        title="Elevate SOLR"
         action_id="solrpush.elevate"
         appId="solrpush-elevate"
         category="SOLR"

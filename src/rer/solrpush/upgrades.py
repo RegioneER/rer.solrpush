@@ -121,3 +121,8 @@ def to_3200(context):
                 item.exclude_from_search = True
                 item.reindexObject(idxs=["exclude_from_search"])
             remove_from_solr(brain.UID)
+
+
+def to_3300(context):
+    update_controlpanel(context)
+    update_actions(context)
