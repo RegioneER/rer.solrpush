@@ -87,8 +87,6 @@ def escape_special_characters(value, wrap):
 
 def set_sort_parameter(query):
     sort_on = query.get("sort_on")
-    if sort_on == "sortable_title":
-        sort_on = "Title"
     sort_order = query.get("sort_order", "asc")
     if sort_order in ["reverse", "descending"]:
         sort_order = "desc"

@@ -141,6 +141,7 @@
    <field name="SearchableText" type="text_it" indexed="true" stored="true" required="false" multiValued="true" termVectors="false" termPositions="false" termOffsets="false" />
    <field name="Subject" type="string" indexed="true" stored="true" required="false" multiValued="true" termVectors="false" termPositions="false" termOffsets="false" />
    <field name="Title" type="text_it" indexed="true" stored="true" required="false" multiValued="false" termVectors="false" termPositions="false" termOffsets="false" />
+   <field name="sortable_title" type="string" indexed="true" stored="true" required="false" multiValued="false" termVectors="false" termPositions="false" termOffsets="false" />
    <field name="Type" type="string" indexed="true" stored="true" required="false" multiValued="false" termVectors="false" termPositions="false" termOffsets="false" />
    <field name="UID" type="string" indexed="true" stored="true" required="true" multiValued="false" termVectors="false" termPositions="false" termOffsets="false" />
    <field name="allowedRolesAndUsers" type="string" indexed="true" stored="true" required="false" multiValued="true" termVectors="false" termPositions="false" termOffsets="false" />
@@ -226,6 +227,7 @@
    <copyField source="portal_type" dest="@type"/>
    <copyField source="url" dest="@id"/>
    <copyField source="Title" dest="title"/>
+
 
 
   
