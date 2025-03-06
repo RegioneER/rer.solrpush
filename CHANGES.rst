@@ -2,7 +2,7 @@ Changelog
 =========
 
 
-1.6.2 (unreleased)
+1.6.2 (2025-03-06)
 ------------------
 
 - Do not remap sortable_title on search: now is a real index (#28952).
