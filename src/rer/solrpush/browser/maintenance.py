@@ -164,10 +164,7 @@ class ReindexBaseView(BrowserView):
                     res = push_to_solr(obj)
                 except Exception as e:
                     logger.exception(e)
-                    status["in_progress"] = False
-                    status["error"] = True
-                    status["message"] = self.solr_error_message
-                    return
+                    res = None
                 if res:
                     indexed += 1
                 else:
@@ -185,9 +182,7 @@ class ReindexBaseView(BrowserView):
             )
             if i % 200 == 0:
                 logger.info(
-                    "[PROGRESS]: {}/{}".format(
-                        tot, brains_to_reindex.actual_result_count
-                    )
+                    "[PROGRESS]: {}/{}".format(i, brains_to_reindex.actual_result_count)
                 )
             status["counter"] = i
 
