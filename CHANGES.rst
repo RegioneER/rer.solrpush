@@ -5,7 +5,8 @@ Changelog
 1.6.3 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Do not redefine Description attr in solr brain object, because it's already correctly mapped.
+  [cekk]
 
 
 1.6.2 (2025-03-06)

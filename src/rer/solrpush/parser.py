@@ -70,9 +70,9 @@ class Brain(dict):
         """convenience alias"""
         return self.get("id", self.get("getId"))
 
-    @property
-    def Description(self):
-        return self.get("description", "")
+    # @property
+    # def Description(self):
+    #     return self.get("description", "")
 
     def absolute_url(self):
         """convenience alias"""
