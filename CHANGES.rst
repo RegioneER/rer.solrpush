@@ -2,7 +2,7 @@ Changelog
 =========
 
 
-1.6.3 (unreleased)
+1.6.3 (2025-03-18)
 ------------------
 
 - Do not redefine Description attr in solr brain object, because it's already correctly mapped.
