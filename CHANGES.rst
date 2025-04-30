@@ -2,7 +2,7 @@ Changelog
 =========
 
 
-1.6.4 (unreleased)
+1.6.4 (2025-04-30)
 ------------------
 
 - Remove line breaks in get_site_title method.
