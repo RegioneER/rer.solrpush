@@ -85,7 +85,7 @@ def get_site_title(lang=None):
     if subtitle:
         title = f"{title} {subtitle}"
 
-    return title
+    return title.replace("\n", " ")
 
 
 def parse_date_as_datetime(value):

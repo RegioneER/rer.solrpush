@@ -5,8 +5,8 @@ Changelog
 1.6.4 (unreleased)
 ------------------
 
-- Nothing changed yet.
-
+- Remove line breaks in get_site_title method.
+  [cekk]
 
 1.6.3 (2025-03-18)
 ------------------
