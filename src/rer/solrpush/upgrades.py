@@ -126,3 +126,7 @@ def to_3200(context):
 def to_3300(context):
     update_controlpanel(context)
     update_actions(context)
+
+
+def to_3400(context):
+    update_controlpanel(context)

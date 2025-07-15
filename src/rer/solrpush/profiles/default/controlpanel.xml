@@ -5,7 +5,7 @@
     i18n:domain="rer.bandisolr">
 
     <configlet
-        title="Configurazione RER SolrPush"
+        title="RER SolrPush"
         action_id="SolrPushSettings"
         appId="SolrPushSettings"
         category="Products"

@@ -5,7 +5,8 @@ Changelog
 1.6.5 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Fix controlpanel label.
+  [cekk]
 
 
 1.6.4 (2025-04-30)

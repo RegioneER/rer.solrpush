@@ -116,5 +116,12 @@
       destination="3300"
       handler=".upgrades.to_3300"
       />
-      
+    <genericsetup:upgradeStep
+      title="Update controlpanel label"
+      description=""
+      profile="rer.solrpush:default"
+      source="3300"
+      destination="3400"
+      handler=".upgrades.to_3400"
+      />
 </configure>
