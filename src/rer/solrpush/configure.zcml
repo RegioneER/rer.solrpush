@@ -75,13 +75,11 @@
       factory=".indexer.SolrIndexProcessor"
       name="solrpush.utility"
       />
-  <adapter
-      factory=".indexer.path_depth"
-      name="path_depth"
-      />
-  <adapter
-      factory=".indexer.path_parents"
-      name="path_parents"
+
+  <!-- registry event handler: sync metadata fields to Solr schema -->
+  <subscriber
+      for="plone.registry.interfaces.IRecordModifiedEvent"
+      handler=".events.on_registry_record_modified"
       />
 
 </configure>

@@ -1,7 +1,7 @@
 from plone.restapi.deserializer.controlpanels import ControlpanelDeserializeFromJson
 from plone.restapi.interfaces import IDeserializeFromJson
 from rer.solrpush.interfaces import IRERSolrpushRestapiControlpanel
-from rer.solrpush.utils import init_solr_push
+from rer.solrpush.utils import check_solr_connection
 from zope.component import adapter
 from zope.interface import implementer
 
@@ -11,4 +11,4 @@ from zope.interface import implementer
 class RERSolrpushControlpanelDeserializeFromJson(ControlpanelDeserializeFromJson):
     def __call__(self):
         super().__call__()
-        init_solr_push()
+        check_solr_connection()

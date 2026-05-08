@@ -8,12 +8,12 @@ from plone.restapi.serializer.converters import json_compatible
 from Products.CMFPlone.interfaces.controlpanel import ISiteSchema
 from rer.solrpush import _
 from rer.solrpush.interfaces.adapter import IExtractFileFromTika
-from rer.solrpush.utils.solr_common import get_index_fields
 from rer.solrpush.utils.solr_common import get_setting
 from rer.solrpush.utils.solr_common import get_solr_connection
 from rer.solrpush.utils.solr_common import is_solr_active
 from rer.solrpush.utils.solr_common import should_force_commit
-from six.moves import map
+from rer.solrpush.utils.solr_schema import get_effective_skip_fields
+from rer.solrpush.utils.solr_schema import get_metadata_only_fields
 from zope.component import getUtility
 from zope.component import queryMultiAdapter
 from zope.globalrequest import getRequest
@@ -22,14 +22,11 @@ import datetime
 import json
 import logging
 import pysolr
-import six
-
 
 logger = logging.getLogger(__name__)
 
-ADDITIONAL_FIELDS = [""]
-
-RESTAPI_METADATA_FIELDS = ["@id", "@type", "description", "title"]
+# Sentinel used by _serialize_value to signal "skip this field".
+_SKIP = object()
 
 # HELPER METHODS
 
@@ -102,6 +99,50 @@ def parse_date_str(value):
     return parse_date_as_datetime(DateTime(value))
 
 
+def _serialize_value(value):
+    """Serialize a single catalog value for Solr indexing.
+
+    Returns _SKIP if the value is empty and should be omitted from the
+    document. Otherwise returns the value ready to be sent to Solr:
+    - callables are called first
+    - DateTime → ISO-8601 UTC string
+    - datetime.date / datetime.datetime → ISO-8601 UTC string
+    - ISO-8601 strings with timezone → convert to UTC
+    - PersistentMapping → JSON string
+    - set → list (JSON-serializable)
+    - all other types are returned unchanged
+    """
+    if callable(value):
+        value = value()
+    # Skip None, empty strings, and string representation of None
+    if value is None or value == "" or value == "None":
+        return _SKIP
+    if not value and value is not False:
+        return _SKIP
+    if isinstance(value, DateTime):
+        return parse_date_as_datetime(value)
+    if isinstance(value, (datetime.datetime, datetime.date)):
+        return parse_date_str(value)
+    # Handle ISO-8601 strings with timezone (e.g., '2017-02-15T13:45:00+02:00')
+    if (
+        isinstance(value, str)
+        and "T" in value
+        and ("+" in value or value.count("-") >= 3)
+    ):
+        try:
+            dt = DateTime(value)
+            return parse_date_as_datetime(dt)
+        except Exception:
+            pass  # not a valid ISO-8601 date string, return as-is
+    if isinstance(value, PersistentMapping):
+        return json.dumps(json_compatible(value))
+    if isinstance(value, dict):
+        return json.dumps(json_compatible(value))
+    if isinstance(value, set):
+        return list(value)
+    return value
+
+
 def attachment_to_index(item):
     """
     If item has a provider to extract text, return the file to be indexed
@@ -138,8 +179,12 @@ def can_index(item):
 def create_index_dict(item, default={}):
     """Restituisce un dizionario pronto per essere 'mandato' a SOLR per
     l'indicizzazione.
+
+    Iterates all portal_catalog indexes and sends their values to Solr.
+    Date/datetime values are serialized to Solr ISO-8601 format.
+    Extra Solr-specific fields (path, path_depth, path_parents, site_name,
+    url, view_name) are appended after the catalog loop.
     """
-    index_fields = get_index_fields()
     frontend_url = get_setting(field="frontend_url")
     if frontend_url:
         frontend_url = frontend_url.rstrip("/")
@@ -147,61 +192,75 @@ def create_index_dict(item, default={}):
     catalog = api.portal.get_tool(name="portal_catalog")
     adapter = queryMultiAdapter((item, catalog), IIndexableObject)
     index_me = {}
-    for field, field_infos in index_fields.items():
-        if field in RESTAPI_METADATA_FIELDS:
-            # skip. These fields are only metadata fields needed in restap-like
-            # repsonses and can be copied in solr configuration.
+
+    effective_skip_fields = get_effective_skip_fields()
+
+    for field in catalog.indexes():
+        if field in effective_skip_fields:
             continue
-        field_type = field_infos.get("type")
         try:
-            value = getattr(adapter, field, None)
+            raw = getattr(adapter, field, None)
         except Exception:
-            # if we are in creation and indexing a content with a File, SearchableText
-            # raise PosKeyError because it tries to read the file too, but the blob
-            # isn't created yet.
-            value = default.get(field, None)
-        if not value and value is not False:
+            # e.g. PosKeyError when a blob isn't committed yet (SearchableText on File)
+            raw = default.get(field, None)
+
+        value = _serialize_value(raw)
+        if value is _SKIP:
             continue
-        if callable(value):
-            value = value()
-        if isinstance(value, DateTime):
-            value = parse_date_as_datetime(value)
-        else:
-            if field_type == "date":
-                value = parse_date_str(value)
-        if isinstance(value, PersistentMapping):
-            # convert dict-like object in json object
-            value = json.dumps(json_compatible(value))
         index_me[field] = value
 
-    for field in ADDITIONAL_FIELDS:
-        value = getattr(item, field, None)
-        if value is not None:
-            index_me[field] = value
+    # Add metadata-only columns (present in catalog brain but not in any
+    # catalog index). These are stored in Solr but not indexed for search.
+    # Note: effective skip fields are already excluded by get_metadata_only_fields().
+    for field in get_metadata_only_fields():
+        if field in index_me:
+            continue
+        try:
+            raw = getattr(adapter, field, None)
+        except Exception:
+            raw = default.get(field, None)
+
+        value = _serialize_value(raw)
+        if value is _SKIP:
+            continue
+        index_me[field] = value
+
     portal = api.portal.get()
 
-    # extra-catalog schema
+    # Solr-specific extra fields not in the Plone catalog
     index_me["site_name"] = get_site_title(getattr(item, "language", ""))
-    index_me["path"] = "/".join(item.getPhysicalPath())
-    index_me["path_depth"] = len(item.getPhysicalPath()) - 2
-    index_me["attachment"] = attachment_to_index(item)
-    index_me["getIcon"] = False
-    if "view_name" in index_fields.keys():
-        index_me["view_name"] = item.getLayout()
+    physical_path = item.getPhysicalPath()
+    index_me["path"] = "/".join(physical_path)
+    index_me["path_depth"] = len(physical_path) - 2
+    index_me["path_parents"] = [
+        "/".join(physical_path[: n + 1]) for n in range(1, len(physical_path))
+    ]
+    index_me["view_name"] = item.getLayout()
 
-    # convert url to frontend one
+    attachment = attachment_to_index(item)
+    if attachment:
+        index_me["attachment"] = attachment
+
+    # url with optional frontend URL substitution
     if frontend_url:
         index_me["url"] = item.absolute_url().replace(portal.portal_url(), frontend_url)
     else:
         index_me["url"] = item.absolute_url()
 
-    # backward compatibility with Plone < 6 where there wasn't image_field and image_scales indexers
-    has_image = False
-    if index_me.get("image_field", None) and index_me.get("image_scales", None):
-        has_image = True
-    else:
-        has_image = getattr(item.aq_base, "image", None)
-    if has_image:
+    # restapi-compatible field copies (replaces old Solr copyField directives)
+    index_me["@id"] = index_me["url"]
+    if "portal_type" in index_me:
+        index_me["@type"] = index_me["portal_type"]
+    if "Title" in index_me:
+        index_me["title"] = index_me["Title"]
+    if "Description" in index_me:
+        index_me["description"] = index_me["Description"]
+
+    # image detection
+    index_me["getIcon"] = False
+    if index_me.get("image_field") and index_me.get("image_scales"):
+        index_me["getIcon"] = True
+    elif getattr(item.aq_base, "image", None):
         index_me["getIcon"] = True
 
     return index_me
@@ -212,7 +271,7 @@ def encode_strings_for_attachments(value):
     Needed because attachments POST use standard requests encoding
     and not utf-8
     """
-    if isinstance(value, six.string_types):
+    if isinstance(value, str):
         return value.encode("ISO-8859-1", "ignore")
     if isinstance(value, list):
         return list(map(encode_strings_for_attachments, value))

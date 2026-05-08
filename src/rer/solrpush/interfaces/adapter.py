@@ -10,5 +10,14 @@ class IExtractFileFromTika(Interface):
         """
 
 
+class IAdditionalSolrSkipFields(Interface):
+    def get_fields(self):
+        """Return an iterable of catalog field names to exclude from Solr sync.
+
+        Add-ons can register a utility providing this interface to extend the
+        built-in skip list used by solr schema synchronization.
+        """
+
+
 class ISolrBrain(IContentListingObject):
     """ """

@@ -5,7 +5,8 @@ Changelog
 1.6.6 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Fix getObject method: if the path in solr is not correct, return the Proxy object instead of None to avoid errors in solr brains.
+  [cekk]
 
 
 1.6.5 (2025-07-15)

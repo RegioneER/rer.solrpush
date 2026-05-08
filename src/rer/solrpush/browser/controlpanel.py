@@ -7,14 +7,12 @@ from rer.solrpush import _
 from rer.solrpush.interfaces.settings import IRerSolrpushConf
 from rer.solrpush.interfaces.settings import IRerSolrpushSearchConf
 from rer.solrpush.interfaces.settings import IRerSolrpushSettings
-from rer.solrpush.utils import init_solr_push
+from rer.solrpush.utils import check_solr_connection
 from z3c.form import button
 from z3c.form import field
 from z3c.form import group
-from z3c.form.interfaces import HIDDEN_MODE
 
 import logging
-
 
 logger = logging.getLogger(__name__)
 
@@ -49,9 +47,6 @@ class RerSolrpushEditForm(RegistryEditForm):
 
     def updateFields(self):
         super(RerSolrpushEditForm, self).updateFields()
-        for form_group in self.groups:
-            if "ready" in form_group.fields:
-                form_group.fields["ready"].mode = HIDDEN_MODE
 
     @button.buttonAndHandler(_("Save"), name=None)
     def handleSave(self, action):
@@ -61,31 +56,16 @@ class RerSolrpushEditForm(RegistryEditForm):
             return
         self.applyChanges(data)
         api.portal.show_message(_("Changes saved."), request=self.request)
-        init_error = init_solr_push()
-        if init_error:
-            api.portal.show_message(init_error, type="error", request=self.request)
+        conn_error = check_solr_connection()
+        if conn_error:
+            api.portal.show_message(conn_error, type="error", request=self.request)
         else:
-            api.portal.show_message(
-                _("Loaded schema.xml from SOLR"), request=self.request
-            )
+            api.portal.show_message(_("Solr connection OK"), request=self.request)
         self.request.response.redirect(self.request.getURL())
 
     @button.buttonAndHandler(_("Cancel"), name="cancel")
     def handleCancel(self, action):
         super(RerSolrpushEditForm, self).handleCancel(self, action)
-
-    @button.buttonAndHandler(_("Reload schema.xml"), name="reload")
-    def handleReload(self, action):
-        data, errors = self.extractData()
-
-        init_error = init_solr_push()
-        if init_error:
-            api.portal.show_message(init_error, type="error", request=self.request)
-        else:
-            api.portal.show_message(
-                _("Reloaded schema.xml from SOLR"), request=self.request
-            )
-        self.request.response.redirect(self.request.getURL())
 
 
 class RerSolrpushSettingsView(ControlPanelFormWrapper):

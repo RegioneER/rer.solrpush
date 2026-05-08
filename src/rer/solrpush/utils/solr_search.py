@@ -5,7 +5,6 @@ from pysolr import safe_urlencode
 from rer.solrpush import _
 from rer.solrpush.interfaces import IElevateSettings
 from rer.solrpush.interfaces.settings import IRerSolrpushSettings
-from rer.solrpush.utils.solr_common import get_index_fields
 from rer.solrpush.utils.solr_common import get_setting
 from rer.solrpush.utils.solr_common import get_solr_connection
 from rer.solrpush.utils.solr_common import is_solr_active
@@ -19,7 +18,6 @@ import logging
 import re
 import requests
 import six
-
 
 logger = logging.getLogger(__name__)
 
@@ -221,7 +219,8 @@ def extract_elevate_schema(query):
 
 
 def extract_from_query(query):
-    index_fields = get_index_fields()
+    catalog = api.portal.get_tool(name="portal_catalog")
+    date_meta_types = {"DateIndex", "DateRangeIndex"}
     params = {"q": "", "fq": []}
     for index, value in query.items():
         if not value and value is not False:
@@ -233,11 +232,18 @@ def extract_from_query(query):
             params["q"] = fix_value(value, wrap=False)
 
             continue
-        index_infos = index_fields.get(index, {})
-        if not index_infos:
+        # Only add filter queries for known catalog indexes or Solr-specific
+        # extra fields defined by this product.
+        plone_index = catalog.Indexes.get(index)
+        is_solr_extra = index in ("path", "site_name", "view_name")
+        if plone_index is None and not is_solr_extra:
             continue
+        is_date = (
+            plone_index is not None
+            and getattr(plone_index, "meta_type", "") in date_meta_types
+        )
         # other indexes will be added in fq
-        value = fix_value(value=value, index_type=index_infos.get("type", ""))
+        value = fix_value(value=value, index_type="date" if is_date else "")
         if value or value is False:
             if index == "path":
                 index = "path_parents"

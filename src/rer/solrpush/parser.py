@@ -6,11 +6,9 @@ from Products.MimetypesRegistry.MimeTypeItem import guess_icon_path
 from rer.solrpush.browser.scales import SolrScalesHandler
 from rer.solrpush.interfaces.adapter import ISolrBrain
 from rer.solrpush.interfaces.settings import IRerSolrpushSettings
-from rer.solrpush.utils.solr_indexer import get_index_fields
 from rer.solrpush.utils.solr_indexer import get_site_title
 from zope.globalrequest import getRequest
 from zope.interface import implementer
-
 
 try:
     from ZTUtils.Lazy import Lazy
@@ -28,7 +26,6 @@ import json
 import os
 import six
 
-
 timezone = DateTime().timezone()
 
 
@@ -43,18 +40,18 @@ class Brain(dict):
         """look up attributes in dict"""
         if name not in self.keys():
             return None
-        marker = []
-        value = self.get(name, marker)
-        schema = get_index_fields()
-        if value is not marker:
-            field_schema = schema.get(name, {})
-            if field_schema.get("type", "") == "date":
-                # dates are stored in SOLR as UTC
-                value = DateTime(value).toZone(timezone)
+        value = self.get(name)
+        if value is None:
             return value
-        else:
-            if name not in schema:
-                raise AttributeError(name)
+        catalog = api.portal.get_tool(name="portal_catalog")
+        plone_index = catalog.Indexes.get(name)
+        if plone_index is not None and getattr(plone_index, "meta_type", "") in (
+            "DateIndex",
+            "DateRangeIndex",
+        ):
+            # dates are stored in Solr as UTC strings
+            return DateTime(value).toZone(timezone)
+        return value
 
     def __init__(self, context, request=None):
         self.context = context
@@ -97,7 +94,9 @@ class Brain(dict):
             path = self.getPath()
             if six.PY2:
                 path = path.encode("utf-8")
-            return api.content.get(path)
+            obj = api.content.get(path)
+            if obj is not None:
+                return obj
         return self
 
     def _unrestrictedGetObject(self):

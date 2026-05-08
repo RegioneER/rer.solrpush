@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 """Setup tests for this package."""
+
 from plone.app.testing import setRoles
 from plone.app.testing import TEST_USER_ID
 from rer.solrpush.testing import RER_SOLRPUSH_API_FUNCTIONAL_TESTING

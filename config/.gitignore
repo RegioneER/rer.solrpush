@@ -1,0 +1,3 @@
+# Solr runtime files (auto-generated, mutable schema)
+*/conf/managed-schema.xml
+*/data/

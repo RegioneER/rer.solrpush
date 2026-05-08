@@ -1,13 +1,10 @@
 # -*- coding: utf-8 -*-
-from lxml import etree
 from plone import api
 from rer.solrpush import _
 from rer.solrpush.interfaces.settings import IRerSolrpushSettings
 
-import json
 import pysolr
 import requests
-import six
 
 
 def get_setting(field, interface=IRerSolrpushSettings):
@@ -27,58 +24,28 @@ def should_force_commit():
     return get_setting(field="force_commit") or False
 
 
-def get_index_fields():
-    json_str = get_setting(field="index_fields")
-    return json_str and json.loads(json_str) or {}
+def check_solr_connection():
+    """Verify that the configured SOLR instance is reachable.
 
-
-def extract_fields(nodes):
-    fields = {}
-    for node in nodes:
-        field_name = node.get("name")
-        field_type = node.get("type")
-        if six.PY2:
-            field_name = six.text_type(field_name)
-            field_type = six.text_type(field_type)
-        fields[field_name] = {"type": field_type}
-    return fields
-
-
-def init_solr_push():
-    """Inizializza la voce di registro 'index_fields'
-
-    Lo fa leggendo il file xml di SOLR.
-
-    :param solr_url: [required] L'url a cui richiedere il file xml
-    :type solr_url: string
-    :returns: Empty String if everything's good
-    :rtype: String
+    :returns: None if everything is fine, an error message string otherwise.
     """
     solr_url = get_setting(field="solr_url")
+    if not solr_url:
+        return _("No SOLR url provided")
+    if not solr_url.endswith("/"):
+        solr_url = solr_url + "/"
+    try:
+        resp = requests.get(solr_url + "admin/ping", timeout=5)
+    except requests.exceptions.RequestException as err:
+        return "Connection problem:\n{0}".format(err)
+    if resp.status_code != 200:
+        return "SOLR ping failed:\n{0}\n{1}".format(resp.status_code, resp.reason)
+    return None
 
-    if solr_url:
-        if not solr_url.endswith("/"):
-            solr_url = solr_url + "/"
-        try:
-            respo = requests.get(solr_url + "admin/file?file=schema.xml")
-        except requests.exceptions.RequestException as err:
-            ErrorMessage = "Connection problem:\n{0}".format(err)
-            return ErrorMessage
-        if respo.status_code != 200:
-            ErrorMessage = "Problems fetching schema:\n{0}\n{1}".format(
-                respo.status_code, respo.reason
-            )
-            return ErrorMessage
 
-        root = etree.fromstring(respo.content)
-        chosen_fields = json.dumps(extract_fields(nodes=root.findall(".//field")))
-        if six.PY2:
-            chosen_fields = chosen_fields.decode("utf-8")
-        set_setting(field="index_fields", value=chosen_fields)
-        set_setting(field="ready", value=True)
-        return
-
-    return _("No SOLR url provided")
+# Backward-compatible alias kept for any external code still calling init_solr_push().
+# Deprecated: use check_solr_connection() instead.
+init_solr_push = check_solr_connection
 
 
 def get_solr_connection(context=None, **kwargs):
@@ -90,9 +57,8 @@ def get_solr_connection(context=None, **kwargs):
     # XXX: rivalutare il default True per always_commit !
     if "always_commit" not in kwargs:
         kwargs["always_commit"] = True
-    is_ready = get_setting(field="ready")
     solr_url = get_setting(field="solr_url")
-    if not is_ready or not solr_url:
+    if not is_solr_active() or not solr_url:
         return
     if context is None:
         context = api.portal.get()

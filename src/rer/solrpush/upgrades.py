@@ -2,11 +2,10 @@
 from plone import api
 from plone.app.upgrade.utils import installOrReinstallProduct
 from rer.solrpush.utils import remove_from_solr
-from rer.solrpush.utils.solr_common import init_solr_push
+from rer.solrpush.utils.solr_common import check_solr_connection
 from rer.solrpush.utils.solr_indexer import push_to_solr
 
 import logging
-
 
 logger = logging.getLogger(__name__)
 
@@ -62,7 +61,7 @@ def to_1600(context):
     # add new criteria
     update_registry(context)
     # reload schema
-    init_solr_push()
+    check_solr_connection()
     brains = api.content.find(portal_type=["File", "Image"])
     tot = len(brains)
     logger.info("Reindexing {} contents for updated mime_types.".format(tot))
@@ -81,8 +80,7 @@ def to_1600(context):
 
 
 def to_3000(context):
-    # reload schema
-    init_solr_push()
+    check_solr_connection()
 
 
 def to_3200(context):
@@ -130,3 +128,21 @@ def to_3300(context):
 
 def to_3400(context):
     update_controlpanel(context)
+
+
+def to_3500(context):
+    """Remove index_fields and ready registry records (Solr 9 migration)."""
+    registry = api.portal.get_tool(name="portal_registry")
+    for key in (
+        "rer.solrpush.interfaces.settings.IRerSolrpushConf.index_fields",
+        "rer.solrpush.interfaces.settings.IRerSolrpushConf.ready",
+    ):
+        if key in registry:
+            del registry.records[key]
+            logger.info("Removed registry record: %s", key)
+    update_registry(context)
+
+
+def to_3600(context):
+    """Add excluded_catalog_fields registry record."""
+    update_registry(context)

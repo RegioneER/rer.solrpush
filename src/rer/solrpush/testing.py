@@ -8,8 +8,8 @@ from plone.restapi.testing import PloneRestApiDXLayer
 from plone.testing import Layer
 from plone.testing import z2
 from rer.solrpush.interfaces.settings import IRerSolrpushSettings
-from rer.solrpush.utils import init_solr_push
-from six.moves import range
+from urllib.error import URLError
+from urllib.request import urlopen
 from time import sleep
 from ZPublisher.HTTPRequest import HTTPRequest
 
@@ -17,10 +17,8 @@ import collective.z3cform.jsonwidget
 import os
 import plone.restapi
 import rer.solrpush
-import six
 import subprocess
 import sys
-
 
 BIN_DIR = os.path.dirname(os.path.realpath(sys.argv[0]))
 
@@ -58,11 +56,11 @@ class SolrLayer(Layer):
             solr_ping_url = "{0}/admin/ping?wt=xml".format(self.solr_url)
             for i in range(1, 10):
                 try:
-                    result = six.moves.urllib.request.urlopen(solr_ping_url)
+                    result = urlopen(solr_ping_url)
                     if result.code == 200:
                         if b'<str name="status">OK</str>' in result.read():
                             break
-                except six.moves.urllib.error.URLError:
+                except URLError:
                     sleep(3)
                     sys.stdout.write(".")
                 if i == 9:
@@ -76,7 +74,7 @@ class SolrLayer(Layer):
         solr_clean_url = "{0}/update?stream.body=<delete><query>*:*</query></delete>&commit=true".format(  # noqa
             self.solr_url
         )
-        six.moves.urllib.request.urlopen(solr_clean_url)
+        urlopen(solr_clean_url)
         if os.environ.get("BUILDOUT_SOLR_ENVIRONMENT", "").lower() in ("true", "1"):
             subprocess.check_call(
                 "./solr-stop", shell=True, close_fds=True, cwd=BIN_DIR
@@ -137,7 +135,6 @@ class RerSolrpushRestApiLayer(PloneRestApiDXLayer):
             self.solr_layer.solr_url,
             interface=IRerSolrpushSettings,
         )
-        init_solr_push()
 
     def tearDownPloneSite(self, portal):
         set_registry_record("active", True, interface=IRerSolrpushSettings)

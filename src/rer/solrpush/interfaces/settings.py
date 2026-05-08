@@ -70,25 +70,22 @@ class IRerSolrpushConf(model.Schema):
         value_type=schema.Choice(vocabulary="plone.app.vocabularies.PortalTypes"),
     )
 
-    index_fields = schema.SourceText(
+    excluded_catalog_fields = schema.List(
         title=_(
-            "index_fields_label",
-            default="List of fields loaded from SOLR that we use for " "indexing.",
+            "excluded_catalog_fields_label",
+            default="Excluded catalog fields from Solr sync",
         ),
         description=_(
-            "index_fields_help",
-            default="We store this list for performance"
-            " reasons. If the configuration changes, you need to click on"
-            " Reload button",
+            "excluded_catalog_fields_help",
+            default=(
+                "Catalog indexes/metadata field names to exclude from Solr schema "
+                "sync. These values are merged with the built-in skip list."
+            ),
         ),
         required=False,
-    )
-    # NASCOSTO DAL PANNELLO DI CONTROLLO (vedi: browser/controlpanel.py)
-    ready = schema.Bool(
-        title=_("Ready"),
-        description=_("SOLR push is ready to be used."),
-        required=False,
-        default=False,
+        default=[],
+        missing_value=[],
+        value_type=schema.TextLine(),
     )
 
 
