@@ -13,7 +13,9 @@ from rer.solrpush.utils import push_to_solr
 from rer.solrpush.utils import remove_from_solr
 from rer.solrpush.utils import reset_solr
 from rer.solrpush.utils import search
+from rer.solrpush.utils.solr_common import get_solr_connection
 from rer.solrpush.utils.solr_common import is_solr_active
+from rer.solrpush.utils.solr_common import should_force_commit
 from rer.solrpush.utils.solr_indexer import all_site_titles
 from rer.solrpush.utils.solr_indexer import can_index
 from rer.solrpush.utils.solr_indexer import parse_date_as_datetime
@@ -31,7 +33,6 @@ import json
 import logging
 import os
 import pkg_resources
-
 
 JS_TEMPLATE = "{portal_url}/++plone++rer.solrpush/dist/{env_mode}/{name}.js?v={version}"
 CSS_TEMPLATE = (
@@ -117,6 +118,12 @@ class ReindexBaseView(BrowserView):
                 "in_progress": True,
                 "tot": items_len,
                 "counter": 0,
+                "indexed": 0,
+                "failed": 0,
+                "skipped": 0,
+                "unindexed": 0,
+                "commit_error": "",
+                "errors": [],
                 "timestamp": strftime("%Y/%m/%d-%H:%M:%S "),
                 "message": message,
             }
@@ -153,7 +160,9 @@ class ReindexBaseView(BrowserView):
         logger.info("Reindexing {} items.".format(tot))
         skipped = 0
         indexed = 0
+        failed = 0
         unindexed = 0
+        errors = []
         i = 0
         for brain in brains_to_reindex:
             i += 1
@@ -163,15 +172,58 @@ class ReindexBaseView(BrowserView):
                 try:
                     res = push_to_solr(obj)
                 except Exception as e:
-                    logger.exception(e)
-                    res = None
-                if res:
-                    indexed += 1
+                    failed += 1
+                    errors.append(
+                        {
+                            "UID": brain.UID,
+                            "path": brain.getPath(),
+                            "phase": "index",
+                            "message": str(e),
+                        }
+                    )
+                    logger.exception(
+                        "Failed to index UID %s at %s: %s",
+                        brain.UID,
+                        brain.getPath(),
+                        e,
+                    )
                 else:
-                    skipped += 1
+                    if res:
+                        indexed += 1
+                    else:
+                        skipped += 1
             else:
-                remove_from_solr(brain.UID)
-                unindexed += 1
+                try:
+                    removed = remove_from_solr(brain.UID)
+                except Exception as e:
+                    failed += 1
+                    errors.append(
+                        {
+                            "UID": brain.UID,
+                            "path": brain.getPath(),
+                            "phase": "remove",
+                            "message": str(e),
+                        }
+                    )
+                    logger.exception(
+                        "Failed to remove UID %s at %s: %s",
+                        brain.UID,
+                        brain.getPath(),
+                        e,
+                    )
+                else:
+                    if not removed:
+                        failed += 1
+                        errors.append(
+                            {
+                                "UID": brain.UID,
+                                "path": brain.getPath(),
+                                "phase": "remove",
+                                "message": "SOLR delete was not successful",
+                            }
+                        )
+                    else:
+                        unindexed += 1
             logger.debug(
                 "[{idx}/{total}] {path} ({type})".format(
                     idx=i,
@@ -186,9 +238,32 @@ class ReindexBaseView(BrowserView):
                 )
             status["counter"] = i
 
+        if (indexed or unindexed) and not should_force_commit():
+            try:
+                solr = get_solr_connection()
+                if solr is None:
+                    raise RuntimeError("SOLR connection is not configured")
+                solr.commit()
+            except Exception as e:
+                status["commit_error"] = str(e)
+                logger.exception("Failed to commit the bulk SOLR reindex: %s", e)
+
+        status["indexed"] = indexed
+        status["failed"] = failed
+        status["skipped"] = skipped
+        status["unindexed"] = unindexed
+        status["errors"] = errors
         status["in_progress"] = False
         elapsed_time = next(elapsed)
-        logger.info("SOLR Reindex completed in {}".format(elapsed_time))
+        logger.info(
+            "SOLR Reindex completed in %s. Submitted: %s, failed: %s, "
+            "skipped: %s, removed: %s.",
+            elapsed_time,
+            indexed,
+            failed,
+            skipped,
+            unindexed,
+        )
 
     def removeZombiesFromSolr(self, disable_progress=False):
         """
@@ -271,6 +346,10 @@ class ReindexBaseView(BrowserView):
             solr_items=solr_items,
             disable_progress=disable_progress,
         )
+        if results["not_indexed"]:
+            logger.warning(
+                "SOLR sync failed for %s items.", len(results["not_indexed"])
+            )
         elapsed_time = next(elapsed)
         logger.info("Completed in {}.".format(elapsed_time))
         if len(results["indexed"]):
@@ -300,7 +379,9 @@ class ReindexBaseView(BrowserView):
     def sync_contents(self, brains_to_sync, solr_items, disable_progress=False):
         indexed = []
         not_indexed = []
+        skipped = 0
         removed = []
+        errors = []
         if not disable_progress:
             status = self.setupAnnotations(
                 items_len=len(brains_to_sync), message="Sync contents to SOLR"
@@ -321,16 +402,39 @@ class ReindexBaseView(BrowserView):
                     res = push_to_solr(item)
                     if res:
                         indexed.append(brain.getPath())
+                    else:
+                        skipped += 1
                 except SolrError as e:
-                    not_indexed.append(
-                        {"path": brain.getPath(), "message": e.__str__()}
-                    )
+                    error = {
+                        "UID": brain.UID,
+                        "path": brain.getPath(),
+                        "phase": "index",
+                        "message": str(e),
+                    }
+                    not_indexed.append(error)
+                    errors.append(error)
                 except Exception as e:
-                    not_indexed.append({"path": brain.getPath(), "message": str(e)})
+                    error = {
+                        "UID": brain.UID,
+                        "path": brain.getPath(),
+                        "phase": "index",
+                        "message": str(e),
+                    }
+                    not_indexed.append(error)
+                    errors.append(error)
             else:
                 if not can_index(item):
-                    remove_from_solr(brain.UID)
-                    removed.append(brain.getPath())
+                    if remove_from_solr(brain.UID):
+                        removed.append(brain.getPath())
+                    else:
+                        error = {
+                            "UID": brain.UID,
+                            "path": brain.getPath(),
+                            "phase": "remove",
+                            "message": "SOLR delete was not successful",
+                        }
+                        not_indexed.append(error)
+                        errors.append(error)
                     continue
                 if (
                     parse_date_as_datetime(brain.modified)
@@ -341,10 +445,23 @@ class ReindexBaseView(BrowserView):
                         res = push_to_solr(item)
                         if res:
                             indexed.append(brain.getPath())
+                        else:
+                            skipped += 1
                     except Exception as e:
-                        not_indexed.append({"path": brain.getPath(), "message": str(e)})
+                        error = {
+                            "UID": brain.UID,
+                            "path": brain.getPath(),
+                            "phase": "index",
+                            "message": str(e),
+                        }
+                        not_indexed.append(error)
+                        errors.append(error)
         if not disable_progress:
-            status["in_progress"] = False
+            status["indexed"] = len(indexed)
+            status["failed"] = len(not_indexed)
+            status["skipped"] = skipped
+            status["unindexed"] = len(removed)
+            status["errors"] = errors
         return {
             "indexed": indexed,
             "not_indexed": not_indexed,
@@ -390,6 +507,26 @@ class DoSyncView(ReindexBaseView):
 
         self.removeZombiesFromSolr(disable_progress=cron_view)
         self.syncPloneWithSolr(disable_progress=cron_view)
+
+        if not should_force_commit():
+            try:
+                solr = get_solr_connection()
+                if solr is None:
+                    raise RuntimeError("SOLR connection is not configured")
+                solr.commit()
+            except Exception as e:
+                logger.exception("Failed to commit the bulk SOLR sync: %s", e)
+                if not cron_view:
+                    annotations = IAnnotations(api.portal.get())
+                    status = annotations.get("solr_reindex")
+                    if status is not None:
+                        status["commit_error"] = str(e)
+
+        if not cron_view:
+            annotations = IAnnotations(api.portal.get())
+            status = annotations.get("solr_reindex")
+            if status is not None:
+                status["in_progress"] = False
 
         pysolr_logger.setLevel(logging.INFO)
         pt_logger.setLevel(logging.INFO)

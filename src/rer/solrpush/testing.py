@@ -13,14 +13,12 @@ from six.moves import range
 from time import sleep
 from ZPublisher.HTTPRequest import HTTPRequest
 
-import collective.z3cform.jsonwidget
 import os
 import plone.restapi
 import rer.solrpush
 import six
 import subprocess
 import sys
-
 
 BIN_DIR = os.path.dirname(os.path.realpath(sys.argv[0]))
 
@@ -73,10 +71,13 @@ class SolrLayer(Layer):
 
     def tearDown(self):
         """Stop Solr."""
-        solr_clean_url = "{0}/update?stream.body=<delete><query>*:*</query></delete>&commit=true".format(  # noqa
-            self.solr_url
+        # stream.body is disabled by default since Solr 8.4
+        solr_clean_request = six.moves.urllib.request.Request(
+            "{0}/update?commit=true".format(self.solr_url),
+            data=b"<delete><query>*:*</query></delete>",
+            headers={"Content-Type": "text/xml"},
         )
-        six.moves.urllib.request.urlopen(solr_clean_url)
+        six.moves.urllib.request.urlopen(solr_clean_request)
         if os.environ.get("BUILDOUT_SOLR_ENVIRONMENT", "").lower() in ("true", "1"):
             subprocess.check_call(
                 "./solr-stop", shell=True, close_fds=True, cwd=BIN_DIR
@@ -123,7 +124,6 @@ class RerSolrpushRestApiLayer(PloneRestApiDXLayer):
 
         self.loadZCML(package=rer.solrpush)
         self.loadZCML(package=plone.restapi)
-        self.loadZCML(package=collective.z3cform.jsonwidget)
 
     def tearDownZope(self, app):
         HTTPRequest.retry_max_count = self._orig_retry_max_count

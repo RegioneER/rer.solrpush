@@ -1,8 +1,19 @@
 import React from 'react';
 import { Line } from 'rc-progress';
-import { number, string, bool } from 'prop-types';
+import { number, string, bool, array } from 'prop-types';
 
-const ProgressBar = ({ tot, counter, message, error }) => {
+const ProgressBar = ({
+  tot,
+  counter,
+  message,
+  error,
+  indexed,
+  failed,
+  skipped,
+  unindexed,
+  commit_error,
+  errors,
+}) => {
   if (error) {
     return <div className="status-message">{message || 'Generic Error.'}</div>;
   }
@@ -26,6 +37,31 @@ const ProgressBar = ({ tot, counter, message, error }) => {
           ''
         )}
       </div>
+      {indexed !== undefined ? (
+        <div className="status-summary">
+          <div>Submitted: {indexed}</div>
+          <div>Failed: {failed}</div>
+          <div>Skipped: {skipped}</div>
+          <div>Removed: {unindexed}</div>
+          {commit_error ? <div>Final commit failed: {commit_error}</div> : ''}
+          {errors && errors.length ? (
+            <details>
+              <summary>Failed items ({errors.length})</summary>
+              <ul>
+                {errors.map((error) => (
+                  <li key={`${error.UID}-${error.phase}`}>
+                    {error.UID} - {error.path} ({error.phase}): {error.message}
+                  </li>
+                ))}
+              </ul>
+            </details>
+          ) : (
+            ''
+          )}
+        </div>
+      ) : (
+        ''
+      )}
     </React.Fragment>
   );
 };
@@ -35,6 +71,12 @@ ProgressBar.propTypes = {
   counter: number,
   message: string,
   error: bool,
+  indexed: number,
+  failed: number,
+  skipped: number,
+  unindexed: number,
+  commit_error: string,
+  errors: array,
 };
 
 export default ProgressBar;
