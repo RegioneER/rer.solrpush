@@ -95,7 +95,15 @@ class TestMaintenance(unittest.TestCase):
     def test_maintenance_reindex(self):
         solr_results = search(query={"*": "*", "b_size": 100000}, fl="UID")
         self.assertEqual(solr_results.hits, 0)
+        set_registry_record("force_commit", False, interface=IRerSolrpushSettings)
         self.reindex_view()
+        status = self.reindex_view.status
+        self.assertEqual(status["indexed"], 1)
+        self.assertEqual(status["failed"], 0)
+        self.assertEqual(status["skipped"], 0)
+        self.assertEqual(status["unindexed"], 0)
+        self.assertEqual(status["commit_error"], "")
+        self.assertEqual(status["errors"], [])
         solr_results = search(query={"*": "*", "b_size": 100000}, fl="UID")
         self.assertEqual(solr_results.hits, 1)
         self.assertEqual(solr_results.docs[0]["UID"], self.published_doc.UID())
@@ -159,6 +167,11 @@ class TestMaintenance(unittest.TestCase):
         set_registry_record(
             "enabled_types", ["Document"], interface=IRerSolrpushSettings
         )
+        set_registry_record("force_commit", False, interface=IRerSolrpushSettings)
         self.sync_view()
+        status = self.reindex_view.status
+        self.assertEqual(status["failed"], 0)
+        self.assertEqual(status["errors"], [])
+        self.assertEqual(status["commit_error"], "")
         solr_results = search(query={"*": "*", "b_size": 100000}, fl="UID")
         self.assertEqual(solr_results.hits, 2)

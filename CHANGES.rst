@@ -5,7 +5,8 @@ Changelog
 1.6.6 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Better handle commits in maintenance view.
+  [cekk]
 
 
 1.6.5 (2025-07-15)

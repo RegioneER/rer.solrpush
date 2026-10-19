@@ -221,14 +221,16 @@ def encode_strings_for_attachments(value):
     return value
 
 
-def add_with_attachment(solr, attachment, fields):
+def add_with_attachment(solr, attachment, fields, commit=None):
+    if commit is None:
+        commit = should_force_commit()
     params = {
         "extractOnly": "false",
         "lowernames": "false",
         "fmap.content": "SearchableText",
         "fmap.title": "SearchableText",
         "literalsOverride": "true",
-        "commit": should_force_commit() and "true" or "false",
+        "commit": commit and "true" or "false",
     }
     params.update(
         {
@@ -250,10 +252,12 @@ def add_with_attachment(solr, attachment, fields):
 # LIBRARY METHODS
 
 
-def push_to_solr(item_or_obj):
+def push_to_solr(item_or_obj, commit=None):
     """
     Perform push to solr
     """
+    if commit is None:
+        commit = should_force_commit()
     solr = get_solr_connection()
     if not solr:
         logger.error("Unable to push to solr. Configuration is incomplete.")
@@ -273,9 +277,11 @@ def push_to_solr(item_or_obj):
         if isinstance(item_or_obj, dict) and item_or_obj.get("attachment", None):
             attachment = item_or_obj["attachment"]
     if attachment:
-        add_with_attachment(solr=solr, attachment=attachment, fields=index_dict)
+        add_with_attachment(
+            solr=solr, attachment=attachment, fields=index_dict, commit=commit
+        )
     else:
-        solr.add(docs=[index_dict], commit=should_force_commit())
+        solr.add(docs=[index_dict], commit=commit)
     return True
 
 
@@ -284,14 +290,15 @@ def remove_from_solr(uid):
     Perform remove item from solr
     """
     if not is_solr_active():
-        return
+        return False
     solr = get_solr_connection()
     portal = api.portal.get()
     if not solr:
         logger.error("Unable to push to solr. Configuration is incomplete.")
-        return
+        return False
     try:
         solr.delete(q=f"UID:{uid}", commit=should_force_commit())
+        return True
     except (pysolr.SolrError, TypeError) as err:
         logger.error(err)
         message = _(
@@ -300,6 +307,7 @@ def remove_from_solr(uid):
             " Please contact site administrator.",
         )
         api.portal.show_message(message=message, request=portal.REQUEST, type="warning")
+        return False
 
 
 def reset_solr(all=False):
