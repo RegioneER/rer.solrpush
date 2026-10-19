@@ -1,15 +1,7 @@
 <config>
-  <luceneMatchVersion>8.11.2</luceneMatchVersion>
-  <lib dir="${solr.install.dir:../../../..}/contrib/extraction/lib" regex=".*\.jar"></lib>
-  <lib dir="${solr.install.dir:../../../..}/dist/" regex="solr-cell-\d.*\.jar"></lib>
-  <lib dir="${solr.install.dir:../../../..}/contrib/clustering/lib/" regex=".*\.jar"></lib>
-  <lib dir="${solr.install.dir:../../../..}/dist/" regex="solr-clustering-\d.*\.jar"></lib>
-  <lib dir="${solr.install.dir:../../../..}/contrib/langid/lib/" regex=".*\.jar"></lib>
-  <lib dir="${solr.install.dir:../../../..}/dist/" regex="solr-langid-\d.*\.jar"></lib>
-  <lib dir="${solr.install.dir:../../../..}/dist/" regex="solr-ltr-\d.*\.jar"></lib>
-  <lib dir="${solr.install.dir:../../../..}/contrib/velocity/lib" regex=".*\.jar"></lib>
-  <lib path="${solr.install.dir:../../../..}/example/files/browse-resources"></lib>		
-  <lib dir="${solr.install.dir:../../../..}/dist/" regex="solr-velocity-\d.*\.jar"></lib>
+  <luceneMatchVersion>9.10</luceneMatchVersion>
+  <!-- Nota: in Solr 9 la directory contrib/ è stata rimossa.
+       Il modulo extraction (Tika) va abilitato tramite modules=extraction in core.properties. -->
   
   <dataDir>${solr.data.dir:}</dataDir>
   <directoryFactory class="${solr.directoryFactory:solr.NRTCachingDirectoryFactory}" name="DirectoryFactory"></directoryFactory>
@@ -35,11 +27,10 @@
   <query>
     <maxBooleanClauses>${solr.max.booleanClauses:1024}</maxBooleanClauses>
     <slowQueryThresholdMillis>-1</slowQueryThresholdMillis>
-    <filterCache autowarmCount="4096" class="solr.FastLRUCache" initialSize="4096" size="16384"></filterCache>
-    <queryResultCache autowarmCount="32" class="solr.LRUCache" initialSize="64" size="128"></queryResultCache>
-    <documentCache autowarmCount="0" class="solr.LRUCache" initialSize="512" size="512"></documentCache>
-    <cache autowarmCount="10" class="solr.search.LRUCache" initialSize="0" name="perSegFilter" regenerator="solr.NoOpRegenerator" size="10"></cache>
-    <cache autowarmCount="4096" class="solr.search.LRUCache" enable="${solr.ltr.enabled:false}" initialSize="2048" name="QUERY_DOC_FV" regenerator="solr.search.NoOpRegenerator" size="4096"></cache>									   
+    <filterCache autowarmCount="4096" class="solr.CaffeineCache" initialSize="4096" size="16384"></filterCache>
+    <queryResultCache autowarmCount="32" class="solr.CaffeineCache" initialSize="64" size="128"></queryResultCache>
+    <documentCache autowarmCount="0" class="solr.CaffeineCache" initialSize="512" size="512"></documentCache>
+    <cache autowarmCount="10" class="solr.CaffeineCache" initialSize="0" name="perSegFilter" regenerator="solr.NoOpRegenerator" size="10"></cache>
     <enableLazyFieldLoading>true</enableLazyFieldLoading>
     <queryResultWindowSize>20</queryResultWindowSize>
     <queryResultMaxDocsCached>200</queryResultMaxDocsCached>
@@ -57,11 +48,12 @@
     <useColdSearcher>false</useColdSearcher>
   </query>
   
-  <circuitBreaker class="solr.CircuitBreakerManager" enabled="true">
-    <str name="memEnabled">true</str>
-    <str name="memThreshold">75</str>
-    <str name="cpuEnabled">true</str>
-    <str name="cpuThreshold">75</str>
+  <!-- Circuit Breakers - sintassi Solr 9.x -->
+  <circuitBreaker class="solr.MemoryCircuitBreaker">
+    <double name="threshold">75</double>
+  </circuitBreaker>
+  <circuitBreaker class="solr.CPUCircuitBreaker">
+    <double name="threshold">75</double>
   </circuitBreaker>
   
   <requestDispatcher handleSelect="false">
@@ -95,49 +87,7 @@
      </lst>
   </requestHandler>
   
-  <requestHandler class="solr.SearchHandler" name="/browse">
-     <lst name="defaults">
-       <str name="echoParams">explicit</str>
-       <str name="wt">velocity</str>
-       <str name="v.template">browse</str>
-       <str name="v.layout">layout</str>
-       <str name="title">Solritas</str>
-       <str name="df">SearchableText</str> 
-       <str name="q.op">AND</str> 
-       <str name="q.alt">*:*</str>
-       <str name="rows">1000</str>
-       <str name="fl">*,score</str>
-       <str name="hl">on</str>
-       <str name="hl.fl">content features title name</str>
-       <str name="hl.preserveMulti">true</str>
-       <str name="hl.encoder">html</str>
-       <str name="hl.simple.pre">&lt;b&gt;</str>
-       <str name="hl.simple.post">&lt;/b&gt;</str>
-       <str name="f.title.hl.fragsize">0</str>
-       <str name="f.title.hl.alternateField">title</str>
-       <str name="f.name.hl.fragsize">0</str>
-       <str name="f.name.hl.alternateField">name</str>
-       <str name="f.content.hl.snippets">3</str>
-       <str name="f.content.hl.fragsize">200</str>
-       <str name="f.content.hl.alternateField">content</str>
-       <str name="f.content.hl.maxAlternateFieldLength">750</str>
-       <str name="spellcheck">on</str>
-       <str name="spellcheck.extendedResults">false</str>
-       <str name="spellcheck.count">5</str>
-       <str name="spellcheck.alternativeTermCount">2</str>
-       <str name="spellcheck.maxResultsForSuggest">5</str>
-       <str name="spellcheck.collate">true</str>
-       <str name="spellcheck.collateExtendedResults">true</str>
-       <str name="spellcheck.maxCollationTries">5</str>
-       <str name="spellcheck.maxCollations">3</str>
-     </lst>
-     
-     <arr name="last-components">
-       <str>spellcheck</str>
-     </arr>
-  </requestHandler>
-
-  <initParams path="/update/**,/query,/select,/tvrh,/elevate,/spell,/browse">
+  <initParams path="/update/**,/query,/select,/tvrh,/elevate,/spell">
     <lst name="defaults">
       <str name="df">text</str>
     </lst>
@@ -251,49 +201,8 @@
     </arr>
   </requestHandler>
   
-  <searchComponent class="solr.clustering.ClusteringComponent" enable="${solr.clustering.enabled:false}" name="clustering">
-    
-    <lst name="engine">
-      <str name="name">lingo3g</str>
-      <bool name="optional">true</bool>
-      <str name="carrot.algorithm">com.carrotsearch.lingo3g.Lingo3GClusteringAlgorithm</str>
-      <str name="carrot.resourcesDir">clustering/carrot2</str>
-    </lst>
-    <lst name="engine">
-      <str name="name">lingo</str>
-      <str name="carrot.algorithm">org.carrot2.clustering.lingo.LingoClusteringAlgorithm</str>
-      <str name="carrot.resourcesDir">clustering/carrot2</str>
-    </lst>
-    <lst name="engine">
-      <str name="name">stc</str>
-      <str name="carrot.algorithm">org.carrot2.clustering.stc.STCClusteringAlgorithm</str>
-      <str name="carrot.resourcesDir">clustering/carrot2</str>
-    </lst>
-    <lst name="engine">
-      <str name="name">kmeans</str>
-      <str name="carrot.algorithm">org.carrot2.clustering.kmeans.BisectingKMeansClusteringAlgorithm</str>
-      <str name="carrot.resourcesDir">clustering/carrot2</str>
-    </lst>
-  </searchComponent>
-  
-  <requestHandler class="solr.SearchHandler" enable="${solr.clustering.enabled:false}" name="/clustering" startup="lazy">
-    <lst name="defaults">
-      <bool name="clustering">true</bool>
-      <bool name="clustering.results">true</bool>
-      <str name="carrot.title">name</str>
-      <str name="carrot.url">id</str>
-      <str name="carrot.snippet">features</str>
-      <bool name="carrot.produceSummary">true</bool>
-      <bool name="carrot.outputSubClusters">false</bool>
-      <str name="q.alt">*:*</str>
-      <str name="rows">1000</str>
-      <str name="fl">*,score</str>
-    </lst>
-    <arr name="last-components">
-      <str>clustering</str>
-    </arr>
-  </requestHandler>
-  
+  <!-- Clustering rimosso: API Carrot2 completamente cambiata in Solr 9 -->
+
   <searchComponent class="solr.TermsComponent" name="terms"></searchComponent>
   
   <requestHandler class="solr.SearchHandler" name="/terms" startup="lazy">
@@ -437,12 +346,7 @@
     </processor>
 -->
 
-    <processor class="org.apache.solr.update.processor.LangDetectLanguageIdentifierUpdateProcessorFactory">
-      <lst name="defaults">
-        <str name="langid.fl">content</str>
-        <str name="langid.langField">Language</str>
-      </lst>
-    </processor>
+    <!-- LangDetect rimosso: contrib langid non esiste in Solr 9 -->
     
     <processor class="solr.LogUpdateProcessorFactory"></processor>
     <processor class="solr.DistributedUpdateProcessorFactory"></processor>
@@ -453,17 +357,4 @@
     <str name="content-type">text/plain; charset=UTF-8</str>
   </queryResponseWriter>
   
-    <queryResponseWriter class="solr.VelocityResponseWriter" name="velocity" startup="lazy">
-      <str name="template.base.dir">${velocity.template.base.dir:}</str>
-    </queryResponseWriter>
-  
-  <queryResponseWriter class="solr.XSLTResponseWriter" name="xslt">
-    <int name="xsltCacheLifetimeSeconds">5</int>
-  </queryResponseWriter>
-  
-  <queryParser class="org.apache.solr.ltr.search.LTRQParserPlugin" enable="${solr.ltr.enabled:false}" name="ltr"></queryParser>
-  
-    <transformer class="org.apache.solr.ltr.response.transform.LTRFeatureLoggerTransformerFactory" enable="${solr.ltr.enabled:false}" name="features">
-      <str name="fvCacheName">QUERY_DOC_FV</str>
-    </transformer>
 </config>
