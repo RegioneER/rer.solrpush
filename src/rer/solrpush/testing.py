@@ -21,7 +21,6 @@ import six
 import subprocess
 import sys
 
-
 BIN_DIR = os.path.dirname(os.path.realpath(sys.argv[0]))
 
 

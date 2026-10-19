@@ -34,7 +34,6 @@ import logging
 import os
 import pkg_resources
 
-
 JS_TEMPLATE = "{portal_url}/++plone++rer.solrpush/dist/{env_mode}/{name}.js?v={version}"
 CSS_TEMPLATE = (
     "{portal_url}/++plone++rer.solrpush/dist/{env_mode}/{name}.css?v={version}"

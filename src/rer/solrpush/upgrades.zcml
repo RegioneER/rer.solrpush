@@ -108,7 +108,7 @@
       destination="3200"
       handler=".upgrades.to_3200"
       />
-    <genericsetup:upgradeStep
+  <genericsetup:upgradeStep
       title="Update controlpanel translation"
       description=""
       profile="rer.solrpush:default"
@@ -116,7 +116,7 @@
       destination="3300"
       handler=".upgrades.to_3300"
       />
-    <genericsetup:upgradeStep
+  <genericsetup:upgradeStep
       title="Update controlpanel label"
       description=""
       profile="rer.solrpush:default"

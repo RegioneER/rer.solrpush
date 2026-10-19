@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 """Setup tests for this package."""
+
 from plone import api
 from plone.api.portal import get_registry_record
 from plone.api.portal import set_registry_record
@@ -15,7 +16,6 @@ from zope.lifecycleevent import ObjectModifiedEvent
 
 import requests
 import unittest
-
 
 try:
     from Products.CMFPlone.utils import get_installer

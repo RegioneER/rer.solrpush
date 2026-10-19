@@ -3,7 +3,6 @@ from plone import api
 from rer.solrpush.interfaces.adapter import IExtractFileFromTika
 from zope.interface import implementer
 
-
 try:
     from collective.limitfilesizepanel.interfaces import ILimitFileSizePanel
 
@@ -12,7 +11,6 @@ except ImportError:
     HAS_LFSP = False
 
 import logging
-
 
 logger = logging.getLogger(__name__)
 
