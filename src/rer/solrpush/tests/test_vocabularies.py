@@ -4,8 +4,8 @@
 from plone.app.testing import setRoles
 from plone.app.testing import TEST_USER_ID
 from rer.solrpush.testing import RER_SOLRPUSH_API_FUNCTIONAL_TESTING
-from rer.solrpush.utils import push_to_solr
 from rer.solrpush.utils import reset_solr
+from rer.solrpush.utils.solr_common import get_solr_connection
 from rer.solrpush.utils.solr_common import init_solr_push
 from transaction import commit
 from zope.component import getUtility
@@ -33,39 +33,38 @@ class TestVocabularies(unittest.TestCase):
         init_solr_push()
         commit()
 
-        push_to_solr(
-            {
-                "title": "Document from site foo",
-                "portal_type": "Document",
-                "site_name": "foo",
-                "UID": "000",
-            }
-        )
-        push_to_solr(
-            {
-                "title": "Document from site foo with subject",
-                "portal_type": "Document",
-                "site_name": "foo",
-                "Subject": ["foo-subject"],
-                "UID": "111",
-            }
-        )
-        push_to_solr(
-            {
-                "title": "Document from site bar",
-                "portal_type": "Document",
-                "site_name": "bar",
-                "UID": "222",
-            }
-        )
-        push_to_solr(
-            {
-                "title": "News Item from site bar",
-                "portal_type": "News Item",
-                "site_name": "bar",
-                "Subject": ["bar-subject"],
-                "UID": "333",
-            }
+        # these documents don't exist in Plone (they come from other sites), so
+        # we add them directly to SOLR: push_to_solr only indexes real contents
+        get_solr_connection().add(
+            [
+                {
+                    "title": "Document from site foo",
+                    "portal_type": "Document",
+                    "site_name": "foo",
+                    "UID": "000",
+                },
+                {
+                    "title": "Document from site foo with subject",
+                    "portal_type": "Document",
+                    "site_name": "foo",
+                    "Subject": ["foo-subject"],
+                    "UID": "111",
+                },
+                {
+                    "title": "Document from site bar",
+                    "portal_type": "Document",
+                    "site_name": "bar",
+                    "UID": "222",
+                },
+                {
+                    "title": "News Item from site bar",
+                    "portal_type": "News Item",
+                    "site_name": "bar",
+                    "Subject": ["bar-subject"],
+                    "UID": "333",
+                },
+            ],
+            commit=True,
         )
 
     def tearDown(self):

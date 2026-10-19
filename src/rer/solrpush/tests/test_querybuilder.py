@@ -8,8 +8,8 @@ from plone.app.testing import TEST_USER_ID
 from plone.namedfile.file import NamedBlobImage
 from rer.solrpush.interfaces.settings import IRerSolrpushSettings
 from rer.solrpush.testing import RER_SOLRPUSH_API_FUNCTIONAL_TESTING
-from rer.solrpush.utils import push_to_solr
 from rer.solrpush.utils import reset_solr
+from rer.solrpush.utils.solr_common import get_solr_connection
 from rer.solrpush.utils.solr_common import init_solr_push
 from transaction import commit
 
@@ -139,9 +139,11 @@ class TestCollections(unittest.TestCase):
         # events are not indexed on solr
         self.assertEqual(results.sequence_length, 20)
 
-    def test_querybuilderresults_search_on_current_site_by_default(self):
-        for i in range(10):
-            push_to_solr(
+    def add_docs_from_another_site(self):
+        # these documents don't exist in Plone, so we add them directly to
+        # SOLR: push_to_solr only indexes real contents
+        get_solr_connection().add(
+            [
                 {
                     "title": "Document {} from another site".format(i),
                     "UID": "foo{}".format(i),
@@ -150,7 +152,13 @@ class TestCollections(unittest.TestCase):
                     "site_name": "Another site",
                     "url": "http://www.plone.com/doc-{}".format(i),
                 }
-            )
+                for i in range(10)
+            ],
+            commit=True,
+        )
+
+    def test_querybuilderresults_search_on_current_site_by_default(self):
+        self.add_docs_from_another_site()
 
         query = [
             {
@@ -169,17 +177,7 @@ class TestCollections(unittest.TestCase):
         self.assertEqual(results.sequence_length, 20)
 
     def test_querybuilderresults_search_on_multiple_sites_if_set(self):
-        for i in range(10):
-            push_to_solr(
-                {
-                    "title": "Document {} from another site".format(i),
-                    "UID": "foo{}".format(i),
-                    "id": "doc-another-site-{}".format(i),
-                    "portal_type": "Document",
-                    "site_name": "Another site",
-                    "url": "http://www.plone.com/doc-{}".format(i),
-                }
-            )
+        self.add_docs_from_another_site()
 
         query = [
             {
