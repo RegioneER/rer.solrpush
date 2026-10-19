@@ -6,7 +6,6 @@ from rer.solrpush.utils.solr_indexer import push_to_solr
 
 import logging
 
-
 logger = logging.getLogger(__name__)
 
 default_profile = "profile-rer.solrpush:default"
