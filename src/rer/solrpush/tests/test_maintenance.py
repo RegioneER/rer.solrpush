@@ -14,6 +14,7 @@ from rer.solrpush.utils import init_solr_push
 from rer.solrpush.utils import reset_solr
 from rer.solrpush.utils import search
 from transaction import commit
+from zope.annotation.interfaces import IAnnotations
 
 import unittest
 
@@ -78,6 +79,10 @@ class TestMaintenance(unittest.TestCase):
             name="do-sync", context=self.portal, request=self.request
         )
 
+    @property
+    def maintenance_status(self):
+        return dict(IAnnotations(self.portal).get("solr_reindex", {}))
+
     def test_maintenance_do_reindex_is_protected(self):
         reindex_view = api.content.get_view(
             name="do-reindex", context=self.portal, request=self.request
@@ -97,11 +102,12 @@ class TestMaintenance(unittest.TestCase):
         self.assertEqual(solr_results.hits, 0)
         set_registry_record("force_commit", False, interface=IRerSolrpushSettings)
         self.reindex_view()
-        status = self.reindex_view.status
+        status = self.maintenance_status
         self.assertEqual(status["indexed"], 1)
         self.assertEqual(status["failed"], 0)
         self.assertEqual(status["skipped"], 0)
-        self.assertEqual(status["unindexed"], 0)
+        # the unpublished document is not indexable, so it is removed from solr
+        self.assertEqual(status["unindexed"], 1)
         self.assertEqual(status["commit_error"], "")
         self.assertEqual(status["errors"], [])
         solr_results = search(query={"*": "*", "b_size": 100000}, fl="UID")
@@ -169,7 +175,7 @@ class TestMaintenance(unittest.TestCase):
         )
         set_registry_record("force_commit", False, interface=IRerSolrpushSettings)
         self.sync_view()
-        status = self.reindex_view.status
+        status = self.maintenance_status
         self.assertEqual(status["failed"], 0)
         self.assertEqual(status["errors"], [])
         self.assertEqual(status["commit_error"], "")
