@@ -17,14 +17,19 @@ jobs:
         plone: ["60"]
         tz: ["UTC", "Europe/Rome"]
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Cache eggs
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: eggs
           key: ${{ runner.OS }}-build-python${{ matrix.python }}-${{ matrix.plone }}
+      - name: Cache downloads (solr tarball)
+        uses: actions/cache@v4
+        with:
+          path: downloads
+          key: ${{ runner.OS }}-downloads-${{ hashFiles('base.cfg') }}
       - name: Set up Python ${{ matrix.python }}
-        uses: actions/setup-python@v3
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python }}
       - name: Install dependencies
@@ -33,7 +38,8 @@ jobs:
           cp test_plone${{ matrix.plone }}.cfg buildout.cfg
       - name: Install buildout
         run: |
-          buildout -N code-analysis:return-status-codes=True
+          mkdir -p downloads
+          buildout -N code-analysis:return-status-codes=True buildout:download-cache=downloads
       - name: Code analysis
         run: |
           bin/code-analysis
