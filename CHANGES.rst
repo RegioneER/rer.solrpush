@@ -10,6 +10,10 @@ Changelog
 - Remove unused dependency on collective.z3cform.jsonwidget
   (it is not uninstalled from existing sites).
   [cekk]
+- Push indexing queue to SOLR in an after-commit hook: during the indexing
+  queue tpc_finish new objects could not be loadable yet (POSKeyError),
+  depending on the order of transaction resource managers.
+  [cekk]
 
 
 1.6.5 (2025-07-15)

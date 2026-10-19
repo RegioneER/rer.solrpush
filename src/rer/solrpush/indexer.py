@@ -21,6 +21,7 @@ from zope.interface import implementer
 
 import json
 import logging
+import transaction
 
 logger = logging.getLogger(__name__)
 
@@ -104,28 +105,39 @@ class SolrIndexProcessor(object):
 
     def commit(self, wait=None):
         if self.active and self.queue:
-            # TODO: è possibile con sol anche mandare un set di comandi (add+delete) in un
-            #  unica volta, anzichè uno alla volta, valutare le due opzioni
-            # Sort so unindex operations come first
-            # for iop, obj in sorted(res.values(), key=itemgetter(0)):
-            for uid, iop, data, args in self.queue:
-                try:
-                    if iop in (INDEX, REINDEX):
-                        push_to_solr(data)
-                    elif iop == UNINDEX:
-                        remove_from_solr(uid)
-                except SolrError:
-                    logger.exception("error indexing %s %s", iop, uid)
-                    message = _(
-                        "content_indexed_error",
-                        default="There was a problem indexing or unindexing "
-                        "this content. Please take note of this address and "
-                        "contact site administrator.",
-                    )
-                    api.portal.show_message(
-                        message=message, request=getRequest(), type="warning"
-                    )
+            # This is called in the indexing queue tpc_finish, that can run
+            # before the ZODB one (it depends on resource managers sortKey):
+            # new objects could not be loadable yet, so we push to SOLR after
+            # the transaction has been committed.
+            transaction.get().addAfterCommitHook(
+                self.push_queue_to_solr, args=(self.queue,)
+            )
             self.queue = []
+
+    def push_queue_to_solr(self, status, queue):
+        if not status:
+            return
+        # TODO: è possibile con sol anche mandare un set di comandi (add+delete) in un
+        #  unica volta, anzichè uno alla volta, valutare le due opzioni
+        # Sort so unindex operations come first
+        # for iop, obj in sorted(res.values(), key=itemgetter(0)):
+        for uid, iop, data, args in queue:
+            try:
+                if iop in (INDEX, REINDEX):
+                    push_to_solr(data)
+                elif iop == UNINDEX:
+                    remove_from_solr(uid)
+            except SolrError:
+                logger.exception("error indexing %s %s", iop, uid)
+                message = _(
+                    "content_indexed_error",
+                    default="There was a problem indexing or unindexing "
+                    "this content. Please take note of this address and "
+                    "contact site administrator.",
+                )
+                api.portal.show_message(
+                    message=message, request=getRequest(), type="warning"
+                )
 
     def abort(self):
         self.queue = []
