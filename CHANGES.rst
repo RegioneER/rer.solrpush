@@ -7,6 +7,9 @@ Changelog
 
 - Better handle commits in maintenance view.
   [cekk]
+- Remove unused dependency on collective.z3cform.jsonwidget
+  (it is not uninstalled from existing sites).
+  [cekk]
 
 
 1.6.5 (2025-07-15)
