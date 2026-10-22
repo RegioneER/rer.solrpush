@@ -5,7 +5,12 @@ Changelog
 1.6.6 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Remove unused dependency on collective.z3cform.jsonwidget
+  (it is not uninstalled from existing sites).
+  [cekk]
+- Remove unused towncrier configuration from pyproject.toml: changelog is
+  still managed in CHANGES.rst.
+  [cekk]
 
 
 1.6.5 (2025-07-15)

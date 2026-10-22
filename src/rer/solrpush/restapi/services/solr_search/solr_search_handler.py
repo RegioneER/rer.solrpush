@@ -9,7 +9,6 @@ from rer.solrpush.parser import SolrResponse
 from rer.solrpush.utils import search as solr_search
 from zope.component import getMultiAdapter
 
-
 FIELD_ACCESSORS = {
     "@id": "getURL",
     "@type": "PortalType",
