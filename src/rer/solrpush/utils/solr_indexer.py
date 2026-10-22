@@ -24,6 +24,7 @@ import logging
 import pysolr
 import six
 
+
 logger = logging.getLogger(__name__)
 
 ADDITIONAL_FIELDS = [""]

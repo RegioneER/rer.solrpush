@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 """Setup tests for this package."""
-
 from plone import api
 from plone.api.portal import set_registry_record
 from plone.app.testing import setRoles

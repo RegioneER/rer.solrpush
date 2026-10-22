@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 """Setup tests for this package."""
-
 from AccessControl import Unauthorized
 from plone import api
 from plone.api.portal import get_registry_record
@@ -16,6 +15,7 @@ from rer.solrpush.utils import search
 from transaction import commit
 
 import unittest
+
 
 try:
     from Products.CMFPlone.utils import get_installer
