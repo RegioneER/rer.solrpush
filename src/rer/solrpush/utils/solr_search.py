@@ -20,7 +20,6 @@ import re
 import requests
 import six
 
-
 logger = logging.getLogger(__name__)
 
 TRIM = re.compile(r"\s+")

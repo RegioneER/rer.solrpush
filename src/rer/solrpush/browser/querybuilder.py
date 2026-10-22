@@ -15,7 +15,6 @@ from zope.component import getUtilitiesFor
 
 import logging
 
-
 SORT_ON_MAPPING = {}
 
 logger = logging.getLogger(__name__)

@@ -4,7 +4,6 @@ import os
 import pkg_resources
 import subprocess
 
-
 domain = "rer.solrpush"
 os.chdir(pkg_resources.resource_filename(domain, ""))
 os.chdir("../../../")
