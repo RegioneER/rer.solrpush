@@ -2,7 +2,7 @@ Changelog
 =========
 
 
-1.6.6 (unreleased)
+1.7.0 (2026-10-22)
 ------------------
 
 - Remove unused dependency on collective.z3cform.jsonwidget
