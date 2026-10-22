@@ -2,6 +2,7 @@
 <metadata>
   <version>3400</version>
   <dependencies>
+    <dependency>profile-collective.z3cform.jsonwidget:default</dependency>
     <dependency>profile-plone.restapi:default</dependency>
   </dependencies>
 </metadata>

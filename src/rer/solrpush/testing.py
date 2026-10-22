@@ -13,12 +13,14 @@ from six.moves import range
 from time import sleep
 from ZPublisher.HTTPRequest import HTTPRequest
 
+import collective.z3cform.jsonwidget
 import os
 import plone.restapi
 import rer.solrpush
 import six
 import subprocess
 import sys
+
 
 BIN_DIR = os.path.dirname(os.path.realpath(sys.argv[0]))
 
@@ -121,6 +123,7 @@ class RerSolrpushRestApiLayer(PloneRestApiDXLayer):
 
         self.loadZCML(package=rer.solrpush)
         self.loadZCML(package=plone.restapi)
+        self.loadZCML(package=collective.z3cform.jsonwidget)
 
     def tearDownZope(self, app):
         HTTPRequest.retry_max_count = self._orig_retry_max_count
