@@ -1,12 +1,10 @@
 # -*- coding: utf-8 -*-
 from plone import api
-from plone.app.upgrade.utils import installOrReinstallProduct
 from rer.solrpush.utils import remove_from_solr
 from rer.solrpush.utils.solr_common import init_solr_push
 from rer.solrpush.utils.solr_indexer import push_to_solr
 
 import logging
-
 
 logger = logging.getLogger(__name__)
 
@@ -53,7 +51,6 @@ def to_1300(context):
 
 
 def to_1400(context):
-    installOrReinstallProduct(api.portal.get(), "collective.z3cform.jsonwidget")
     update_registry(context)
     update_controlpanel(context)
 

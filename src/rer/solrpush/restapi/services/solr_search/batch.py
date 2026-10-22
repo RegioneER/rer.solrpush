@@ -3,7 +3,6 @@ from plone.restapi.deserializer import json_body
 from six.moves.urllib.parse import parse_qsl
 from six.moves.urllib.parse import urlencode
 
-
 DEFAULT_BATCH_SIZE = 25
 
 
