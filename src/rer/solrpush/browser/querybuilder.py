@@ -153,11 +153,16 @@ class QueryBuilder(BaseView):
                 )
                 root_path = portal_state.navigation_root_path()
                 path = self.extract_value(v)
-                if len(path) == 1 and path[0].rstrip("/") == root_path:
+                if isinstance(path, str):
+                    path = [path]
+                # path_parents values in Solr don't have a trailing slash,
+                # but plone.app.querystring could add it ("/Plone/")
+                path = [x.rstrip("/") for x in path if x]
+                if len(path) == 1 and path[0] == root_path:
                     # no sites selected (or an empty value): search only on
                     # the current one
                     filtered_sites.append(get_site_title())
-                else:
+                elif path:
                     fixed_query["path_parents"] = path
             elif k == "solr_sites":
                 if has_solr_sites:

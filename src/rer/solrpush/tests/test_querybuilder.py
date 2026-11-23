@@ -262,6 +262,34 @@ class TestCollections(unittest.TestCase):
         results = self.get_results(query=query)
         self.assertEqual(results.sequence_length, 20)
 
+    def test_querybuilderresults_path_with_trailing_slash(self):
+        folder = api.content.create(container=self.portal, type="Folder", id="folder")
+        for i in range(3):
+            obj = api.content.create(
+                container=folder, type="Document", id="doc-in-folder-%s" % i
+            )
+            api.content.transition(obj=obj, transition="publish")
+        commit()
+        query = [
+            {
+                "i": "portal_type",
+                "o": "plone.app.querystring.operation.selection.any",
+                "v": ["Document"],
+            },
+            {
+                "i": "searchWithSolr",
+                "o": "plone.app.querystring.operation.boolean.isTrue",
+                "v": "",
+            },
+            {
+                "i": "path",
+                "o": "plone.app.querystring.operation.string.absolutePath",
+                "v": "/folder/",
+            },
+        ]
+        results = self.get_results(query=query)
+        self.assertEqual(results.sequence_length, 3)
+
     def test_querybuilderresults_ignore_path_if_solr_sites_set(self):
         api.content.create(container=self.portal, type="Folder", id="folder")
         for i in range(10):

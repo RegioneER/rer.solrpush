@@ -12,6 +12,9 @@ Changelog
 - Search only on the current site when the ``solr_sites`` criterion has an
   empty value: before, the search was made on all sites.
   [cekk]
+- Remove trailing slashes from paths used as ``path_parents`` filter: values
+  indexed in Solr don't have them, so searches returned no results.
+  [cekk]
 - Fix POSKeyError when indexing contents: send to Solr the data generated
   before the commit, instead of reading again the content in ``tpc_finish``
   (when it is not yet stored in the ZODB).
