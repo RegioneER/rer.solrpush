@@ -9,27 +9,20 @@ from plone.testing import Layer
 from plone.testing import z2
 from rer.solrpush.interfaces.settings import IRerSolrpushSettings
 from rer.solrpush.utils import init_solr_push
-from six.moves import range
 from time import sleep
+from urllib.error import URLError
+from urllib.request import Request
+from urllib.request import urlopen
 from ZPublisher.HTTPRequest import HTTPRequest
 
-import os
 import plone.restapi
 import rer.solrpush
-import six
-import subprocess
-import sys
-
-BIN_DIR = os.path.dirname(os.path.realpath(sys.argv[0]))
 
 
 class SolrLayer(Layer):
-    """Solr test layer that fires up and shuts down a Solr instance. This
-    layer can be used to unit test a Solr configuration without having to
-    fire up Plone.
+    """Solr test layer: it expects a Solr instance already running
+    (see docker-compose.yml) and waits until it answers to ping.
     """
-
-    proc = None
 
     def __init__(
         self,
@@ -47,38 +40,31 @@ class SolrLayer(Layer):
         self.solr_url = "http://{0}:{1}{2}".format(solr_host, solr_port, solr_base)
 
     def setUp(self):
-        """Start Solr and poll until it is up and running."""
-        if os.environ.get("BUILDOUT_SOLR_ENVIRONMENT", "").lower() in ("true", "1"):
-            self.proc = subprocess.call(
-                "./solr-start", shell=True, close_fds=True, cwd=BIN_DIR
-            )
-            # Poll Solr until it is up and running
-            solr_ping_url = "{0}/admin/ping?wt=xml".format(self.solr_url)
-            for i in range(1, 10):
-                try:
-                    result = six.moves.urllib.request.urlopen(solr_ping_url)
-                    if result.code == 200:
-                        if b'<str name="status">OK</str>' in result.read():
-                            break
-                except six.moves.urllib.error.URLError:
-                    sleep(3)
-                    sys.stdout.write(".")
-                if i == 9:
-                    subprocess.call(
-                        "./solr-stop", shell=True, close_fds=True, cwd=BIN_DIR
-                    )
-                    sys.stdout.write("Solr Instance could not be started !!!")
+        """Poll Solr until it is up and running."""
+        solr_ping_url = "{0}/admin/ping?wt=xml".format(self.solr_url)
+        for i in range(10):
+            try:
+                result = urlopen(solr_ping_url)
+                if result.code == 200 and b'<str name="status">OK</str>' in (
+                    result.read()
+                ):
+                    return
+            except URLError:
+                pass
+            sleep(3)
+        raise RuntimeError(
+            "Solr is not reachable at {0}: start it with "
+            "`docker compose up -d`.".format(self.solr_url)
+        )
 
     def tearDown(self):
-        """Stop Solr."""
-        solr_clean_url = "{0}/update?stream.body=<delete><query>*:*</query></delete>&commit=true".format(  # noqa
-            self.solr_url
+        """Clean Solr test core."""
+        request = Request(
+            "{0}/update?commit=true".format(self.solr_url),
+            data=b'{"delete": {"query": "*:*"}}',
+            headers={"Content-Type": "application/json"},
         )
-        six.moves.urllib.request.urlopen(solr_clean_url)
-        if os.environ.get("BUILDOUT_SOLR_ENVIRONMENT", "").lower() in ("true", "1"):
-            subprocess.check_call(
-                "./solr-stop", shell=True, close_fds=True, cwd=BIN_DIR
-            )
+        urlopen(request)
 
 
 SOLR_FIXTURE = SolrLayer()

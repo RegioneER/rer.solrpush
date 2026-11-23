@@ -136,11 +136,15 @@ Results from SOLR are wrapped into some brain-like objects to be fully compatibl
 Development buildout
 ====================
 
-In the buildout there is a solr configuration (in `conf` folder) and a recipe that builds a solr instance locally.
+Solr is not managed by buildout: there is a ``docker-compose.yml`` that starts
+a Solr 9 instance with two cores (``solrpush_dev`` and ``solrpush_test``),
+configured in the ``config`` folder.
 
-To use it, simply run::
+To start it, run::
 
-    > ./bin/solr-foreground
+    > docker compose up -d
+
+Tests expect Solr to be running at ``http://localhost:8983/solr/solrpush_test``.
 
 
 Installation

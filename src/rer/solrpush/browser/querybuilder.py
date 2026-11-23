@@ -132,10 +132,20 @@ class QueryBuilder(BaseView):
     def clean_query_for_solr(self, query):
         fixed_query = {}
         filtered_sites = []
+        has_solr_sites = self.extract_value(query.get("solr_sites")) not in (
+            None,
+            "",
+            [],
+            "null",
+        )
         for k, v in query.items():
             if k == "sort_on":
                 fixed_query[k] = SORT_ON_MAPPING.get(v, v)
             elif k == "path":
+                if has_solr_sites:
+                    # searching on a list of sites: a path of the current
+                    # site would exclude contents from the other ones
+                    continue
                 portal_state = api.content.get_view(
                     context=self.context,
                     request=self.request,

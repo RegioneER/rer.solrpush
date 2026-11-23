@@ -5,8 +5,6 @@ on:
     paths-ignore:
       - '**.md'
       - '**.rst'
-env:
-  BUILDOUT_SOLR_ENVIRONMENT: true
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -37,6 +35,11 @@ jobs:
       - name: Code analysis
         run: |
           bin/code-analysis
+      - name: Start Solr
+        run: |
+          # Solr container runs as uid 8983 and needs to write cores data
+          chmod -R a+rwX config
+          docker compose up -d
       - name: Run tests
         run: |
           bin/test-coverage
