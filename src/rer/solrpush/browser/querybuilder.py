@@ -154,14 +154,14 @@ class QueryBuilder(BaseView):
                 root_path = portal_state.navigation_root_path()
                 path = self.extract_value(v)
                 if len(path) == 1 and path[0].rstrip("/") == root_path:
-                    if "solr_sites" not in query.keys():
-                        filtered_sites.append(get_site_title())
+                    # no sites selected (or an empty value): search only on
+                    # the current one
+                    filtered_sites.append(get_site_title())
                 else:
                     fixed_query["path_parents"] = path
             elif k == "solr_sites":
-                sites = self.extract_value(v)
-                if sites != "null":
-                    filtered_sites = sites
+                if has_solr_sites:
+                    filtered_sites = self.extract_value(v)
             elif k == "solr_subjects":
                 fixed_query["Subject"] = self.extract_value(v)
                 continue

@@ -9,6 +9,9 @@ Changelog
   ``solr_sites`` are selected: the path of the current site would exclude
   results from the other sites.
   [cekk]
+- Search only on the current site when the ``solr_sites`` criterion has an
+  empty value: before, the search was made on all sites.
+  [cekk]
 - Fix POSKeyError when indexing contents: send to Solr the data generated
   before the commit, instead of reading again the content in ``tpc_finish``
   (when it is not yet stored in the ZODB).
