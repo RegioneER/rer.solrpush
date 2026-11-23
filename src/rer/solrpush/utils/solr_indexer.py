@@ -251,26 +251,24 @@ def add_with_attachment(solr, attachment, fields):
 
 def push_to_solr(item_or_obj):
     """
-    Perform push to solr
+    Perform push to solr.
+
+    item_or_obj can be a content or a dict already generated with
+    create_index_dict. A dict is sent as is: SolrIndexProcessor generates it
+    before the commit and sends it in tpc_finish, when the content can't be
+    read again from the ZODB (it raises POSKeyError if it's not in cache).
     """
     solr = get_solr_connection()
     if not solr:
         logger.error("Unable to push to solr. Configuration is incomplete.")
         return
-    context = item_or_obj
     if isinstance(item_or_obj, dict):
-        obj = api.content.get(UID=item_or_obj.get("UID", ""))
-        if obj:
-            context = obj
-    if not can_index(context):
-        return False
-    index_dict = create_index_dict(item=context, default=item_or_obj)
-    attachment = None
-    if index_dict.get("attachment", None):
-        attachment = index_dict.pop("attachment", None)
+        index_dict = dict(item_or_obj)
     else:
-        if isinstance(item_or_obj, dict) and item_or_obj.get("attachment", None):
-            attachment = item_or_obj["attachment"]
+        if not can_index(item_or_obj):
+            return False
+        index_dict = create_index_dict(item=item_or_obj)
+    attachment = index_dict.pop("attachment", None)
     if attachment:
         add_with_attachment(solr=solr, attachment=attachment, fields=index_dict)
     else:

@@ -5,7 +5,25 @@ Changelog
 1.7.1 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Do not filter by path (``path_parents``) in querystring searches when some
+  ``solr_sites`` are selected: the path of the current site would exclude
+  results from the other sites.
+  [cekk]
+- Search only on the current site when the ``solr_sites`` criterion has an
+  empty value: before, the search was made on all sites.
+  [cekk]
+- Remove trailing slashes from paths used as ``path_parents`` filter: values
+  indexed in Solr don't have them, so searches returned no results.
+  [cekk]
+- Fix POSKeyError when indexing contents: send to Solr the data generated
+  before the commit, instead of reading again the content in ``tpc_finish``
+  (when it is not yet stored in the ZODB).
+  [cekk]
+- Remove Solr 7 from the development buildout: Solr 9 is started with
+  ``docker compose up -d`` (also in CI), and the test layer expects it to be
+  already running. Pin z3c.jbot 2.2 in test buildout (3.x uses native
+  namespaces and breaks the ``z3c`` one).
+  [cekk]
 
 
 1.7.0 (2026-10-22)

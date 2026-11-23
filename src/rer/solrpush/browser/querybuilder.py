@@ -132,10 +132,20 @@ class QueryBuilder(BaseView):
     def clean_query_for_solr(self, query):
         fixed_query = {}
         filtered_sites = []
+        has_solr_sites = self.extract_value(query.get("solr_sites")) not in (
+            None,
+            "",
+            [],
+            "null",
+        )
         for k, v in query.items():
             if k == "sort_on":
                 fixed_query[k] = SORT_ON_MAPPING.get(v, v)
             elif k == "path":
+                if has_solr_sites:
+                    # searching on a list of sites: a path of the current
+                    # site would exclude contents from the other ones
+                    continue
                 portal_state = api.content.get_view(
                     context=self.context,
                     request=self.request,
@@ -143,15 +153,20 @@ class QueryBuilder(BaseView):
                 )
                 root_path = portal_state.navigation_root_path()
                 path = self.extract_value(v)
-                if len(path) == 1 and path[0].rstrip("/") == root_path:
-                    if "solr_sites" not in query.keys():
-                        filtered_sites.append(get_site_title())
-                else:
+                if isinstance(path, str):
+                    path = [path]
+                # path_parents values in Solr don't have a trailing slash,
+                # but plone.app.querystring could add it ("/Plone/")
+                path = [x.rstrip("/") for x in path if x]
+                if len(path) == 1 and path[0] == root_path:
+                    # no sites selected (or an empty value): search only on
+                    # the current one
+                    filtered_sites.append(get_site_title())
+                elif path:
                     fixed_query["path_parents"] = path
             elif k == "solr_sites":
-                sites = self.extract_value(v)
-                if sites != "null":
-                    filtered_sites = sites
+                if has_solr_sites:
+                    filtered_sites = self.extract_value(v)
             elif k == "solr_subjects":
                 fixed_query["Subject"] = self.extract_value(v)
                 continue

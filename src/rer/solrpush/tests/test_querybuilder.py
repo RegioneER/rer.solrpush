@@ -202,6 +202,136 @@ class TestCollections(unittest.TestCase):
 
         self.assertEqual(results.sequence_length, 30)
 
+    def push_docs_from_another_site(self):
+        for i in range(10):
+            push_to_solr(
+                {
+                    "title": "Document {} from another site".format(i),
+                    "UID": "foo{}".format(i),
+                    "id": "doc-another-site-{}".format(i),
+                    "portal_type": "Document",
+                    "site_name": "Another site",
+                    "url": "http://www.plone.com/doc-{}".format(i),
+                }
+            )
+
+    def test_querybuilderresults_search_on_current_site_if_solr_sites_empty(self):
+        self.push_docs_from_another_site()
+        base_query = [
+            {
+                "i": "portal_type",
+                "o": "plone.app.querystring.operation.selection.any",
+                "v": ["Event", "Document"],
+            },
+            {
+                "i": "searchWithSolr",
+                "o": "plone.app.querystring.operation.boolean.isTrue",
+                "v": "",
+            },
+        ]
+        for value in ["", []]:
+            query = base_query + [
+                {
+                    "i": "solr_sites",
+                    "o": "plone.app.querystring.operation.selection.any",
+                    "v": value,
+                }
+            ]
+            results = self.get_results(query=query)
+            self.assertEqual(results.sequence_length, 20)
+
+    def test_querybuilderresults_search_on_current_site_with_root_path(self):
+        self.push_docs_from_another_site()
+        query = [
+            {
+                "i": "portal_type",
+                "o": "plone.app.querystring.operation.selection.any",
+                "v": ["Event", "Document"],
+            },
+            {
+                "i": "searchWithSolr",
+                "o": "plone.app.querystring.operation.boolean.isTrue",
+                "v": "",
+            },
+            {
+                "i": "path",
+                "o": "plone.app.querystring.operation.string.absolutePath",
+                "v": "/",
+            },
+        ]
+        results = self.get_results(query=query)
+        self.assertEqual(results.sequence_length, 20)
+
+    def test_querybuilderresults_path_with_trailing_slash(self):
+        folder = api.content.create(container=self.portal, type="Folder", id="folder")
+        for i in range(3):
+            obj = api.content.create(
+                container=folder, type="Document", id="doc-in-folder-%s" % i
+            )
+            api.content.transition(obj=obj, transition="publish")
+        commit()
+        query = [
+            {
+                "i": "portal_type",
+                "o": "plone.app.querystring.operation.selection.any",
+                "v": ["Document"],
+            },
+            {
+                "i": "searchWithSolr",
+                "o": "plone.app.querystring.operation.boolean.isTrue",
+                "v": "",
+            },
+            {
+                "i": "path",
+                "o": "plone.app.querystring.operation.string.absolutePath",
+                "v": "/folder/",
+            },
+        ]
+        results = self.get_results(query=query)
+        self.assertEqual(results.sequence_length, 3)
+
+    def test_querybuilderresults_ignore_path_if_solr_sites_set(self):
+        api.content.create(container=self.portal, type="Folder", id="folder")
+        for i in range(10):
+            push_to_solr(
+                {
+                    "title": "Document {} from another site".format(i),
+                    "UID": "foo{}".format(i),
+                    "id": "doc-another-site-{}".format(i),
+                    "portal_type": "Document",
+                    "site_name": "Another site",
+                    "path": "/another/doc-{}".format(i),
+                    "path_parents": ["/another"],
+                    "url": "http://www.plone.com/doc-{}".format(i),
+                }
+            )
+
+        query = [
+            {
+                "i": "portal_type",
+                "o": "plone.app.querystring.operation.selection.any",
+                "v": ["Event", "Document"],
+            },
+            {
+                "i": "searchWithSolr",
+                "o": "plone.app.querystring.operation.boolean.isTrue",
+                "v": "",
+            },
+            {
+                "i": "solr_sites",
+                "o": "plone.app.querystring.operation.selection.any",
+                "v": ["Another site"],
+            },
+            {
+                "i": "path",
+                "o": "plone.app.querystring.operation.string.absolutePath",
+                "v": "/folder",
+            },
+        ]
+        results = self.get_results(query=query)
+
+        self.assertEqual(results.sequence_length, 10)
+
     def test_querybuilderresults_return_image_tag(self):
         with open(
             os.path.join(os.path.dirname(__file__), "docs", "plone_logo.png"),
